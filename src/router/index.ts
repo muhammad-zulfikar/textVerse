@@ -2,6 +2,8 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/components/Home.vue';
 import About from '@/components/About.vue';
 
+const base = location.pathname.startsWith('/vue-notes/') ? '/vue-notes/' : '/';
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -16,7 +18,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(base),
   routes
 });
 
