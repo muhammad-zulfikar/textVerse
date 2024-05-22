@@ -10,5 +10,5 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
-  base:'https://muhammad-zulfikar.github.io/vue-notes/'
+  base:'/vue-notes/'
 })

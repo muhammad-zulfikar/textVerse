@@ -4,7 +4,7 @@ import About from '@/components/About.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/vue-notes',
+    path: '/',
     name: 'Home',
     component: Home
   },
@@ -16,7 +16,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHistory('/vue-notes/'),
+  history: createWebHistory(),
   routes
 });
 
