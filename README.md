@@ -1,5 +1,17 @@
 Responsive notes app inspired by Google keep built in Vue 3, TypeScript, Vite, Pinia and styled with Tailwind CSS.
 
+{
+  "project_title": "vue-notes",
+  "description": "A basic note-taking application developed using Vue, Vite, and TypeScript.",
+  "video-demo": "[Link](https://youtu.be/skb-OA50Utc)",
+  "name": "Zulfikar",
+  "github_username": "muhammad-zulfikar",
+  "edx_username": "m-zulfikar",
+  "city": "Jakarta",
+  "country": "Indonesia",
+  "recorded_date": "2024-05-22 22:50"
+}
+
 # Vue 3 + TypeScript + Vite
 
 This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
