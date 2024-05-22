@@ -4,7 +4,7 @@ import About from '@/components/About.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
+    path: '/vue-notes',
     name: 'Home',
     component: Home
   },
