@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import initialNotes from '@/assets/initialNotes.json';
 
 export interface Note {
+  id: number;
   title: string;
   content: string;
   color: string;

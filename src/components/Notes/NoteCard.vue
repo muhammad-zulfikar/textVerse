@@ -1,9 +1,14 @@
 <template>
     <li :style="{ backgroundColor: props.note.color }"
-        class="note-card break-inside-avoid h-min border-2 mb-8 hover:shadow-2xl rounded-lg p-2 flex flex-col overflow-x-auto relative">
+        class="note-card break-inside-avoid h-min border-2 border-black mb-8 hover:shadow-2xl rounded-lg p-2 flex flex-col overflow-x-auto relative">
         <div class="flex justify-between items-start">
-            <h1 class="font-bold text-xl font-mono mt-1">{{ props.note.title }}</h1>
-            <div class="relative">
+            <h1 class="font-bold text-xl font-mono mt-1 cursor-pointer" @click="handleOpenNote">{{ props.note.title }}
+            </h1>
+            <div class="relative flex items-center">
+                <button class="menu-icon flex-shrink-0 w-4 h-4 ml-2 cursor-pointer">
+                    <img src="@/assets/open-notes.svg" class="w-full h-full"
+                        @click="handleOpenNote" alt="Open" />
+                </button>
                 <button @click="toggleMenu" class="menu-icon flex-shrink-0 w-4 h-4 ml-2">
                     <img src="@/assets/three-dots-icon.svg" class="w-full h-full" alt="Menu" />
                 </button>
@@ -33,7 +38,8 @@ const props = defineProps({
     },
     index: Number,
     removeNote: Function,
-    editNote: Function
+    editNote: Function,
+    openNote: Function
 });
 
 const showMenu = ref(false);
@@ -62,6 +68,12 @@ const editNote = () => {
     if (props.editNote) {
         props.editNote(props.index);
         showMenu.value = false;
+    }
+};
+
+const handleOpenNote = () => {
+    if (props.openNote) {
+        props.openNote(props.index);
     }
 };
 </script>

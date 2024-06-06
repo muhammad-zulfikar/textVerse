@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center items-center mt-32 ml-4 mr-4">
-      <div :style="{ backgroundColor: randomColor, color: textColor }" class="text-white p-8 rounded-lg shadow-lg border-gray-200 border-4 max-w-md">
+      <div :style="{ backgroundColor: randomColor, color: textColor }" class="text-white p-8 rounded-lg shadow-lg border-black border-4 max-w-md">
         <p class="text-lg">This is a basic note-taking application developed using Vue, Vite, and TypeScript. This website was created as the final project for the <a href="https://cs50.harvard.edu/x/2024/" target="_blank" class="underline">CS50x</a> course. Please avoid typing sensitive information, as it is stored locally on your browser's cache. The <a class="text-lg underline" href="https://github.com/muhammad-zulfikar/vue-notes" target="_blank">source code</a> is available.</p>
         <p class="text-lg mt-4">TODO:</p>
         <ul class="list-disc pl-6">

@@ -1,5 +1,6 @@
 Responsive notes app inspired by Google keep built in Vue 3, TypeScript, Vite, Pinia and styled with Tailwind CSS.
 
+```
 {
   "project_title": "vue-notes",
   "description": "A basic note-taking application developed using Vue, Vite, and TypeScript.",
@@ -11,6 +12,7 @@ Responsive notes app inspired by Google keep built in Vue 3, TypeScript, Vite, P
   "country": "Indonesia",
   "recorded_date": "2024-05-22 22:50"
 }
+```
 
 # Vue 3 + TypeScript + Vite
 
