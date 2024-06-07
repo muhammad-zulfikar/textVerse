@@ -3,5 +3,5 @@
 @import 'tailwindcss/utilities';
 
 body {
-	@apply bg-yellow-200 dark:bg-yellow-800;
+	@apply bg-yellow-100 dark:bg-gray-900;
 }

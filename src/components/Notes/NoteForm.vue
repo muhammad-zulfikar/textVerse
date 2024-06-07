@@ -8,12 +8,14 @@
           <img src="@/assets/close.svg" class="w-full h-full" alt="Close" />
         </button>
       </div>
-      <h1 class="text-xl font-bold mb-4">
+      <h1 class="text-xl font-bold mb-4 relative">
         <input v-model="title" class="w-full p-1 bg-transparent border-0 border-b-2 border-black outline-none"
           placeholder="Title" autofocus />
+        <span class="flex justify-end font-normal text-sm text-gray-500 mt-1">{{ title.length }} / 50</span>
       </h1>
       <textarea v-model="content" class="w-full p-2 bg-transparent border-2 border-black rounded focus:outline-none"
         rows="5" placeholder="Content"></textarea>
+      <span class="flex justify-end text-sm text-gray-500">{{ content.length }} / 5000</span>
 
       <div class="flex align-center justify-center mt-4">
         <div v-for="(colorOption, index) in colorOptions" :key="index" class="mr-2 mb-2">
@@ -26,7 +28,7 @@
       </div>
 
       <div class="flex justify-end">
-        <button @click.prevent="saveNote" class="flex-shrink-0 w-6 h-6 cursor-pointer">
+        <button :disabled="!isValid" @click.prevent="saveNote" class="flex-shrink-0 w-6 h-6 cursor-pointer">
           <img src="@/assets/save.svg" class="w-full h-full" alt="Save" />
         </button>
       </div>
@@ -35,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref, defineEmits, computed } from 'vue';
 import { useNotesStore } from '@/stores/ProductStore';
 
 const notesStore = useNotesStore();
@@ -46,9 +48,14 @@ const content = ref('');
 const selectedColor = ref('#FFFFFF');
 const colorOptions = ['#FFFFFF', '#FFC0CB', '#FFD700', '#90EE90', '#ADD8E6', '#FFA07A', '#20B2AA', '#87CEFA'];
 
+const isValid = computed(() => {
+  return title.value.trim().length > 0 && title.value.length <= 50 && content.value.length <= 5000;
+});
+
 const saveNote = () => {
-  if (!selectedColor.value) {
-    selectedColor.value = '#FFFFFF';
+  if (!isValid.value) {
+    // Display an error message or alert for invalid input
+    return;
   }
 
   const newNote = {
