@@ -1,6 +1,6 @@
 <template>
     <li :style="{ backgroundColor: props.note.color }"
-        class="note-card break-inside-avoid h-min border-2 border-black mb-8 hover:shadow-2xl rounded-lg p-2 flex flex-col overflow-x-auto relative">
+        class="note-card break-inside-avoid h-min border-2 border-black dark:border-white mb-8 hover:shadow-2xl rounded-lg p-2 flex flex-col overflow-x-auto relative">
         <div class="flex justify-between items-start">
             <h1 class="font-bold text-sl font-mono mt-1 cursor-pointer" @click="handleOpenNote">{{ props.note.title }}
             </h1>
@@ -9,7 +9,7 @@
                     <img src="@/assets/three-dots-icon.svg" class="w-full h-full" alt="Menu" />
                 </button>
                 <div v-if="showMenu"
-                    class="menu bg-yellow-500 border-2 border-black rounded shadow-lg absolute top-0 right-0 w-24 pointer">
+                    class="menu bg-yellow-500 border-2 border-black dark:border-white rounded shadow-lg absolute top-0 right-0 w-24 pointer">
                     <ul class="flex">
                         <li @click="handleOpenNote" class="p-2 hover:bg-yellow-400 cursor-pointer">
                             <img src="@/assets/edit.svg" width="24" height="24" class="mr-2" alt="Edit" />

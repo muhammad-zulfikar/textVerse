@@ -17,7 +17,7 @@
       </div>
       <h1 class="text-xl font-bold mb-4">
         <input v-model="selectedNote.title"
-          class="w-full p-1 bg-transparent border-b-2 border-black focus:outline-none" />
+          class="w-full p-1 bg-transparent border-0 border-b-2 border-black focus:outline-none" />
       </h1>
       <textarea v-model="selectedNote.content"
         class="w-full p-2 bg-white border-2 border-black rounded focus:outline-none" rows="5"

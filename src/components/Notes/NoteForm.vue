@@ -9,7 +9,7 @@
         </button>
       </div>
       <h1 class="text-xl font-bold mb-4">
-        <input v-model="title" class="w-full p-1 bg-transparent border-b-2 border-black focus:outline-none"
+        <input v-model="title" class="w-full p-1 bg-transparent border-0 border-b-2 border-black outline-none"
           placeholder="Title" autofocus />
       </h1>
       <textarea v-model="content" class="w-full p-2 bg-transparent border-2 border-black rounded focus:outline-none"

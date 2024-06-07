@@ -1,4 +1,5 @@
 <template>
+  <Navbar />
   <div class="flex justify-center items-center mt-32 md:mt-24 mb-24">
     <div class="flex flex-col items-center w-full max-w-md">
       <!-- Description Box -->
@@ -32,6 +33,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import Navbar from './Navbar/Navbar.vue';
 
 const colorOptions = ['#FFFFFF', '#FFC0CB', '#FFD700', '#90EE90', '#ADD8E6', '#FFA07A', '#20B2AA', '#87CEFA'];
 
