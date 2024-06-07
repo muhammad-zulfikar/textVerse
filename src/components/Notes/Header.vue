@@ -8,7 +8,7 @@
 
     <!-- Plus Button -->
     <button v-if="!editing" @click="startEditing"
-      class="bg-yellow-500 text-black p-2 pb-3 border-2 border-black rounded-lg shadow-md focus:outline-none">
+      class="bg-yellow-500 text-black p-2 border-2 border-black rounded-lg shadow-md hover:bg-yellow-400 outline-none">
       <span class="text-sm">Add New</span>
     </button>
 
@@ -27,7 +27,7 @@
         </div>
         <h1 class="text-xl font-bold mb-4">
           <input v-model="title" class="w-full p-1 bg-transparent border-b-2 border-black focus:outline-none"
-            placeholder="Title" autofocus/>
+            placeholder="Title" autofocus />
         </h1>
         <textarea v-model="content" class="w-full p-2 bg-transparent border-2 border-black rounded focus:outline-none"
           rows="5" placeholder="Content"></textarea>
@@ -42,9 +42,10 @@
           </div>
         </div>
 
-        <div class="flex justify-end mt-4">
-          <button @click.prevent="saveNote"
-            class="border-2 border-black p-2 rounded-lg hover:shadow-md bg-blue-500 text-white hover:bg-blue-600">Save</button>
+        <div class="flex justify-end">
+          <button class="flex-shrink-0 w-6 h-6 cursor-pointer">
+            <img src="@/assets/save.svg" class="w-full h-full" @click.prevent="saveNote" alt="Save" />
+          </button>
         </div>
       </div>
     </form>

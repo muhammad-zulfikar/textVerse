@@ -1,7 +1,7 @@
 <template>
   <Header @update:modelValue="updateSearchQuery" />
-  
-  <ul class="w-11/12 mx-auto mt-10 mb-20 gap-8 columns-1 md:columns-3 lg:columns-4 2xl:w-7/12">
+
+  <ul class="w-11/12 mx-auto mt-8 mb-18 gap-8 columns-1 md:columns-3 lg:columns-4 2xl:w-7/12">
     <template v-for="(note, index) in filteredNotes" :key="note.id">
       <NoteCard :note="note" :index="index" :removeNote="removeNote" :openNote="openNote" />
     </template>
@@ -10,9 +10,9 @@
   <div v-if="selectedNote" class="modal fixed inset-0 flex items-center justify-center z-50" @click.self="saveNote">
     <div :style="{ backgroundColor: selectedNote.color }"
       class="modal-content w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3 p-5 rounded-lg border-2 border-black relative">
-      <div class="flex justify-end mb-2">
-        <button class="flex-shrink-0 w-6 h-6 cursor-pointer">
-          <img src="@/assets/close.svg" class="w-full h-full" @click="closeNote" alt="Close" />
+      <div class="flex justify-end">
+        <button class="flex-shrink-0 w-6 h-6 cursor-pointer" @click="closeNote">
+          <img src="@/assets/close.svg" class="w-full h-full" alt="Close" />
         </button>
       </div>
       <h1 class="text-xl font-bold mb-4">
@@ -22,9 +22,22 @@
       <textarea v-model="selectedNote.content"
         class="w-full p-2 bg-white border-2 border-black rounded focus:outline-none" rows="5"
         :style="{ backgroundColor: selectedNote.color }"></textarea>
-      <p class="flex justify-end text-gray-500 text-sm mt-4">{{ selectedNote.timeCreated }}</p>
+      <div class="flex justify-between mt-2">
+        <div class="flex gap-2">
+          <button class="flex-shrink-0 w-6 h-6 cursor-pointer" @click="downloadNote">
+            <img src="@/assets/download.svg" class="w-full h-full" alt="Download" />
+          </button>
+          <button class="flex-shrink-0 w-6 h-6 cursor-pointer" @click="removeNote(selectedNote.id)">
+            <img src="@/assets/delete.svg" class="w-full h-full" alt="Delete" />
+          </button>
+        </div>
+        <div>
+          <p class="text-gray-500 text-sm">{{ selectedNote.timeCreated }}</p>
+        </div>
+      </div>
     </div>
   </div>
+
 </template>
 
 <script lang="ts" setup>
@@ -73,6 +86,23 @@ watch(localNotes, () => {
 
 const removeNote = (index: number) => {
   notesStore.removeNote(index);
+  closeNote();
+};
+
+const downloadNote = () => {
+  if (selectedNote.value) {
+    const { title, content, timeCreated } = selectedNote.value;
+    const filename = `${title} - ${timeCreated}.txt`;
+    const blob = new Blob([`Title: ${title}\nTime Created: ${timeCreated}\n\n${content}`], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 };
 
 const openNote = (index: number) => {

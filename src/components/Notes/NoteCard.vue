@@ -5,16 +5,26 @@
             <h1 class="font-bold text-sl font-mono mt-1 cursor-pointer" @click="handleOpenNote">{{ props.note.title }}
             </h1>
             <div class="relative flex items-center">
-                <button @click="toggleMenu" class="menu-icon flex-shrink-0 w-4 h-4 mt-1">
+                <button class="menu-icon flex-shrink-0 w-4 h-4 mt-1" @click="toggleMenu">
                     <img src="@/assets/three-dots-icon.svg" class="w-full h-full" alt="Menu" />
                 </button>
-                <div v-if="showMenu" class="menu bg-white border rounded shadow-lg absolute right-0 mt-2 w-24 pointer">
-                    <ul>
-                        <li @click="editNote" class="px-4 py-2 hover:bg-gray-200 cursor-pointer">Edit</li>
-                        <li @click="onRemove" class="px-4 py-2 hover:bg-gray-200 cursor-pointer">Delete</li>
+                <div v-if="showMenu"
+                    class="menu bg-yellow-500 border-2 border-black rounded shadow-lg absolute top-0 right-0 w-24 pointer">
+                    <ul class="flex">
+                        <li @click="handleOpenNote" class="p-2 hover:bg-yellow-400 cursor-pointer">
+                            <img src="@/assets/edit.svg" width="24" height="24" class="mr-2" alt="Edit" />
+                        </li>
+                        <li @click="downloadNote" class="p-2 hover:bg-yellow-400 cursor-pointer">
+                            <img src="@/assets/download.svg" width="24" height="24" class="mr-2" alt="Download" />
+                        </li>
+                        <li @click="onRemove" class="p-2 hover:bg-yellow-400 cursor-pointer">
+                            <img src="@/assets/delete.svg" width="24" height="24" class="mr-2" alt="Delete" />
+                        </li>
                     </ul>
                 </div>
+
             </div>
+
         </div>
         <p v-html="linkifiedContent" class="font-serif text-sm mt-2"></p>
         <div class="flex pt-3 mt-auto">
@@ -24,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, computed, ref } from 'vue';
+import { defineProps, computed, ref, onMounted, onBeforeUnmount } from 'vue';
 import { Note } from '@/stores/ProductStore';
 
 const props = defineProps({
@@ -34,11 +44,36 @@ const props = defineProps({
     },
     index: Number,
     removeNote: Function,
-    editNote: Function,
     openNote: Function
 });
 
 const showMenu = ref(false);
+
+const onRemove = () => {
+    if (props.removeNote) {
+        props.removeNote(props.index);
+        showMenu.value = false;
+    }
+};
+
+const downloadNote = () => {
+    const { title, content, timeCreated } = props.note;
+    const filename = `${title} - ${timeCreated}.txt`;
+    const blob = new Blob([`Title: ${title}\nTime Created: ${timeCreated}\n\n${content}`], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+};
+
+const handleOpenNote = () => {
+    if (props.openNote) {
+        props.openNote(props.index);
+        showMenu.value = false;
+    }
+};
 
 const linkify = (text: string) => {
     const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/ig;
@@ -53,23 +88,18 @@ const toggleMenu = () => {
     showMenu.value = !showMenu.value;
 };
 
-const onRemove = () => {
-    if (props.removeNote) {
-        props.removeNote(props.index);
+const handleClickOutside = (event: Event) => {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.menu-icon') && !target.closest('.menu')) {
         showMenu.value = false;
     }
 };
 
-const editNote = () => {
-    if (props.editNote) {
-        props.editNote(props.index);
-        showMenu.value = false;
-    }
-};
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+});
 
-const handleOpenNote = () => {
-    if (props.openNote) {
-        props.openNote(props.index);
-    }
-};
+onBeforeUnmount(() => {
+    document.removeEventListener('click', handleClickOutside);
+});
 </script>
