@@ -39,10 +39,11 @@ const selectedNote = ref<Note | null>(null);
 const searchQuery = ref('');
 
 const filteredNotes = computed(() =>
-  localNotes.value.filter((note) =>
-    note.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    note.content.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
+  localNotes.value.filter((note) => {
+    const title = note.title ? note.title.toLowerCase() : '';
+    const content = note.content ? note.content.toLowerCase() : '';
+    return title.includes(searchQuery.value.toLowerCase()) || content.includes(searchQuery.value.toLowerCase());
+  })
 );
 
 const updateSearchQuery = (query: string) => {

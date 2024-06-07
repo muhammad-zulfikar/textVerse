@@ -2,14 +2,10 @@
     <li :style="{ backgroundColor: props.note.color }"
         class="note-card break-inside-avoid h-min border-2 border-black mb-8 hover:shadow-2xl rounded-lg p-2 flex flex-col overflow-x-auto relative">
         <div class="flex justify-between items-start">
-            <h1 class="font-bold text-xl font-mono mt-1 cursor-pointer" @click="handleOpenNote">{{ props.note.title }}
+            <h1 class="font-bold text-sl font-mono mt-1 cursor-pointer" @click="handleOpenNote">{{ props.note.title }}
             </h1>
             <div class="relative flex items-center">
-                <button class="menu-icon flex-shrink-0 w-4 h-4 ml-2 cursor-pointer">
-                    <img src="@/assets/open-notes.svg" class="w-full h-full"
-                        @click="handleOpenNote" alt="Open" />
-                </button>
-                <button @click="toggleMenu" class="menu-icon flex-shrink-0 w-4 h-4 ml-2">
+                <button @click="toggleMenu" class="menu-icon flex-shrink-0 w-4 h-4 mt-1">
                     <img src="@/assets/three-dots-icon.svg" class="w-full h-full" alt="Menu" />
                 </button>
                 <div v-if="showMenu" class="menu bg-white border rounded shadow-lg absolute right-0 mt-2 w-24 pointer">
