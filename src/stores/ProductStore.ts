@@ -39,9 +39,12 @@ export const useNotesStore = defineStore('notes', {
       this.notes.splice(index, 1);
       this.saveNotes();
     },
-    updateNote(index: number, updatedNote: Note) {
-      this.notes.splice(index, 1, updatedNote);
-      this.saveNotes();
+    updateNote(id: number, updatedNote: Note) {
+      const index = this.notes.findIndex(note => note.id === id);
+      if (index !== -1) {
+        this.notes.splice(index, 1, updatedNote);
+        this.saveNotes();
+      }
     },
   },
 });

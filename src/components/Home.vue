@@ -115,15 +115,19 @@ const closeNote = () => {
 
 const saveNote = () => {
   if (selectedNote.value) {
-    const noteIndex = localNotes.value.findIndex(note => note.id === selectedNote.value?.id);
-    if (noteIndex !== -1) {
-      localNotes.value[noteIndex] = { ...selectedNote.value };
-      notesStore.setNotes(localNotes.value);
-      saveNotesToLocalStorage();
-    }
+    const currentTime = new Date().toLocaleString("sk-SK", {
+      day: '2-digit',
+      month: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: false,
+    });
+    selectedNote.value.timeCreated = currentTime;
     closeNote();
   }
 };
+
 </script>
 
 <style scoped>
