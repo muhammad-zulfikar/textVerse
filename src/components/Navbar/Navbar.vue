@@ -27,7 +27,7 @@ const toggleNav = () => {
 };
 
 const darkModeEnabled = ref(false);
-const darkModeText = ref('Light');
+const darkModeText = ref('Dark');
 
 const toggleDarkMode = () => {
   darkModeEnabled.value = !darkModeEnabled.value;

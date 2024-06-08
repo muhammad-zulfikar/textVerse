@@ -22,7 +22,7 @@
           <ul class="list-disc pl-4">
             <li class="text-sm font-serif line-through">Edit notes</li>
             <li class="text-sm font-serif line-through">Download notes as .txt</li>
-            <li class="text-sm font-serif">Dark theme</li>
+            <li class="text-sm font-serif line-through">Dark theme</li>
             <li class="text-sm font-serif">Draggable notes</li>
           </ul>
         </div>

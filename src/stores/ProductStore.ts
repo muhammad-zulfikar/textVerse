@@ -19,7 +19,7 @@ export const useNotesStore = defineStore('notes', {
       const now = new Date();
       newNote.timeCreated = now.toLocaleString("sk-SK", {
         day: '2-digit',
-        month: 'numeric',
+        month: '2-digit',
         year: 'numeric',
         hour: 'numeric',
         minute: '2-digit',
@@ -38,13 +38,6 @@ export const useNotesStore = defineStore('notes', {
     removeNote(index: number) {
       this.notes.splice(index, 1);
       this.saveNotes();
-    },
-    updateNote(id: number, updatedNote: Note) {
-      const index = this.notes.findIndex(note => note.id === id);
-      if (index !== -1) {
-        this.notes.splice(index, 1, updatedNote);
-        this.saveNotes();
-      }
     },
   },
 });
