@@ -7,11 +7,9 @@
 <script setup>
 import Navbar from '../Navbar/Navbar.vue';
 import SearchBar from './SearchBar.vue';
-import NoteForm from './NoteForm.vue';
+import NoteForm from '../Notes/NoteForm.vue';
 import { ref, nextTick, defineEmits } from 'vue';
-import { useNotesStore } from '@/stores/ProductStore';
 
-const notesStore = useNotesStore();
 const editing = ref(false);
 
 const startEditing = async (note = null) => {

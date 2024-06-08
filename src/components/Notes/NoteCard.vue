@@ -7,7 +7,7 @@
       </h1>
       <div class="relative flex items-center">
         <button v-if="showMenu || isMobile" class="flex-shrink-0 w-4 h-4 mt-1" @click="handleOpenOption">
-          <img src="@/assets/menu.svg" class="w-full h-full" alt="Menu" />
+          <img src="@/assets/icons/menu.svg" class="w-full h-full" alt="Menu" />
         </button>
       </div>
     </div>

@@ -3,12 +3,7 @@
   <form v-if="editing" class="fixed inset-0 z-50 flex flex-col items-center justify-center">
     <div class="bg-white w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3 p-5 rounded-lg border-2 border-black relative"
       :style="{ backgroundColor: selectedColor }">
-      <div class="flex justify-end mb-2">
-        <button @click.prevent="closeForm" class="flex-shrink-0 w-6 h-6 cursor-pointer">
-          <img src="@/assets/close.svg" class="w-full h-full" alt="Close" />
-        </button>
-      </div>
-      <h1 class="text-xl font-bold mb-4 relative">
+      <h1 class="text-xl font-bold mb-4 relative mt-4">
         <input v-model="title" class="w-full p-1 bg-transparent border-0 border-b-2 border-black outline-none"
           placeholder="Title" autofocus />
         <span class="flex justify-end font-normal text-sm text-gray-500 mt-1">{{ title.length }} / 50</span>
@@ -27,9 +22,14 @@
         </div>
       </div>
 
-      <div class="flex justify-end">
-        <button :disabled="!isValid" @click.prevent="saveNote" class="flex-shrink-0 w-6 h-6 cursor-pointer">
-          <img src="@/assets/save.svg" class="w-full h-full" alt="Save" />
+      <div class="flex justify-end mt-4">
+        <button @click.prevent="closeForm" :style="{ backgroundColor: darkenColor(selectedColor) }"
+          class="text-black p-2 border-2 border-black dark:border-white rounded-lg hover:shadow-xl outline-none cursor-pointer mr-5">
+          <span class="text-sm">Cancel</span>
+        </button>
+        <button :disabled="!isValid" @click.prevent="saveNote" :style="{ backgroundColor: darkenColor(selectedColor) }"
+          class="text-black p-2 border-2 border-black dark:border-white rounded-lg hover:shadow-xl outline-none cursor-pointer">
+          <span class="text-sm">Save</span>
         </button>
       </div>
     </div>
@@ -51,6 +51,15 @@ const colorOptions = ['#FFFFFF', '#FFC0CB', '#FFD700', '#90EE90', '#ADD8E6', '#F
 const isValid = computed(() => {
   return title.value.trim().length > 0 && title.value.length <= 50 && content.value.length <= 5000;
 });
+
+const darkenColor = (color) => {
+  const amount = -20;
+  return `#${color
+    .slice(1)
+    .match(/.{2}/g)
+    .map((hex) => Math.max(0, Math.min(255, parseInt(hex, 16) + amount)).toString(16).padStart(2, '0'))
+    .join('')}`;
+};
 
 const saveNote = () => {
   if (!isValid.value) {

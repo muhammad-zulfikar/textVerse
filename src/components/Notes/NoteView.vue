@@ -4,7 +4,7 @@
             class="modal-content w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3 p-5 rounded-lg border-2 border-black relative">
             <div class="flex justify-end">
                 <button class="flex-shrink-0 w-6 h-6 cursor-pointer" @click="closeNote">
-                    <img src="@/assets/close.svg" class="w-full h-full" alt="Close" />
+                    <img src="@/assets/icons/close.svg" class="w-full h-full" alt="Close" />
                 </button>
             </div>
             <h1 class="text-xl font-bold mb-4">

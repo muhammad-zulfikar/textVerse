@@ -5,3 +5,37 @@
 body {
 	@apply bg-yellow-100 dark:bg-gray-900;
 }
+
+.toast-custom {
+  display: flex; /* Use Flexbox for positioning */
+  justify-content: center;
+  align-items: center;
+  position: fixed; /* Fixed positioning for toast */
+  bottom: 1rem; /* Adjust bottom spacing as needed */
+  right: 1rem; /* Adjust right spacing as needed */
+  background-color: #FFC107; /* Yellow-500 */
+  color: black;
+  border: 2px solid black;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  outline: none;
+  font-size: 14px;
+  width: 200px; /* Adjust width as needed */
+}
+
+.toast-custom:hover {
+  background-color: #FFD600; /* Yellow-600 */
+  color: white;
+}
+
+.toast-custom.dark {
+  background-color: #FFC107; /* Yellow-600 */
+  color: white;
+  border-color: white;
+}
+
+.toast-custom.dark:hover {
+  background-color: #FFD600; /* Yellow-500 */
+  color: black;
+}
