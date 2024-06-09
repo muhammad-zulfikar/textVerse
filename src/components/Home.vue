@@ -44,10 +44,6 @@ import Toast from './Toast/Toast.vue'
 const showToast = ref(false);
 const toastMessage = ref('');
 
-showToast.value = true;
-toastMessage.value = 'Note deleted successfully!';
-
-
 const notesStore = useNotesStore();
 const localNotes = ref<Note[]>([...notesStore.notes]);
 const deletedNotes = ref<Note[]>([]);
