@@ -6,7 +6,7 @@
 
   <div class="flex justify-between w-11/12 mx-auto mt-2 font-serif">
     <div>
-      <button @click="startEditing"
+      <button :onclick="startEditing"
         class="text-black dark:text-white hover:underline dark:hover:bg-transparent outline-none mr-4">Add New</button>
     </div>
     <div>
@@ -68,6 +68,9 @@ const filteredNotes = computed(() => {
     note.content.toLowerCase().includes(query)
   );
 });
+
+const title = ref('');
+const content = ref('');
 
 const startEditing = async (note: Note | null = null) => {
   editing.value = true;
