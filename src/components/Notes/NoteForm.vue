@@ -1,39 +1,42 @@
 <template>
   <div v-if="editing" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-  <form v-if="editing" class="fixed inset-0 z-50 flex flex-col items-center justify-center">
-    <div class="bg-white w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3 p-5 rounded-lg border-2 border-black relative"
-      :style="{ backgroundColor: selectedColor }">
-      <h1 class="text-xl font-bold mb-4 relative mt-4">
-        <input v-model="title" class="w-full p-1 bg-transparent border-0 border-b-2 border-black outline-none"
-          placeholder="Title" autofocus />
-        <span class="flex justify-end font-normal text-sm text-gray-500 mt-1">{{ title.length }} / 50</span>
-      </h1>
-      <textarea v-model="content" class="w-full p-2 bg-transparent border-2 border-black rounded focus:outline-none"
-        rows="5" placeholder="Content"></textarea>
-      <span class="flex justify-end text-sm text-gray-500">{{ content.length }} / 5000</span>
+  <transition name="fade">
+    <form v-if="editing" class="fixed inset-0 z-50 flex flex-col items-center justify-center font-serif">
+      <div class="bg-white w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3 p-5 rounded-lg border-2 border-black relative"
+        :style="{ backgroundColor: selectedColor }">
+        <h1 class="text-xl font-bold mb-4 relative mt-4">
+          <input v-model="title" class="w-full p-1 bg-transparent border-0 border-b-2 border-black outline-none"
+            placeholder="Title" autofocus />
+          <span class="flex justify-end font-normal text-sm text-gray-500 mt-1">{{ title.length }} / 30</span>
+        </h1>
+        <textarea v-model="content" class="w-full p-2 bg-transparent border-2 border-black rounded focus:outline-none"
+          rows="5" placeholder="Content"></textarea>
+        <span class="flex justify-end text-sm text-gray-500">{{ content.length }} / 5000</span>
 
-      <div class="flex align-center justify-center mt-4">
-        <div v-for="(colorOption, index) in colorOptions" :key="index" class="mr-2 mb-2">
-          <input type="radio" :id="colorOption" v-model="selectedColor" :value="colorOption" class="hidden" />
-          <label :for="colorOption" :style="{
-            backgroundColor: colorOption,
-            borderColor: selectedColor === colorOption ? 'black' : '#d1d5db',
-          }" class="inline-block w-6 lg:w-7 xl:w-8 h-6 lg:h-7 xl:h-8 rounded-full cursor-pointer border-2"></label>
+        <div class="flex align-center justify-center mt-4">
+          <div v-for="(colorOption, index) in colorOptions" :key="index" class="mr-2 mb-2">
+            <input type="radio" :id="colorOption" v-model="selectedColor" :value="colorOption" class="hidden" />
+            <label :for="colorOption" :style="{
+    backgroundColor: colorOption,
+    borderColor: selectedColor === colorOption ? 'black' : '#d1d5db',
+  }" class="inline-block w-6 lg:w-7 xl:w-8 h-6 lg:h-7 xl:h-8 rounded-full cursor-pointer border-2"></label>
+          </div>
+        </div>
+
+        <div class="flex justify-end mt-4">
+          <button @click.prevent="closeForm" :style="{ backgroundColor: darkenColor(selectedColor) }"
+            class="text-black p-2 border-2 border-black dark:border-white rounded-lg hover:shadow-xl outline-none cursor-pointer mr-5">
+            <span class="text-sm">Cancel</span>
+          </button>
+          <button :disabled="!isValid" @click.prevent="saveNote"
+            :style="{ backgroundColor: darkenColor(selectedColor) }"
+            class="text-black p-2 border-2 border-black dark:border-white rounded-lg hover:shadow-xl outline-none cursor-pointer">
+            <span class="text-sm">Save</span>
+          </button>
         </div>
       </div>
-
-      <div class="flex justify-end mt-4">
-        <button @click.prevent="closeForm" :style="{ backgroundColor: darkenColor(selectedColor) }"
-          class="text-black p-2 border-2 border-black dark:border-white rounded-lg hover:shadow-xl outline-none cursor-pointer mr-5">
-          <span class="text-sm">Cancel</span>
-        </button>
-        <button :disabled="!isValid" @click.prevent="saveNote" :style="{ backgroundColor: darkenColor(selectedColor) }"
-          class="text-black p-2 border-2 border-black dark:border-white rounded-lg hover:shadow-xl outline-none cursor-pointer">
-          <span class="text-sm">Save</span>
-        </button>
-      </div>
-    </div>
-  </form>
+    </form>
+  </transition>
 </template>
 
 <script setup>
@@ -49,7 +52,7 @@ const selectedColor = ref('#FFFFFF');
 const colorOptions = ['#FFFFFF', '#FFC0CB', '#FFD700', '#90EE90', '#ADD8E6', '#FFA07A', '#20B2AA', '#87CEFA'];
 
 const isValid = computed(() => {
-  return title.value.trim().length > 0 && title.value.length <= 50 && content.value.length <= 5000;
+  return title.value.trim().length > 0 && title.value.length <= 30 && content.value.length <= 5000;
 });
 
 const darkenColor = (color) => {

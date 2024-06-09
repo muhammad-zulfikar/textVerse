@@ -1,6 +1,8 @@
 <template>
   <Header @update:modelValue="updateSearchQuery" />
 
+  <Toast v-if="showToast" :message="toastMessage" />
+
   <div class="flex justify-end w-11/12 mx-auto mt-4">
     <div class="font-serif flex">
       <button 
@@ -37,14 +39,13 @@ import { useNotesStore, Note } from '@/stores/ProductStore';
 import NoteCard from './Notes/NoteCard.vue';
 import Header from './Header/Header.vue';
 import NoteView from './Notes/NoteView.vue';
-import { useToast } from "vue-toastification";
+import Toast from './Toast/Toast.vue'
 
-const toast = useToast();
-const showToast = (message: string) => {
-  toast(message, {
-    toastClassName: 'toast-custom'
-  });
-};
+const showToast = ref(false);
+const toastMessage = ref('');
+
+showToast.value = true;
+toastMessage.value = 'Note deleted successfully!';
 
 
 const notesStore = useNotesStore();
@@ -97,6 +98,8 @@ const removeNote = (index: number) => {
   const deletedNote = localNotes.value.splice(index, 1)[0];
   deletedNotes.value.push(deletedNote);
   closeNote();
+  showToast.value = true;
+  toastMessage.value = 'Note deleted successfully!';
 };
 
 const closeNote = () => {
@@ -114,7 +117,8 @@ const saveNote = (note: Note) => {
   });
   note.timeCreated = currentTime;
   selectedNote.value = null;
-  showToast('Note saved!')
+  showToast.value = true;
+  toastMessage.value = 'Note saved successfully!';
 };
 
 const deleteAllNotes = () => {
@@ -124,7 +128,8 @@ const deleteAllNotes = () => {
   localNotes.value = []; // Clear localNotes
   notesStore.setNotes([]); // Clear notes in store
   defaultNotesDeleted.value = true;
-  showToast('Note deleted!')
+  showToast.value = true;
+  toastMessage.value = 'Note deleted successfully!';
 };
 
 const undoDelete = () => {
@@ -134,6 +139,8 @@ const undoDelete = () => {
       localNotes.value.push(lastDeletedNote);
       undoStack.value.push([...localNotes.value]);
       defaultNotesDeleted.value = false;
+      showToast.value = true;
+      toastMessage.value = 'Note restored successfully!';
     }
   }
 };
