@@ -1,7 +1,7 @@
 {
   "name": "vue-notes",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,7 @@
     "pinia": "^2.1.7",
     "vue": "^3.3.11",
     "vue-router": "^4.3.2",
-    "vuedraggable": "^4.1.0"
+    "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",

@@ -1,23 +1,23 @@
 <template>
   <Toast v-if="showToast" :message="toastMessage" />
-  <li :style="{ backgroundColor: props.note.color }"
-    class="note-card break-inside-avoid h-min border-2 border-black dark:border-white mb-6 md:mb-8 hover:shadow-2xl rounded-lg p-2 flex flex-col overflow-x-auto relative"
+  <li
+    class="bg-cream dark:bg-gray-800 note-card break-inside-avoid h-min border-2 border-black dark:border-white mb-6 md:mb-8 shadow-xl hover:shadow-2xl rounded-lg p-2 flex flex-col overflow-x-auto relative"
     @mouseover="showMenu = isDesktop" @mouseleave="handleMouseLeave">
     <div class="flex justify-between items-start">
-      <h1 class="font-bold text-sl font-serif cursor-pointer" @click="handleOpenNote">{{ props.note.title }}
+      <h1 class="font-bold text-sl font-serif cursor-pointer dark:text-white" @click="handleOpenNote">{{ props.note.title }}
       </h1>
       <div class="relative flex items-center">
-        <button v-if="showMenu || isMobile" class="flex-shrink-0 w-4 h-4 mt-1" @click="handleOpenOption">
-          <img :src="showOption ? downIcon : upIcon" class="w-full h-full" alt="Menu" />
+        <button v-if="showMenu || isMobile" class="flex-shrink-0 w-3 h-3 mt-1" @click="handleOpenOption">
+          <img :src="showOption ? downIcon : upIcon" class="w-full h-full icon" alt="Menu" />
         </button>
       </div>
     </div>
     <div>
-      <div v-if="!showOption" class="font-serif text-sm mt-2" v-html="linkifiedContent"></div>
+      <div v-if="!showOption" class="font-serif text-sm mt-2 dark:text-white" v-html="linkifiedContent"></div>
       <div v-if="!showOption" class="flex pt-3 mt-auto">
         <p class="font-serif text-gray-500 text-xs mt-auto ml-auto">{{ props.note.timeCreated }}</p>
       </div>
-      <ul v-else class="flex justify-center font-serif text-sm p-4 gap-14 md:gap-10">
+      <ul v-else class="flex justify-center font-serif text-sm p-4 gap-14 md:gap-10 dark:text-white">
         <li @click="handleOpenNote" class="hover:underline cursor-pointer">Edit</li>
         <li @click="onRemove" class="hover:underline cursor-pointer">Delete</li>
         <li @click="downloadNote" class="hover:underline cursor-pointer">Download</li>
@@ -105,12 +105,11 @@ const handleMouseLeave = () => {
 </script>
 
 <style scoped>
-.menu-btn {
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.icon {
+  transition: filter 0.3s ease;
 }
 
-.menu-btn:hover {
-  opacity: 1;
+.dark .icon {
+  filter: invert(1) brightness(2);
 }
 </style>

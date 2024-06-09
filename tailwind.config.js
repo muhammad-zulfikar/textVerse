@@ -6,7 +6,11 @@ export default {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        cream: '#f2ebd4',
+      }
+    },
   },
   plugins: [],
 }

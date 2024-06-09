@@ -3,7 +3,15 @@
 @import 'tailwindcss/utilities';
 
 body {
-	@apply bg-yellow-100 dark:bg-gray-900;
+	@apply dark:bg-gray-700;
+}
+
+:root {
+  --bg-light: hsl(60, 53%, 93%);
+}
+
+body {
+  background-color: var(--bg-light);
 }
 
 .fade-enter-active, .fade-leave-active {

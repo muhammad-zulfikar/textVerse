@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-if="visible" class="toast">
+    <div v-if="visible" :class="{ 'toast': true, 'bg-cream': isLightMode, 'dark:bg-gray-900': !isLightMode }">
       {{ message }}
     </div>
   </transition>
@@ -16,6 +16,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const visible = ref(false);
+const isLightMode = ref(true); // Assume light mode by default
 
 onMounted(() => {
   visible.value = true;
@@ -40,7 +41,6 @@ watch(() => props.message, (newMessage) => {
   z-index: 51;
   bottom: 1rem;
   right: 1rem;
-  background-color: #FFC107;
   border: 2px solid black;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
@@ -48,5 +48,10 @@ watch(() => props.message, (newMessage) => {
   outline: none;
   font-size: 14px;
   font-family: serif;
+}
+
+/* White border in dark mode */
+.dark .toast {
+  border-color: white;
 }
 </style>
