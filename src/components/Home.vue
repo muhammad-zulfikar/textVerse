@@ -17,33 +17,22 @@
     </div>
   </div>
 
-
   <NoteForm v-if="editing" @closeForm="handleFormClose" />
 
-  <ul class="w-11/12 mx-auto mt-6 mb-18 gap-8 columns-1 md:columns-3 lg:columns-4 2xl:w-7/12 relative">
-    <template v-if="filteredNotes.length > 0" v-for="(note, index) in filteredNotes" :key="note.id">
-      <NoteCard :note="note" :index="index" :openNote="openNote" :removeNote="removeNote" />
-    </template>
-    <template v-else>
-      <div class="absolute inset-0 flex justify-center items-center mt-16">
-        <div class="font-serif dark:text-white">Not found</div>
-      </div>
-    </template>
-  </ul>
-
+  <NoteList :notes="localNotes" :searchQuery="searchQuery" :openNote="openNote" :removeNote="removeNote" />
 
   <NoteView v-if="selectedNote" :note="selectedNote" @close="closeNote" @save="saveNote" />
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted, nextTick, computed } from 'vue';
+import { ref, watch, onMounted, nextTick } from 'vue';
 import { useNotesStore, Note } from '@/stores/ProductStore';
 import Navbar from './Navbar/Navbar.vue';
 import SearchBar from './SearchBar/SearchBar.vue';
-import NoteCard from './Notes/NoteCard.vue';
 import NoteForm from './Notes/NoteForm.vue';
 import NoteView from './Notes/NoteView.vue';
 import Toast from './Toast/Toast.vue';
+import NoteList from './Notes/NoteList.vue';
 
 const showToast = ref(false);
 const toastMessage = ref('');
@@ -60,14 +49,6 @@ const defaultNotesDeleted = ref(false);
 const updateSearchQuery = (query: string) => {
   searchQuery.value = query;
 };
-
-const filteredNotes = computed(() => {
-  const query = searchQuery.value.toLowerCase();
-  return localNotes.value.filter(note =>
-    note.title.toLowerCase().includes(query) ||
-    note.content.toLowerCase().includes(query)
-  );
-});
 
 const title = ref('');
 const content = ref('');

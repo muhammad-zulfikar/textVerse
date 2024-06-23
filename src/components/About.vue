@@ -23,7 +23,6 @@
             <li class="text-sm font-serif line-through">Edit notes</li>
             <li class="text-sm font-serif line-through">Download notes as .txt</li>
             <li class="text-sm font-serif line-through">Dark theme</li>
-            <li class="text-sm font-serif">Drag notes</li>
             <li class="text-sm font-serif">Fix toast</li>
           </ul>
         </div>

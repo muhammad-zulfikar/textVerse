@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-if="visible" :class="{ 'toast': true, 'bg-cream': isLightMode, 'dark:bg-gray-900': !isLightMode }">
+    <div v-if="visible" :class="{ 'toast font-serif': true, 'bg-cream': isLightMode, 'dark:bg-gray-900': !isLightMode }">
       {{ message }}
     </div>
   </transition>

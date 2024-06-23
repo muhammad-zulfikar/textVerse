@@ -31,7 +31,6 @@ import { ref, defineProps, computed } from 'vue';
 import { Note } from '@/stores/ProductStore';
 import Toast from '../Toast/Toast.vue';
 
-// Import your icons directly using ES module syntax
 import upIcon from '@/assets/icons/up.svg';
 import downIcon from '@/assets/icons/down.svg';
 
@@ -52,7 +51,7 @@ const handleOpenNote = () => {
   if (props.openNote) {
     props.openNote(props.index);
   }
-  showOption.value = false; // Hide options after opening note
+  showOption.value = false;
 };
 
 const showOption = ref(false);
@@ -68,7 +67,7 @@ const onRemove = () => {
   }
   showToast.value = true;
   toastMessage.value = 'Note deleted successfully!';
-  showOption.value = false; // Hide options after deleting note
+  showOption.value = false;
 };
 
 const downloadNote = () => {
@@ -83,7 +82,7 @@ const downloadNote = () => {
   URL.revokeObjectURL(url);
   showToast.value = true;
   toastMessage.value = 'Note downloaded successfully!';
-  showOption.value = false; // Hide options after downloading note
+  showOption.value = false;
 };
 
 const linkify = (text: string) => {

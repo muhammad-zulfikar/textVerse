@@ -1,16 +1,23 @@
 <template>
-  <div v-if="editing" class="fixed inset-0 z-40" :style="{ backdropFilter: 'blur(2px)' }"></div>
+  <div v-if="editing" class="fixed inset-0 z-40 bg-black bg-opacity-30" :style="{ backdropFilter: 'blur(2px)' }"></div>
   <form v-if="editing" class="fixed inset-0 z-50 flex items-center justify-center font-serif">
-    <div
-      :class="['bg-cream dark:bg-gray-900 p-5 rounded-lg border-2 border-black dark:border-white relative flex flex-col', { 'w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3': !isFullScreen, 'w-full h-full': isFullScreen }]">
+    <div :class="[
+    'bg-cream dark:bg-gray-900 p-5 rounded-lg border-2 border-black dark:border-white relative flex flex-col',
+    {
+      'w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3': !isFullScreen,
+      'w-full h-full': isFullScreen,
+      'rounded-lg': !isFullScreen,
+      'rounded-none': isFullScreen,
+    }
+  ]">
       <h1 class="text-xl font-bold mb-4 relative mt-2">
         <input v-model="title" @focus="handleFocus('title')" @blur="handleBlur('title')" :placeholder="titlePlaceholder"
-          class="text-black dark:text-white w-full p-1 bg-transparent border-0 border-b-2 border-black dark:border-white outline-none hover:shadow-xl placeholder-black dark:placeholder-white placeholder-opacity-50" />
+          class="text-black dark:text-white w-full p-1 bg-transparent border-0 border-b-2 border-black dark:border-white outline-none placeholder-black dark:placeholder-white placeholder-opacity-50" />
         <span class="flex justify-end font-normal text-sm text-gray-500 mt-1">{{ title.length }} / 30</span>
       </h1>
       <textarea v-model="content" @focus="handleFocus('content')" @blur="handleBlur('content')"
         :placeholder="contentPlaceholder"
-        class="text-black dark:text-white w-full p-2 bg-transparent resize-none border-2 border-black dark:border-white rounded focus:outline-none hover:shadow-xl flex-grow placeholder-black dark:placeholder-white placeholder-opacity-50"
+        class="text-black dark:text-white w-full p-2 bg-transparent resize-none border-2 border-black dark:border-white rounded focus:outline-none flex-grow placeholder-black dark:placeholder-white placeholder-opacity-50"
         rows="5"></textarea>
       <span class="flex justify-end text-sm text-gray-500">{{ content.length }} / 5000</span>
 
