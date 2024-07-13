@@ -14,6 +14,10 @@ body {
   background-color: var(--bg-light);
 }
 
+.modal-open {
+  overflow: hidden;
+}
+
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.5s;
 }
@@ -24,4 +28,20 @@ body {
 
 .fade-enter-to, .fade-leave-from {
   opacity: 1;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f2ebd4;
+  border: 1px solid black;
+  border-radius: 6px;
+  outline: rgb(219, 219, 219);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #1f2937;
+  border: 1px solid white;
 }

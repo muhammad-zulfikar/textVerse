@@ -16,7 +16,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const visible = ref(false);
-const isLightMode = ref(true); // Assume light mode by default
+const isLightMode = ref(true);
 
 onMounted(() => {
   visible.value = true;
@@ -50,7 +50,6 @@ watch(() => props.message, (newMessage) => {
   font-family: serif;
 }
 
-/* White border in dark mode */
 .dark .toast {
   border-color: white;
 }

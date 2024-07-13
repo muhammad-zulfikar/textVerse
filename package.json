@@ -1,6 +1,5 @@
 {
   "name": "vue-notes",
-  "private": true,
   "version": "2.0",
   "type": "module",
   "scripts": {

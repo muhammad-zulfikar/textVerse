@@ -1,13 +1,13 @@
 <template>
-  <div v-if="editing" class="fixed inset-0 z-40 bg-black bg-opacity-30" :style="{ backdropFilter: 'blur(2px)' }"></div>
-  <form v-if="editing" class="fixed inset-0 z-50 flex items-center justify-center font-serif">
+  <div v-if="store.editing" class="fixed inset-0 z-40 bg-black bg-opacity-30" :style="{ backdropFilter: 'blur(2px)' }"></div>
+  <form v-if="store.editing" class="fixed inset-0 z-50 flex items-center justify-center font-serif">
     <div :class="[
     'bg-cream dark:bg-gray-900 p-5 rounded-lg border-2 border-black dark:border-white relative flex flex-col',
     {
-      'w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3': !isFullScreen,
-      'w-full h-full': isFullScreen,
-      'rounded-lg': !isFullScreen,
-      'rounded-none': isFullScreen,
+      'w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3': !store.isFullScreen,
+      'w-full h-full': store.isFullScreen,
+      'rounded-lg': !store.isFullScreen,
+      'rounded-none': store.isFullScreen,
     }
   ]">
       <h1 class="text-xl font-bold mb-4 relative mt-2">
@@ -22,9 +22,9 @@
       <span class="flex justify-end text-sm text-gray-500">{{ content.length }} / 5000</span>
 
       <div class="flex justify-between mt-6">
-        <button @click.prevent="toggleFullScreen"
+        <button @click.prevent="store.toggleFullScreen"
           class="text-black dark:text-white hover:underline hover:bg-transparent dark:hover:bg-transparent outline-none cursor-pointer">
-          <span class="text-sm">{{ isFullScreen ? 'Collapse' : 'Expand' }}</span>
+          <span class="text-sm">{{ store.isFullScreen ? 'Collapse' : 'Expand' }}</span>
         </button>
         <div>
           <button @click.prevent="closeForm"
@@ -42,15 +42,13 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useNotesStore } from '@/stores/ProductStore';
 
-const notesStore = useNotesStore();
+const store = useNotesStore();
 
-const editing = ref(true);
 const title = ref('');
 const content = ref('');
-const isFullScreen = ref(false);
 
 const titlePlaceholder = ref('Title');
 const contentPlaceholder = ref('Content');
@@ -64,24 +62,17 @@ const saveNote = () => {
     return;
   }
 
-  const newNote = {
+  store.addNote({
     title: title.value,
     content: content.value,
-    timeCreated: new Date().toLocaleString()
-  };
-  notesStore.addNote(newNote);
-  emit('closeForm');
+  });
+  closeForm();
 };
 
 const closeForm = () => {
-  editing.value = false;
+  store.setEditing(false);
   title.value = '';
   content.value = '';
-  emit('closeForm');
-};
-
-const toggleFullScreen = () => {
-  isFullScreen.value = !isFullScreen.value;
 };
 
 const handleFocus = (field) => {
@@ -103,6 +94,4 @@ const handleBlur = (field) => {
     }
   }
 };
-
-const emit = defineEmits(['closeForm']);
 </script>
