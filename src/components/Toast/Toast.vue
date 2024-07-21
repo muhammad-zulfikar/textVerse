@@ -1,56 +1,44 @@
+<!-- Toast.vue -->
+
 <template>
-  <transition name="fade">
-    <div v-if="visible" :class="{ 'toast font-serif': true, 'bg-cream': isLightMode, 'dark:bg-gray-900': !isLightMode }">
-      {{ message }}
-    </div>
-  </transition>
+  <div
+    v-if="visible"
+    class="fixed z-51 bottom-[1rem] right-[1rem] shadow-sm text-sm md:text-base cursor-default hover:shadow-xl rounded-lg py-[.5rem] px-[1rem] bg-cream dark:bg-gray-800 font-serif border-[1px] md:border-2 border-black dark:border-white"
+  >
+    {{ message }}
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue';
+  import { ref, watch, onMounted } from 'vue';
 
-interface Props {
-  message: string;
-}
-
-const props = defineProps<Props>();
-
-const visible = ref(false);
-const isLightMode = ref(true);
-
-onMounted(() => {
-  visible.value = true;
-  setTimeout(() => {
-    visible.value = false;
-  }, 3000);
-});
-
-watch(() => props.message, (newMessage) => {
-  if (newMessage) {
-    visible.value = true;
-    setTimeout(() => {
-      visible.value = false;
-    }, 3000);
+  interface Props {
+    message: string;
   }
-});
+
+  const props = defineProps<Props>();
+  const visible = ref(false);
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  const showToast = () => {
+    visible.value = true;
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      visible.value = false;
+      timeoutId = null;
+    }, 3000);
+  };
+
+  onMounted(showToast);
+
+  watch(
+    () => props.message,
+    (newMessage) => {
+      if (newMessage) {
+        showToast();
+      }
+    }
+  );
 </script>
-
-<style scoped>
-.toast {
-  position: fixed;
-  z-index: 51;
-  bottom: 1rem;
-  right: 1rem;
-  border: 2px solid black;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  outline: none;
-  font-size: 14px;
-  font-family: serif;
-}
-
-.dark .toast {
-  border-color: white;
-}
-</style>

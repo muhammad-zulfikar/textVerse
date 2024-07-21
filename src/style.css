@@ -3,31 +3,31 @@
 @import 'tailwindcss/utilities';
 
 body {
-	@apply dark:bg-gray-700;
+  @apply dark:bg-gray-600 text-black dark:text-white;
 }
 
 :root {
-  --bg-light: hsl(60, 53%, 93%);
+  --bg-light: rgb(247, 244, 228);
 }
 
 body {
   background-color: var(--bg-light);
 }
 
+.custom-card {
+  @apply bg-cream dark:bg-gray-700 border-[1px] border-black dark:border-white rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
+}
+
+.custom-card-transparent {
+  @apply bg-transparent border-[1px] border-black dark:border-white rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
+}
+
+.custom-card-no-transition {
+  @apply bg-cream dark:bg-gray-700 border-[1px] border-black dark:border-white rounded-lg shadow-lg hover:shadow-2xl;
+}
+
 .modal-open {
   overflow: hidden;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s;
-}
-
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-
-.fade-enter-to, .fade-leave-from {
-  opacity: 1;
 }
 
 ::-webkit-scrollbar {
@@ -42,6 +42,6 @@ body {
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #1f2937;
+  background: #252f3e;
   border: 1px solid white;
 }
