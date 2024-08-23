@@ -1,0 +1,27 @@
+{
+  "name": "textVerse",
+  "short_name": "textVerse",
+  "description": "A simple note-taking application",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#424242",
+  "theme_color": "#424242",
+  "icons": [
+    {
+      "src": "/dark/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/dark/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/dark/apple-touch-icon.png",
+      "sizes": "40x40",
+      "type": "image/png"
+    }
+  ]
+}

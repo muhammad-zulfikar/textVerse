@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .vite/deps
+.env
 
 # Editor directories and files
 .vscode/*
@@ -28,3 +29,4 @@ dist-ssr
 .firebase
 .firebaserc
 firebase.json
+node_modules

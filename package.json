@@ -1,16 +1,22 @@
 {
-  "name": "vue-notes",
+  "name": "textverse",
   "version": "2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,ts,vue,html,css}\""
   },
   "dependencies": {
+    "@phosphor-icons/vue": "^2.2.1",
+    "@types/dompurify": "^3.0.5",
     "@vueuse/core": "^10.9.0",
+    "dompurify": "^3.1.6",
+    "firebase": "^10.13.0",
+    "nanoid": "^5.0.7",
     "pinia": "^2.1.7",
+    "quill": "^2.0.2",
     "vue": "^3.3.11",
     "vue-router": "^4.3.2"
   },
@@ -24,7 +30,6 @@
     "prettier-plugin-vue": "^1.1.6",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2",
-    "vite": "^5.0.8",
-    "vue-tsc": "^1.8.25"
+    "vite": "^5.0.8"
   }
 }
