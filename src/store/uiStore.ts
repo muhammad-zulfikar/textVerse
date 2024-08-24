@@ -61,12 +61,22 @@ export const useUIStore = defineStore('ui', {
     },
 
     loadLocalSettings() {
-      this.theme = JSON.parse(localStorage.getItem('theme') || '"system"') as Theme;
-      this.viewType = JSON.parse(localStorage.getItem('viewType') || '"card"') as ViewType;
-      this.noteOpenPreference = JSON.parse(localStorage.getItem('noteOpenPreference') || '"modal"') as NoteOpenPreference;
-      this.columns = this.getValidColumns(JSON.parse(localStorage.getItem('columns') || '4'));
-      this.blurEnabled = JSON.parse(localStorage.getItem('blurEnabled') || 'false');
-      
+      this.theme = JSON.parse(
+        localStorage.getItem('theme') || '"system"'
+      ) as Theme;
+      this.viewType = JSON.parse(
+        localStorage.getItem('viewType') || '"card"'
+      ) as ViewType;
+      this.noteOpenPreference = JSON.parse(
+        localStorage.getItem('noteOpenPreference') || '"modal"'
+      ) as NoteOpenPreference;
+      this.columns = this.getValidColumns(
+        JSON.parse(localStorage.getItem('columns') || '4')
+      );
+      this.blurEnabled = JSON.parse(
+        localStorage.getItem('blurEnabled') || 'false'
+      );
+
       // Save these initial settings to localStorage
       this.saveSettings();
     },
@@ -94,7 +104,7 @@ export const useUIStore = defineStore('ui', {
         blurEnabled: this.blurEnabled,
         columns: this.columns,
       };
-    
+
       if (authStore.isLoggedIn) {
         try {
           await set(ref(db, `users/${authStore.user!.uid}/settings`), settings);
@@ -102,7 +112,7 @@ export const useUIStore = defineStore('ui', {
           console.error('Error saving settings to Firebase:', error);
         }
       }
-    
+
       // Always save to localStorage
       Object.entries(settings).forEach(([key, value]) => {
         localStorage.setItem(key, JSON.stringify(value));
