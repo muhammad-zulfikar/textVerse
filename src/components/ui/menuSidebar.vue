@@ -160,7 +160,7 @@
   import { authStore, notesStore, uiStore, folderStore } from '@/store/stores';
   import {
     PhHouseLine,
-    PhInfo,
+    // PhInfo,
     PhGear,
     PhTrash,
     PhSignIn,
@@ -187,7 +187,7 @@
 
   const menuItems = [
     { label: 'Home', path: '/', icon: PhHouseLine },
-    { label: 'About', path: '/about', icon: PhInfo },
+    // { label: 'About', path: '/about', icon: PhInfo },
     { label: 'Settings', path: '/settings', icon: PhGear },
     { label: 'Trash', path: '/trash', icon: PhTrash },
   ];

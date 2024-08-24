@@ -26,7 +26,7 @@
   import LoadingSpinner from '@/components/ui/loadingSpinner.vue';
 
   const router = useRouter();
-  const routeOrder = ['Home', 'About', 'Settings', 'Trash', 'Sign In'];
+  const routeOrder = ['Home', 'Settings', 'Trash', 'Sign In', 'About'];
   const transitionName = ref('slide-right');
   const isLoading = ref(true);
 

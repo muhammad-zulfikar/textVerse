@@ -152,7 +152,20 @@
     }
   };
 
-  const closeNote = () => uiStore.closeNote();
+  const closeNote = async () => {
+    if (notesStore.isContentEmpty(props.note.content)) {
+      if (props.note.id) {
+        await notesStore.deleteNote(props.note.id);
+      }
+      uiStore.showToastMessage('Empty note discarded');
+    } else if (props.isEditMode && !props.hasChanges) {
+    } else {
+      uiStore.closeNote();
+      return;
+    }
+
+    uiStore.closeNote();
+  };
 
   const updateTitle = (newTitle: string) => emit('updateTitle', newTitle);
   const deleteNote = () => emit('deleteNote');

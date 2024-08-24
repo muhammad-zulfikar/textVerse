@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted, watch, computed } from 'vue';
+  import { onMounted, watch, computed } from 'vue';
   import { authStore, notesStore, folderStore, uiStore } from '@/store/stores';
   import cardView from './view/cardView.vue';
   import tableView from './view/tableView.vue';

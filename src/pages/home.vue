@@ -45,7 +45,7 @@
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (!uiStore.isNoteCardOpen && !uiStore.isNoteSidebarOpen) {
+    if (!uiStore.isNoteModalOpen && !uiStore.isNoteSidebarOpen) {
       if ((event.ctrlKey || event.metaKey) && event.key === 'v') {
         navigator.clipboard.readText().then(handlePaste);
       }

@@ -121,6 +121,14 @@
   }
 
   async function saveNote() {
+    if (notesStore.isContentEmpty(editedNote.value.content)) {
+      if (editedNote.value.id) {
+        await notesStore.deleteNote(editedNote.value.id);
+      }
+      uiStore.showToastMessage('Empty note discarded');
+      return;
+    }
+
     if (isEditMode.value && !hasChanges.value) return;
 
     try {
@@ -137,7 +145,7 @@
       originalNote.value = { ...editedNote.value };
 
       await new Promise((resolve) =>
-        setTimeout(resolve, Math.max(0, 500 - (Date.now() - saveStartTime)))
+        setTimeout(resolve, Math.max(0, 1000 - (Date.now() - saveStartTime)))
       );
     } catch (error) {
       console.error('Error saving note:', error);
@@ -153,7 +161,7 @@
   }
 
   function updateNoteContent() {
-    if (hasChanges.value) {
+    if (!notesStore.isContentEmpty(editedNote.value.content)) {
       saveNote();
     }
   }
@@ -163,17 +171,22 @@
     saveNote();
   }
 
-  function handleOutsideClick() {
-    if (!editedNote.value.content.trim()) {
+  async function handleOutsideClick() {
+    if (notesStore.isContentEmpty(editedNote.value.content)) {
+      if (editedNote.value.id) {
+        await notesStore.deleteNote(editedNote.value.id);
+      }
       uiStore.closeNote();
       uiStore.showToastMessage('Empty note discarded');
       return;
     }
+
     if (isEditMode.value && !hasChanges.value) {
       uiStore.closeNote();
       return;
     }
-    saveNote();
+
+    await saveNote();
     uiStore.closeNote();
   }
 

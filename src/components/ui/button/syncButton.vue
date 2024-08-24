@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, watch, nextTick } from 'vue';
+  import { ref, computed, watch } from 'vue';
   import {
     PhCloudCheck,
     PhSpinnerGap,
@@ -20,7 +20,7 @@
     PhSignIn,
   } from '@phosphor-icons/vue';
   import { useRouter } from 'vue-router';
-  import { notesStore, authStore, uiStore } from '@/store/stores';
+  import { notesStore, authStore } from '@/store/stores';
   import Button from '@/components/ui/button.vue';
 
   const router = useRouter();

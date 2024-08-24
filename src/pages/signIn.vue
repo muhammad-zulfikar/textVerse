@@ -194,22 +194,22 @@
 
   .slide-left-enter-from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(15px);
   }
 
   .slide-left-leave-to {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-15px);
   }
 
   .slide-right-enter-from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-15px);
   }
 
   .slide-right-leave-to {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(15px);
   }
 
   .loading-dots {
@@ -238,7 +238,7 @@
   @keyframes bounce {
     to {
       opacity: 0.3;
-      transform: translate3d(0, -0.5rem, 0);
+      transform: translate3d(0, -0.25rem, 0);
     }
   }
 </style>

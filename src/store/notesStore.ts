@@ -76,6 +76,10 @@ export const useNotesStore = defineStore('notes', {
       }
     },
 
+    isContentEmpty(content: string): boolean {
+      return content.replace(/<[^>]*>/g, '').trim() === '';
+    },
+
     async restoreNote(noteId: string) {
       const restoredNote = this.removeNoteFromTrash(noteId);
       if (restoredNote) {
@@ -288,6 +292,7 @@ export const useNotesStore = defineStore('notes', {
         await firebaseStore.moveNoteToTrash(authStore.user!.uid, note);
       } else {
         this.saveDeletedNotes();
+        this.saveNotes(); // Add this line to save the updated notes list
       }
     },
 
@@ -515,6 +520,11 @@ export const useNotesStore = defineStore('notes', {
         this.notes = JSON.parse(savedNotes);
       } else {
         await this.loadInitialNotes();
+      }
+
+      const savedDeletedNotes = localStorage.getItem('deletedNotes');
+      if (savedDeletedNotes) {
+        this.deletedNotes = JSON.parse(savedDeletedNotes);
       }
     },
 
