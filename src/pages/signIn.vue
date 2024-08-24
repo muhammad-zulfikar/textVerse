@@ -45,9 +45,17 @@
             </div>
             <button
               type="submit"
-              class="flex w-full md:w-fit flex items-center justify-center px-4 py-2 mt-4 mx-auto custom-card"
+              class="flex w-full md:w-28 items-center justify-center px-4 py-2 mt-4 mx-auto custom-card"
+              :disabled="isLoading"
             >
-              {{ isSignUp ? 'Sign up' : 'Sign in' }}
+              <template v-if="!isLoading">
+                {{ isSignUp ? 'Sign up' : 'Sign in' }}
+              </template>
+              <div v-else class="loading-dots py-2 px-4">
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
             </button>
           </form>
           <p v-if="!isSignUp" class="text-center my-2">or</p>
@@ -55,13 +63,21 @@
             <button
               @click="signInWithGoogle"
               class="w-full md:w-fit custom-card text-gray-700 dark:text-white py-2 px-4 rounded flex items-center justify-center mb-6 mx-auto"
+              :disabled="isGoogleLoading"
             >
-              <img
-                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                alt="Google logo"
-                class="w-5 h-5 mr-2"
-              />
-              Sign in with Google
+              <template v-if="!isGoogleLoading">
+                <img
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  alt="Google logo"
+                  class="w-5 h-5 mr-2"
+                />
+                Sign in with Google
+              </template>
+              <div v-else class="loading-dots py-2 px-4">
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
             </button>
           </div>
           <p v-if="error" class="text-red-500 mt-4 text-center">{{ error }}</p>
@@ -105,12 +121,18 @@
   const transitionName = computed(() => `slide-${slideDirection.value}`);
   const error = ref('');
 
+  const isLoading = ref(false);
+  const isGoogleLoading = ref(false);
+
   const handleLogin = async () => {
+    isLoading.value = true;
     try {
       await authStore.login(email.value, password.value);
       router.push('/');
     } catch (err) {
       uiStore.showToastMessage('Invalid email or password');
+    } finally {
+      isLoading.value = false;
     }
   };
 
@@ -119,6 +141,7 @@
       uiStore.showToastMessage('Passwords do not match');
       return;
     }
+    isLoading.value = true;
     try {
       await authStore.signUp(email.value, password.value);
       router.push('/');
@@ -128,10 +151,13 @@
       } else {
         uiStore.showToastMessage('Invalid email or password');
       }
+    } finally {
+      isLoading.value = false;
     }
   };
 
   const signInWithGoogle = async () => {
+    isGoogleLoading.value = true;
     try {
       await authStore.signInWithGoogle();
       if (authStore.isLoggedIn) {
@@ -142,6 +168,8 @@
       }
     } catch (err) {
       uiStore.showToastMessage('Google sign-in failed');
+    } finally {
+      isGoogleLoading.value = false;
     }
   };
 
@@ -182,5 +210,35 @@
   .slide-right-leave-to {
     opacity: 0;
     transform: translateX(20px);
+  }
+
+  .loading-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .loading-dots div {
+    width: 0.5rem;
+    height: 0.5rem;
+    margin: 0 0.2rem;
+    background-color: currentColor;
+    border-radius: 50%;
+    animation: 0.9s bounce infinite alternate;
+  }
+
+  .loading-dots div:nth-child(2) {
+    animation-delay: 0.3s;
+  }
+
+  .loading-dots div:nth-child(3) {
+    animation-delay: 0.6s;
+  }
+
+  @keyframes bounce {
+    to {
+      opacity: 0.3;
+      transform: translate3d(0, -0.5rem, 0);
+    }
   }
 </style>

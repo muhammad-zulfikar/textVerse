@@ -23,16 +23,12 @@
   import mailView from './view/mailView.vue';
   import folderView from './view/folderView.vue';
 
-  const isLoading = ref(true);
-
   const filteredNotes = computed(() =>
     notesStore.filteredNotes(folderStore.currentFolder)
   );
 
   const loadNotes = async () => {
-    isLoading.value = true;
     await notesStore.loadNotes();
-    isLoading.value = false;
   };
 
   onMounted(async () => {

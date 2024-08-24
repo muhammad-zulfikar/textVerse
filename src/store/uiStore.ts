@@ -1,87 +1,51 @@
 // stores/uiStore.ts
 
 import { defineStore } from 'pinia';
-
 import { authStore, notesStore } from './stores';
-
 import { ref, set, onValue, off } from 'firebase/database';
-
 import { db } from '@/firebase';
 
 type Theme = 'light' | 'dark' | 'system';
-
 type ViewType = 'card' | 'table' | 'mail' | 'folder';
-
 type NoteOpenPreference = 'modal' | 'sidebar';
-
 type FolderViewType = 'grid' | 'list';
 
 interface UIState {
   theme: Theme;
-
   viewType: ViewType;
-
   noteOpenPreference: NoteOpenPreference;
-
   columns: number;
-
   folderViewType: FolderViewType;
-
   blurEnabled: boolean;
-
   isExpanded: boolean;
-
   activeDropdown: string | null;
-
   showToast: boolean;
-
   toastMessage: string;
-
   toastTimeoutId: number | null;
-
   isNoteModalOpen: boolean;
-
   isNoteSidebarOpen: boolean;
-
   isEditing: boolean;
-
   isCreatingNote: boolean;
-
   settingsListener: (() => void) | null;
 }
 
 export const useUIStore = defineStore('ui', {
   state: (): UIState => ({
     theme: 'system',
-
     viewType: 'card',
-
     noteOpenPreference: 'modal',
-
     columns: 4,
-
     folderViewType: 'grid',
-
     blurEnabled: false,
-
     isExpanded: false,
-
     activeDropdown: null,
-
     showToast: false,
-
     toastMessage: '',
-
     toastTimeoutId: null,
-
     isNoteModalOpen: false,
-
     isNoteSidebarOpen: false,
-
     isEditing: false,
-
     isCreatingNote: false,
-
     settingsListener: null,
   }),
 
@@ -90,24 +54,21 @@ export const useUIStore = defineStore('ui', {
       if (authStore.isLoggedIn) {
         await this.loadSettings();
       } else {
-        this.loadUISettings();
+        this.loadLocalSettings();
       }
 
       this.applyTheme();
     },
 
     loadLocalSettings() {
-      this.theme = (localStorage.getItem('theme') as Theme) || 'system';
-      this.viewType = (localStorage.getItem('viewType') as ViewType) || 'card';
-      this.noteOpenPreference =
-        (localStorage.getItem('noteOpenPreference') as NoteOpenPreference) ||
-        'modal';
-      this.columns =
-        parseInt(localStorage.getItem('columns') || '', 10) ||
-        (window.innerWidth < 640 ? 2 : 4);
-      this.blurEnabled = JSON.parse(
-        localStorage.getItem('blurEnabled') || 'false'
-      );
+      this.theme = JSON.parse(localStorage.getItem('theme') || '"system"') as Theme;
+      this.viewType = JSON.parse(localStorage.getItem('viewType') || '"card"') as ViewType;
+      this.noteOpenPreference = JSON.parse(localStorage.getItem('noteOpenPreference') || '"modal"') as NoteOpenPreference;
+      this.columns = this.getValidColumns(JSON.parse(localStorage.getItem('columns') || '4'));
+      this.blurEnabled = JSON.parse(localStorage.getItem('blurEnabled') || 'false');
+      
+      // Save these initial settings to localStorage
+      this.saveSettings();
     },
 
     async setupFirebaseListener() {
@@ -131,8 +92,9 @@ export const useUIStore = defineStore('ui', {
         viewType: this.viewType,
         noteOpenPreference: this.noteOpenPreference,
         blurEnabled: this.blurEnabled,
+        columns: this.columns,
       };
-
+    
       if (authStore.isLoggedIn) {
         try {
           await set(ref(db, `users/${authStore.user!.uid}/settings`), settings);
@@ -140,11 +102,11 @@ export const useUIStore = defineStore('ui', {
           console.error('Error saving settings to Firebase:', error);
         }
       }
-
+    
+      // Always save to localStorage
       Object.entries(settings).forEach(([key, value]) => {
         localStorage.setItem(key, JSON.stringify(value));
       });
-      localStorage.setItem('columns', this.columns.toString());
     },
 
     clearSettingsListener() {

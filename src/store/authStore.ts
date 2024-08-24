@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null as User | null,
     avatarUrl: '' as string,
-    isLoading: false,
+    isLoading: true,
     isInitialized: false,
   }),
   actions: {
@@ -35,11 +35,12 @@ export const useAuthStore = defineStore('auth', {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           this.user = user;
           this.avatarUrl = user?.photoURL || '/avatar.png';
-          this.isLoading = false;
+
           this.isInitialized = true;
           unsubscribe();
           resolve();
         });
+        this.isLoading = false;
       });
     },
 
@@ -94,6 +95,8 @@ export const useAuthStore = defineStore('auth', {
 
         this.user = null;
         this.avatarUrl = '';
+
+        await folderStore.loadFoldersFromLocalStorage();
 
         uiStore.showToastMessage('Signed out successfully');
       } catch (error) {

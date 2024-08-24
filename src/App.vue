@@ -41,21 +41,33 @@
   );
 
   onMounted(async () => {
-    try {
-      await authStore.initialize();
-      await uiStore.initializeSettings();
-      if (authStore.isLoggedIn) {
-        await Promise.all([folderStore.loadFolders(), notesStore.loadNotes()]);
-      }
-    } catch (error) {
-      console.error('Error loading app:', error);
-      uiStore.showToastMessage(
-        'An error occurred while loading the app. Please try again.'
-      );
-    } finally {
-      isLoading.value = false;
+  const startTime = Date.now();
+
+  try {
+    await uiStore.initializeSettings();
+    
+    if (authStore.isLoggedIn) {
+      await Promise.all([folderStore.loadFolders(), notesStore.loadNotes()]);
+    } else {
+      await Promise.all([
+        folderStore.loadFoldersFromLocalStorage(),
+        notesStore.loadNotesFromLocalStorage()
+      ]);
     }
-  });
+  } catch (error) {
+    console.error('Error loading app:', error);
+    uiStore.showToastMessage(
+      'An error occurred while loading the app. Please try again.'
+    );
+  } finally {
+    const elapsedTime = Date.now() - startTime;
+    const remainingTime = Math.max(2000 - elapsedTime, 0);
+    
+    setTimeout(() => {
+      isLoading.value = false;
+    }, remainingTime);
+  }
+});
 </script>
 
 <style>

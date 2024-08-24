@@ -15,9 +15,11 @@ app.use(pinia);
 app.use(router);
 initializeStores();
 
-authStore.initialize().then(() => {
-  app.mount('#app');
-});
+// Mount the app immediately
+app.mount('#app');
+
+// Initialize auth store after mounting
+authStore.initialize();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js');

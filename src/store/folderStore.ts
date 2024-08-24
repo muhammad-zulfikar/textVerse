@@ -103,6 +103,28 @@ export const useFolderStore = defineStore('folders', {
       this.currentFolder = folderName;
     },
 
+    clearFolderListener() {
+      if (this.folderListener) {
+        if (authStore.user) {
+          off(ref(db, `users/${authStore.user.uid}/folders`));
+        }
+        this.folderListener = null;
+      }
+    },
+
+    async loadFoldersFromLocalStorage() {
+      const savedFolders = localStorage.getItem('folders');
+      if (savedFolders) {
+        this.folders = JSON.parse(savedFolders);
+      } else {
+        this.folders = [
+          DEFAULT_FOLDERS.ALL_NOTES,
+          DEFAULT_FOLDERS.UNCATEGORIZED,
+        ];
+      }
+      this.currentFolder = DEFAULT_FOLDERS.ALL_NOTES;
+    },
+
     async loadFolders() {
       if (authStore.isLoggedIn) {
         const foldersRef = ref(db, `users/${authStore.user!.uid}/folders`);
@@ -117,19 +139,7 @@ export const useFolderStore = defineStore('folders', {
           );
         });
       } else {
-        const savedFolders = localStorage.getItem('folders');
-        if (savedFolders) {
-          this.folders = JSON.parse(savedFolders);
-        }
-      }
-    },
-
-    clearFolderListener() {
-      if (this.folderListener) {
-        if (authStore.user) {
-          off(ref(db, `users/${authStore.user.uid}/folders`));
-        }
-        this.folderListener = null;
+        await this.loadFoldersFromLocalStorage();
       }
     },
 
