@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', {
     isInitialized: false,
   }),
   actions: {
-    async initialize() {
+    async initializeAuth() {
       return new Promise<void>((resolve) => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           this.user = user;

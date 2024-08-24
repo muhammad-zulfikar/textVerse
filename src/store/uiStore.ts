@@ -2,7 +2,7 @@
 
 import { defineStore } from 'pinia';
 import { authStore, notesStore } from './stores';
-import { ref, set, onValue, off } from 'firebase/database';
+import { ref, set, onValue, off, get } from 'firebase/database';
 import { db } from '@/firebase';
 
 type Theme = 'light' | 'dark' | 'system';
@@ -26,6 +26,7 @@ interface UIState {
   isNoteSidebarOpen: boolean;
   isEditing: boolean;
   isCreatingNote: boolean;
+  isSyncing: boolean;
   settingsListener: (() => void) | null;
 }
 
@@ -46,17 +47,18 @@ export const useUIStore = defineStore('ui', {
     isNoteSidebarOpen: false,
     isEditing: false,
     isCreatingNote: false,
+    isSyncing: false,
     settingsListener: null,
   }),
 
   actions: {
     async initializeSettings() {
       if (authStore.isLoggedIn) {
-        await this.loadSettings();
+        await this.loadFirebaseSettings();
+        this.setupFirebaseListener();
       } else {
         this.loadLocalSettings();
       }
-
       this.applyTheme();
     },
 
@@ -76,24 +78,40 @@ export const useUIStore = defineStore('ui', {
       this.blurEnabled = JSON.parse(
         localStorage.getItem('blurEnabled') || 'false'
       );
-
-      // Save these initial settings to localStorage
-      this.saveSettings();
     },
 
-    async setupFirebaseListener() {
+    async loadFirebaseSettings() {
+      if (!authStore.isLoggedIn) return;
+
+      const settingsRef = ref(db, `users/${authStore.user!.uid}/settings`);
+      const snapshot = await get(settingsRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        this.updateSettings(data, false);
+      } else {
+        this.loadLocalSettings();
+        this.saveSettings();
+      }
+    },
+
+    setupFirebaseListener() {
+      if (!authStore.isLoggedIn) return;
+
       const settingsRef = ref(db, `users/${authStore.user!.uid}/settings`);
       this.settingsListener = onValue(settingsRef, (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
-          this.updateSettings(data);
+          this.updateSettings(data, false);
         }
       });
     },
 
-    updateSettings(settings: Partial<UIState>) {
+    updateSettings(settings: Partial<UIState>, saveToFirebase: boolean = true) {
       Object.assign(this, settings);
-      this.saveSettings();
+      if (saveToFirebase && authStore.isLoggedIn) {
+        this.saveSettings();
+      }
+      this.applyTheme();
     },
 
     async saveSettings() {
@@ -102,7 +120,6 @@ export const useUIStore = defineStore('ui', {
         viewType: this.viewType,
         noteOpenPreference: this.noteOpenPreference,
         blurEnabled: this.blurEnabled,
-        columns: this.columns,
       };
 
       if (authStore.isLoggedIn) {
@@ -113,10 +130,11 @@ export const useUIStore = defineStore('ui', {
         }
       }
 
-      // Always save to localStorage
-      Object.entries(settings).forEach(([key, value]) => {
-        localStorage.setItem(key, JSON.stringify(value));
-      });
+      Object.entries({ ...settings, columns: this.columns }).forEach(
+        ([key, value]) => {
+          localStorage.setItem(key, JSON.stringify(value));
+        }
+      );
     },
 
     clearSettingsListener() {
@@ -144,7 +162,7 @@ export const useUIStore = defineStore('ui', {
 
     setColumns(columns: number) {
       this.columns = this.getValidColumns(columns);
-      this.saveSettings();
+      localStorage.setItem('columns', JSON.stringify(this.columns));
     },
 
     getValidColumns(columns: number): number {
@@ -229,19 +247,23 @@ export const useUIStore = defineStore('ui', {
       document.body.classList.remove('modal-open');
     },
 
+    setSyncing(value: boolean) {
+      this.isSyncing = value;
+    },
+
     async loadSettings() {
       if (authStore.isLoggedIn) {
         const settingsRef = ref(db, `users/${authStore.user!.uid}/settings`);
-        this.settingsListener = onValue(settingsRef, (snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.val();
-            this.updateSettings(data);
-          } else {
-            this.loadUISettings();
-          }
-        });
+        const snapshot = await get(settingsRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          this.updateSettings(data, false);
+        } else {
+          this.loadLocalSettings();
+          this.saveSettings();
+        }
       } else {
-        this.loadUISettings();
+        this.loadLocalSettings();
       }
     },
 

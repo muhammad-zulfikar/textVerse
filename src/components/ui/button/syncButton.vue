@@ -20,7 +20,7 @@
     PhSignIn,
   } from '@phosphor-icons/vue';
   import { useRouter } from 'vue-router';
-  import { notesStore, authStore } from '@/store/stores';
+  import { notesStore, authStore, uiStore } from '@/store/stores';
   import Button from '@/components/ui/button.vue';
 
   const router = useRouter();
@@ -50,6 +50,7 @@
     isSyncing.value = true;
     isSpinning.value = true;
     syncStatus.value = 'syncing';
+    uiStore.setSyncing(true);
 
     try {
       await Promise.all([
@@ -64,7 +65,8 @@
       setTimeout(() => {
         isSyncing.value = false;
         isSpinning.value = false;
-      }, 200);
+        uiStore.setSyncing(false);
+      }, 100);
     }
   };
 

@@ -2,7 +2,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
 import router from './router';
-import { initializeStores, authStore } from './store/stores';
+import { initializeStores } from './store/stores';
 import 'tailwindcss/tailwind.css';
 import './style/style.css';
 import 'quill/dist/quill.snow.css';
@@ -15,11 +15,7 @@ app.use(pinia);
 app.use(router);
 initializeStores();
 
-// Mount the app immediately
 app.mount('#app');
-
-// Initialize auth store after mounting
-authStore.initialize();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js');

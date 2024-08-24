@@ -1,7 +1,7 @@
 <template>
   <div>
     <transition name="slide-fade" mode="out-in">
-      <NoteList v-if="!isLoading" :notes="notesStore.filteredNotes" />
+      <NoteList v-if="showNotes" :notes="notesStore.filteredNotes" />
       <LoadingSpinner v-else />
     </transition>
     <NoteView />
@@ -9,15 +9,39 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted, onUnmounted } from 'vue';
-  import { notesStore, folderStore, uiStore } from '@/store/stores';
+  import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+  import { notesStore, folderStore, uiStore, authStore } from '@/store/stores';
   import NoteList from '@/components/notes/noteList.vue';
   import NoteView from '@/components/notes/noteView.vue';
   import LoadingSpinner from '@/components/ui/loadingSpinner.vue';
   import { DEFAULT_FOLDERS } from '@/store/constants';
   import { nanoid } from 'nanoid';
 
-  const isLoading = ref(true);
+  const showNotes = ref(false);
+
+  const showNotesList = computed(() => {
+    return (
+      (!authStore.isLoggedIn || notesStore.isFirebaseNotesLoaded) &&
+      !uiStore.isSyncing
+    );
+  });
+
+  watch(showNotesList, (newValue) => {
+    if (newValue) {
+      showNotes.value = true;
+    } else {
+      showNotes.value = false;
+    }
+  });
+
+  onMounted(async () => {
+    if (authStore.isLoggedIn) {
+      await notesStore.loadNotesFromFirebase();
+    } else {
+      await notesStore.loadNotesFromLocalStorage();
+    }
+    showNotes.value = true;
+  });
 
   const handlePaste = async (clipboardText: string) => {
     if (clipboardText) {
@@ -54,9 +78,6 @@
 
   onMounted(() => {
     document.addEventListener('keydown', handleKeyDown);
-    setTimeout(() => {
-      isLoading.value = false;
-    }, 100);
   });
 
   onUnmounted(() => {

@@ -44,6 +44,7 @@
     const startTime = Date.now();
 
     try {
+      authStore.initializeAuth();
       await uiStore.initializeSettings();
 
       if (authStore.isLoggedIn) {
@@ -68,6 +69,18 @@
       }, remainingTime);
     }
   });
+
+  watch(
+    () => authStore.isLoggedIn,
+    async (newValue) => {
+      if (newValue) {
+        await uiStore.initializeSettings();
+      } else {
+        uiStore.clearSettingsListener();
+        uiStore.loadLocalSettings();
+      }
+    }
+  );
 </script>
 
 <style>

@@ -16,6 +16,7 @@ interface NotesState {
   searchQuery: string;
   publicNotes: Map<string, string>;
   notesListener: (() => void) | null;
+  isFirebaseNotesLoaded: boolean;
 }
 
 export const useNotesStore = defineStore('notes', {
@@ -27,6 +28,7 @@ export const useNotesStore = defineStore('notes', {
     searchQuery: '',
     publicNotes: new Map(),
     notesListener: null,
+    isFirebaseNotesLoaded: false,
   }),
 
   getters: {
@@ -500,17 +502,30 @@ export const useNotesStore = defineStore('notes', {
     },
 
     async loadNotesFromFirebase() {
+      this.isFirebaseNotesLoaded = false;
       const userId = authStore.user!.uid;
       const notesRef = ref(db, `users/${userId}/notes`);
 
-      this.notesListener = onValue(notesRef, (snapshot) => {
-        const notesData = snapshot.val();
-        if (notesData) {
-          this.notes = Object.values(notesData as Record<string, Note>);
-        } else {
-          this.notes = [];
-        }
-        this.reorderNotes();
+      return new Promise<void>((resolve) => {
+        this.notesListener = onValue(
+          notesRef,
+          (snapshot) => {
+            const notesData = snapshot.val();
+            if (notesData) {
+              this.notes = Object.values(notesData as Record<string, Note>);
+            } else {
+              this.notes = [];
+            }
+            this.reorderNotes();
+            this.isFirebaseNotesLoaded = true;
+            resolve();
+          },
+          (error) => {
+            console.error('Error loading notes from Firebase:', error);
+            this.isFirebaseNotesLoaded = true; // Set to true even on error to prevent infinite loading
+            resolve();
+          }
+        );
       });
     },
 
