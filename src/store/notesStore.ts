@@ -36,16 +36,16 @@ export const useNotesStore = defineStore('notes', {
       state.notes.find((note) => note.id === state.selectedNoteId),
     filteredNotes:
       (state) =>
-      (folderId: string): Note[] => {
-        const query = state.searchQuery.toLowerCase();
-        return state.notes.filter(
-          (note) =>
-            (folderId === DEFAULT_FOLDERS.ALL_NOTES ||
-              note.folder === folderId) &&
-            (note.title.toLowerCase().includes(query) ||
-              note.content.toLowerCase().includes(query))
-        );
-      },
+        (folderId: string): Note[] => {
+          const query = state.searchQuery.toLowerCase();
+          return state.notes.filter(
+            (note) =>
+              (folderId === DEFAULT_FOLDERS.ALL_NOTES ||
+                note.folder === folderId) &&
+              (note.title.toLowerCase().includes(query) ||
+                note.content.toLowerCase().includes(query))
+          );
+        },
   },
 
   actions: {
@@ -507,9 +507,16 @@ export const useNotesStore = defineStore('notes', {
       const notesRef = ref(db, `users/${userId}/notes`);
 
       return new Promise<void>((resolve) => {
+        const timeout = setTimeout(() => {
+          console.warn('Firebase notes loading timed out');
+          this.isFirebaseNotesLoaded = true;
+          resolve();
+        }, 10000);
+
         this.notesListener = onValue(
           notesRef,
           (snapshot) => {
+            clearTimeout(timeout);
             const notesData = snapshot.val();
             if (notesData) {
               this.notes = Object.values(notesData as Record<string, Note>);
@@ -521,8 +528,9 @@ export const useNotesStore = defineStore('notes', {
             resolve();
           },
           (error) => {
+            clearTimeout(timeout);
             console.error('Error loading notes from Firebase:', error);
-            this.isFirebaseNotesLoaded = true; // Set to true even on error to prevent infinite loading
+            this.isFirebaseNotesLoaded = true;
             resolve();
           }
         );
@@ -607,7 +615,7 @@ export const useNotesStore = defineStore('notes', {
       return (
         originalNote.title !== editedNote.title ||
         sanitizeAndNormalizeContent(originalNote.content) !==
-          sanitizeAndNormalizeContent(editedNote.content || '') ||
+        sanitizeAndNormalizeContent(editedNote.content || '') ||
         originalNote.folder !== editedNote.folder
       );
     },
