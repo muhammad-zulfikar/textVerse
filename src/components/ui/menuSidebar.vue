@@ -200,7 +200,7 @@
         const dateB = new Date(b.last_edited || b.time_created).getTime();
         return dateB - dateA;
       })
-      .slice(0, 5);
+      .slice(0, 3);
   });
 
   const signout = async () => {
