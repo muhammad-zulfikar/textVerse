@@ -152,7 +152,10 @@
     }
   };
 
-  const isHomePage = computed(() => route.path === '/');
+  const isHomePage = computed(() => {
+    return route.path === '/' || route.name === 'Note';
+  });
+
   const isSelectModeActive = computed(
     () => notesStore.selectedNotes.length > 0
   );

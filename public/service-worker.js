@@ -1,4 +1,3 @@
-// In your service worker file
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open('google-api-cache').then((cache) => {

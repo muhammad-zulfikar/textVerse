@@ -53,7 +53,9 @@
   const route = useRoute();
   const router = useRouter();
 
-  const currentPath = computed(() => route.name as string);
+  const currentPath = computed(() => {
+    return route.name === 'Note' ? 'Home' : (route.name as string);
+  });
 
   const currentPathName = computed(() => {
     return availableRoutes.value.some((r) => r.name === currentPath.value)
@@ -85,8 +87,9 @@
       (route) =>
         route.name &&
         route.name !== 'NotFound' &&
-        route.path !== '/public/:publicId' &&
-        route.path !== '/about' &&
+        route.name !== 'Public' &&
+        route.name !== 'About' &&
+        route.name !== 'Note' &&
         !(route.name === 'Sign In' && authStore.isLoggedIn)
     )
   );

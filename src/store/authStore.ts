@@ -129,13 +129,13 @@ export const useAuthStore = defineStore('auth', {
             `users/${this.user.uid}/avatars`
           );
 
-          if (newAvatarUrl === '/avatar.png') {
+          if (newAvatarUrl === '/icons/avatar.png') {
             try {
               await deleteObject(imageRef);
             } catch (error) {}
 
             await updateProfile(this.user, { photoURL: null });
-            this.avatarUrl = '/avatar.png';
+            this.avatarUrl = '/icons/avatar.png';
           } else {
             await uploadString(imageRef, newAvatarUrl, 'data_url');
             const downloadURL = await getDownloadURL(imageRef);

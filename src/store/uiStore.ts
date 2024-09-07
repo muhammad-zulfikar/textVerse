@@ -233,17 +233,30 @@ export const useUIStore = defineStore('ui', {
 
     openNote(noteId: string | null) {
       notesStore.selectedNoteId = noteId;
+
+      if (noteId) {
+        window.history.pushState({}, '', `/${noteId}`);
+      }
+
       if (this.noteOpenPreference === 'modal') {
         this.isNoteModalOpen = true;
       } else {
         this.isNoteSidebarOpen = true;
       }
+
       document.body.classList.add('modal-open');
     },
 
     closeNote() {
-      this.isNoteModalOpen = false;
-      this.isNoteSidebarOpen = false;
+      notesStore.selectedNoteId = null;
+      window.history.pushState({}, '', '/');
+
+      if (this.noteOpenPreference === 'modal') {
+        this.isNoteModalOpen = false;
+      } else {
+        this.isNoteSidebarOpen = false;
+      }
+
       document.body.classList.remove('modal-open');
     },
 

@@ -132,7 +132,7 @@
 
   const removeAvatar = async () => {
     try {
-      await authStore.updateAvatar('/avatar.png');
+      await authStore.updateAvatar('/icons/avatar.png');
       showAvatarPicker.value = false;
       uiStore.showToastMessage('Avatar removed successfully');
     } catch (error) {

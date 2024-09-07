@@ -36,16 +36,16 @@ export const useNotesStore = defineStore('notes', {
       state.notes.find((note) => note.id === state.selectedNoteId),
     filteredNotes:
       (state) =>
-        (folderId: string): Note[] => {
-          const query = state.searchQuery.toLowerCase();
-          return state.notes.filter(
-            (note) =>
-              (folderId === DEFAULT_FOLDERS.ALL_NOTES ||
-                note.folder === folderId) &&
-              (note.title.toLowerCase().includes(query) ||
-                note.content.toLowerCase().includes(query))
-          );
-        },
+      (folderId: string): Note[] => {
+        const query = state.searchQuery.toLowerCase();
+        return state.notes.filter(
+          (note) =>
+            (folderId === DEFAULT_FOLDERS.ALL_NOTES ||
+              note.folder === folderId) &&
+            (note.title.toLowerCase().includes(query) ||
+              note.content.toLowerCase().includes(query))
+        );
+      },
   },
 
   actions: {
@@ -224,6 +224,10 @@ export const useNotesStore = defineStore('notes', {
 
     setSelectedNote(noteId: string | null) {
       this.selectedNoteId = noteId;
+    },
+
+    getNoteById(id: string) {
+      return this.notes.find((note) => note.id === id);
     },
 
     // Helper methods (previously private)
@@ -615,7 +619,7 @@ export const useNotesStore = defineStore('notes', {
       return (
         originalNote.title !== editedNote.title ||
         sanitizeAndNormalizeContent(originalNote.content) !==
-        sanitizeAndNormalizeContent(editedNote.content || '') ||
+          sanitizeAndNormalizeContent(editedNote.content || '') ||
         originalNote.folder !== editedNote.folder
       );
     },

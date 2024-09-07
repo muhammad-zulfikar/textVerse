@@ -13,11 +13,11 @@
         class="flex justify-between items-center px-4 py-[6.5px] bg-[#f7f4e4] dark:bg-gray-700"
       >
         <img
-          src="/dark/android-chrome-512x512.png"
+          src="/icons/dark/android-chrome-512x512.png"
           class="size-12 -ml-2 hidden dark:block cursor-pointer"
         />
         <img
-          src="/light/android-chrome-512x512.png"
+          src="/icons/light/android-chrome-512x512.png"
           class="size-12 -ml-2 dark:hidden cursor-pointer"
         />
       </div>

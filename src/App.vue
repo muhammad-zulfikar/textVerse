@@ -2,7 +2,7 @@
   <div class="app-container">
     <LoadingSpinner v-if="isLoading" />
     <template v-else>
-      <Navbar />
+      <Navbar ref="navbarRef" />
       <div class="scrollable-container">
         <router-view v-slot="{ Component, route }">
           <transition :name="transitionName" mode="out-in">
