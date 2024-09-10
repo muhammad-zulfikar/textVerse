@@ -216,10 +216,10 @@
     PhPushPinSlash,
     PhLock,
   } from '@phosphor-icons/vue';
-  import { uiStore, folderStore, authStore } from '@/store/stores';
+  import { uiStore, folderStore, authStore } from '@/utils/stores';
   import Dropdown from '@/components/ui/dropdown.vue';
   import InputModal from '@/components/ui/modal/inputModal.vue';
-  import { DEFAULT_FOLDERS } from '@/store/constants';
+  import { DEFAULT_FOLDERS } from '@/utils/constants';
 
   const props = defineProps<{
     noteId: string | null;

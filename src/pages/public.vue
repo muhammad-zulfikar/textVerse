@@ -70,8 +70,8 @@
 
 <script setup lang="ts">
   import { ref, onMounted, nextTick, onUnmounted, watch } from 'vue';
-  import { notesStore, uiStore } from '@/store/stores';
-  import { Note, PublicNote } from '@/store/types';
+  import { notesStore, uiStore } from '@/utils/stores';
+  import { Note, PublicNote } from '@/utils/types';
   import { useRoute, useRouter } from 'vue-router';
   import { PhFloppyDisk, PhX } from '@phosphor-icons/vue';
   import Quill from 'quill';

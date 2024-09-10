@@ -1,16 +1,27 @@
+// notesStore.ts
+
 import { defineStore } from 'pinia';
-import { Note, PublicNote } from './types';
-import { DEFAULT_FOLDERS } from './constants';
-import { authStore, folderStore, uiStore, firebaseStore } from './stores';
-import { db } from '@/firebase';
-import { get, onValue, ref, remove, set } from 'firebase/database';
+import { Note } from '../utils/types';
+import { DEFAULT_FOLDERS } from '../utils/constants';
+import { authStore, folderStore, uiStore, localStore, firebaseStore } from '../utils/stores';
 import initialNotes from '@/assets/initialNotes.json';
+import {
+  createNoteObject,
+  createUpdatedNoteObject,
+  createDuplicateNoteObject,
+  areValidNotes,
+  compareNotes,
+  hasChanged,
+  localeDate,
+  createPublicNote
+} from '../utils/helpers';
 import DOMPurify from 'dompurify';
 import { nanoid } from 'nanoid';
 
 interface NotesState {
   notes: Note[];
   deletedNotes: Note[];
+  deletedNotesLoaded: boolean;
   selectedNotes: string[];
   selectedNoteId: string | null;
   searchQuery: string;
@@ -23,6 +34,7 @@ export const useNotesStore = defineStore('notes', {
   state: (): NotesState => ({
     notes: [],
     deletedNotes: [],
+    deletedNotesLoaded: false,
     selectedNotes: [],
     selectedNoteId: null,
     searchQuery: '',
@@ -52,19 +64,19 @@ export const useNotesStore = defineStore('notes', {
     async addNote(
       newNote: Omit<Note, 'id' | 'time_created' | 'last_edited' | 'pinned'>
     ) {
-      const note = this.createNoteObject(newNote);
+      const note = createNoteObject(newNote, folderStore.currentFolder);
       await this.saveNoteToStore(note);
       uiStore.showToastMessage(`${note.title} added`);
       return note;
     },
 
     async updateNote(updatedNote: Note) {
-      const noteWithTimestamp = this.createUpdatedNoteObject(updatedNote);
+      const noteWithTimestamp = createUpdatedNoteObject(updatedNote);
       await this.saveNoteToStore(noteWithTimestamp);
     },
 
     async duplicateNote(originalNote: Note) {
-      const newNote = this.createDuplicateNoteObject(originalNote);
+      const newNote = createDuplicateNoteObject(originalNote);
       await this.saveNoteToStore(newNote);
       uiStore.showToastMessage(`${newNote.title} created`);
       return newNote;
@@ -91,8 +103,25 @@ export const useNotesStore = defineStore('notes', {
     },
 
     async permanentlyDeleteNote(noteId: string) {
-      await this.removeNoteFromTrash(noteId, true);
+      if (authStore.isLoggedIn) {
+        await firebaseStore.permanentlyDeleteNoteFromTrash(
+          authStore.user!.uid,
+          noteId
+        );
+      } else {
+        localStore.permanentlyDeleteNoteFromTrashInLocalStorage(noteId);
+      }
       uiStore.showToastMessage('Note permanently deleted');
+    },
+
+    async emptyTrash() {
+      if (authStore.isLoggedIn) {
+        await firebaseStore.emptyTrashInFirebase(authStore.user!.uid);
+      } else {
+        localStore.emptyTrashInLocalStorage();
+      }
+      this.deletedNotes = [];
+      uiStore.showToastMessage('Trash emptied successfully');
     },
 
     async pinNote(noteId: string) {
@@ -215,7 +244,7 @@ export const useNotesStore = defineStore('notes', {
     },
 
     reorderNotes() {
-      this.notes.sort(this.compareNotes);
+      this.notes.sort(compareNotes);
     },
 
     setSearchQuery(query: string) {
@@ -231,56 +260,25 @@ export const useNotesStore = defineStore('notes', {
     },
 
     // Helper methods (previously private)
-    createNoteObject(
-      newNote: Omit<Note, 'id' | 'time_created' | 'last_edited' | 'pinned'>
-    ): Note {
-      const now = new Date().toISOString();
-      return {
-        ...newNote,
-        id: nanoid(),
-        time_created: now,
-        last_edited: now,
-        pinned: false,
-        folder:
-          folderStore.currentFolder === DEFAULT_FOLDERS.ALL_NOTES
-            ? DEFAULT_FOLDERS.UNCATEGORIZED
-            : folderStore.currentFolder,
-        content: DOMPurify.sanitize(newNote.content),
-      };
-    },
-
-    createUpdatedNoteObject(updatedNote: Note): Note {
-      return {
-        ...updatedNote,
-        content: DOMPurify.sanitize(updatedNote.content),
-        last_edited: new Date().toISOString(),
-      };
-    },
-
-    createDuplicateNoteObject(originalNote: Note): Note {
-      return {
-        ...originalNote,
-        id: nanoid(),
-        title: `${originalNote.title} (Copy)`,
-        time_created: new Date().toISOString(),
-        last_edited: new Date().toISOString(),
-        pinned: false,
-      };
+    updateLocalNotes() {
+      if (authStore.isLoggedIn) {
+        firebaseStore.getAllNotesFromFirebase(authStore.user!.uid).then((notes) => {
+          this.notes = Object.values(notes);
+          this.reorderNotes();
+        });
+      } else {
+        this.notes = Object.values(localStore.getAllNotesFromLocalStorage());
+        this.reorderNotes();
+      }
     },
 
     async saveNoteToStore(note: Note) {
       if (authStore.isLoggedIn) {
         await firebaseStore.saveNoteToFirebase(authStore.user!.uid, note);
       } else {
-        const index = this.notes.findIndex((n) => n.id === note.id);
-        if (index !== -1) {
-          this.notes[index] = note;
-        } else {
-          this.notes.unshift(note);
-        }
-        this.saveNotes();
+        localStore.saveNoteToLocalStorage(note);
       }
-      this.reorderNotes();
+      this.updateLocalNotes();
     },
 
     removeNoteFromStore(noteId: string): Note | undefined {
@@ -297,8 +295,7 @@ export const useNotesStore = defineStore('notes', {
       if (authStore.isLoggedIn) {
         await firebaseStore.moveNoteToTrash(authStore.user!.uid, note);
       } else {
-        this.saveDeletedNotes();
-        this.saveNotes(); // Add this line to save the updated notes list
+        localStore.moveNoteToTrashInLocalStorage(note);
       }
     },
 
@@ -342,21 +339,17 @@ export const useNotesStore = defineStore('notes', {
     },
 
     async makeNotePublic(note: Note) {
-      const publicId = nanoid();
-      const publicNote: PublicNote = {
-        id: note.id,
-        uid: authStore.user!.uid,
-        publicId,
-      };
-      const publicRef = ref(db, `publicNotes/${publicId}`);
-      await set(publicRef, publicNote);
-      this.publicNotes.set(note.id, publicId);
-      this.copyLinkToClipboard(publicId);
+      const publicNote = createPublicNote(note, authStore.user!.uid);
+      
+      await firebaseStore.savePublicNote(publicNote);
+
+      this.publicNotes.set(note.id, publicNote.publicId);
+      this.copyLinkToClipboard(publicNote.publicId);
     },
 
     async removePublicNote(publicId: string) {
-      const publicRef = ref(db, `publicNotes/${publicId}`);
-      await remove(publicRef);
+      await firebaseStore.removePublicNote(publicId);
+
       for (const [noteId, id] of this.publicNotes.entries()) {
         if (id === publicId) {
           this.publicNotes.delete(noteId);
@@ -393,7 +386,6 @@ export const useNotesStore = defineStore('notes', {
         await this.validateAndSaveImportedNotes(importedNotes);
         uiStore.showToastMessage('Notes and folders imported successfully!');
       } catch (error) {
-        console.error('Import error:', error);
         uiStore.showToastMessage(
           'Failed to import notes. Please check the file format and try again.'
         );
@@ -401,26 +393,13 @@ export const useNotesStore = defineStore('notes', {
     },
 
     async validateAndSaveImportedNotes(importedNotes: Note[]) {
-      if (!Array.isArray(importedNotes) || !this.areValidNotes(importedNotes)) {
+      if (!Array.isArray(importedNotes) || !areValidNotes(importedNotes)) {
         throw new Error('Invalid notes format.');
       }
 
       await this.importFolders(importedNotes);
       await this.saveImportedNotes(importedNotes);
       await this.loadNotes();
-    },
-
-    areValidNotes(notes: any[]): notes is Note[] {
-      return notes.every(
-        (note) =>
-          note.id &&
-          note.title &&
-          note.content &&
-          note.time_created &&
-          note.last_edited &&
-          typeof note.pinned === 'boolean' &&
-          note.folder
-      );
     },
 
     async importFolders(notes: Note[]) {
@@ -451,7 +430,9 @@ export const useNotesStore = defineStore('notes', {
         }
       } else {
         this.notes = [...this.notes, ...notes];
-        this.saveNotes();
+        notes.forEach(note => {
+          localStore.saveNoteToLocalStorage(note);
+        });
       }
     },
 
@@ -483,17 +464,11 @@ export const useNotesStore = defineStore('notes', {
 
     async clearAllNotes() {
       if (authStore.isLoggedIn) {
-        const notesRef = ref(db, `users/${authStore.user!.uid}/notes`);
-        const folderRef = ref(db, `users/${authStore.user!.uid}/folders`);
-        await remove(notesRef);
-        await remove(folderRef);
+        await firebaseStore.clearAllNotesFromFirebase(authStore.user!.uid);
       } else {
-        localStorage.removeItem('notes');
-        localStorage.removeItem('folders');
+        localStore.clearAllNotesFromLocalStorage();
         this.deletedNotes.push(...this.notes);
       }
-      this.notes = [];
-      this.saveNotes();
     },
 
     resetFolders() {
@@ -508,66 +483,52 @@ export const useNotesStore = defineStore('notes', {
     async loadNotesFromFirebase() {
       this.isFirebaseNotesLoaded = false;
       const userId = authStore.user!.uid;
-      const notesRef = ref(db, `users/${userId}/notes`);
-
+      
       return new Promise<void>((resolve) => {
         const timeout = setTimeout(() => {
           console.warn('Firebase notes loading timed out');
           this.isFirebaseNotesLoaded = true;
           resolve();
         }, 10000);
-
-        this.notesListener = onValue(
-          notesRef,
-          (snapshot) => {
-            clearTimeout(timeout);
-            const notesData = snapshot.val();
-            if (notesData) {
-              this.notes = Object.values(notesData as Record<string, Note>);
-            } else {
-              this.notes = [];
-            }
+    
+        this.notesListener = firebaseStore.onNotesUpdate(userId, (notes) => {
+          clearTimeout(timeout);
+          if (notes === null || notes === undefined) {
+            this.notes = [];
+          } else {
+            this.notes = Object.values(notes);
             this.reorderNotes();
-            this.isFirebaseNotesLoaded = true;
-            resolve();
-          },
-          (error) => {
-            clearTimeout(timeout);
-            console.error('Error loading notes from Firebase:', error);
-            this.isFirebaseNotesLoaded = true;
-            resolve();
           }
-        );
+          this.isFirebaseNotesLoaded = true;
+          resolve();
+        });
       });
     },
 
     async loadNotesFromLocalStorage() {
-      const savedNotes = localStorage.getItem('notes');
-      if (savedNotes) {
-        this.notes = JSON.parse(savedNotes);
-      } else {
-        await this.loadInitialNotes();
-      }
-
-      const savedDeletedNotes = localStorage.getItem('deletedNotes');
-      if (savedDeletedNotes) {
-        this.deletedNotes = JSON.parse(savedDeletedNotes);
-      }
+      const notes = localStore.getAllNotesFromLocalStorage();
+      this.notes = Object.values(notes);
+      this.deletedNotes = Object.values(localStore.getDeletedNotesFromLocalStorage());
     },
 
     async loadInitialNotes() {
       const importedNotes = initialNotes.map((note) => ({
         ...note,
-        id: nanoid(),
+        id: note.id,
         time_created: note.time_created,
         last_edited: note.time_created,
         pinned: false,
         folder: note.folder || DEFAULT_FOLDERS.UNCATEGORIZED,
       }));
-
+    
       await this.importFolders(importedNotes);
       this.notes = importedNotes;
-      this.saveNotes();
+    
+      importedNotes.forEach((note) => {
+        localStore.saveNoteToLocalStorage(note);
+      });
+    
+      localStore.setInitialNotesLoaded(true);
     },
 
     async performNoteSync(userId: string) {
@@ -579,26 +540,10 @@ export const useNotesStore = defineStore('notes', {
 
       this.notes = Object.values(firebaseNotes);
       this.reorderNotes();
-      this.saveNotes();
 
       const elapsedTime = Date.now() - startTime;
       if (elapsedTime < 800) {
         await new Promise((resolve) => setTimeout(resolve, 800 - elapsedTime));
-      }
-    },
-
-    compareNotes(a: Note, b: Note): number {
-      if (a.pinned !== b.pinned) {
-        return a.pinned ? -1 : 1;
-      }
-      const dateA = new Date(a.last_edited || a.time_created).getTime();
-      const dateB = new Date(b.last_edited || b.time_created).getTime();
-      return dateB - dateA;
-    },
-
-    saveNotes() {
-      if (!authStore.isLoggedIn) {
-        localStorage.setItem('notes', JSON.stringify(this.notes));
       }
     },
 
@@ -609,29 +554,11 @@ export const useNotesStore = defineStore('notes', {
     },
 
     hasChanged(originalNote: Note, editedNote: Partial<Note>): boolean {
-      const sanitizeAndNormalizeContent = (content: string) => {
-        const sanitized = DOMPurify.sanitize(content);
-        const div = document.createElement('div');
-        div.innerHTML = sanitized;
-        return div.innerHTML;
-      };
-
-      return (
-        originalNote.title !== editedNote.title ||
-        sanitizeAndNormalizeContent(originalNote.content) !==
-          sanitizeAndNormalizeContent(editedNote.content || '') ||
-        originalNote.folder !== editedNote.folder
-      );
+      return hasChanged(originalNote, editedNote);
     },
 
     localeDate(dateString: string | Date): string {
-      const date =
-        typeof dateString === 'string' ? new Date(dateString) : dateString;
-      return date.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      });
+      return localeDate(dateString);
     },
 
     addSelectedNote(noteId: string) {
@@ -695,38 +622,28 @@ export const useNotesStore = defineStore('notes', {
       this.clearSelectedNotes();
     },
 
-    async emptyTrash() {
-      if (authStore.isLoggedIn) {
-        await firebaseStore.emptyTrashInFirebase(authStore.user!.uid);
-      }
-      this.deletedNotes = [];
-      this.saveDeletedNotes();
-      uiStore.showToastMessage('Trash emptied successfully');
-    },
-
     async loadDeletedNotes() {
       if (authStore.isLoggedIn) {
         const deletedNotes = await firebaseStore.getDeletedNotesFromFirebase(
           authStore.user!.uid
         );
         this.deletedNotes = Object.values(deletedNotes);
+        this.deletedNotesLoaded = true;
       } else {
         const savedDeletedNotes = localStorage.getItem('deletedNotes');
         if (savedDeletedNotes) {
           this.deletedNotes = JSON.parse(savedDeletedNotes);
+          this.deletedNotesLoaded = true;
         }
       }
     },
 
     async fetchPublicNotes() {
-      const publicNotesRef = ref(db, `publicNotes`);
-      const snapshot = await get(publicNotesRef);
-      if (snapshot.exists()) {
-        const publicNotes = snapshot.val() as Record<string, PublicNote>;
-        Object.values(publicNotes).forEach((publicNote) => {
-          this.publicNotes.set(publicNote.id, publicNote.publicId);
-        });
-      }
+      const publicNotes = await firebaseStore.getPublicNotes();
+
+      Object.values(publicNotes).forEach((publicNote) => {
+        this.publicNotes.set(publicNote.id, publicNote.publicId);
+      });
     },
   },
 });

@@ -157,7 +157,7 @@
 <script setup lang="ts">
   import { ref, computed, watch } from 'vue';
   import { useRouter } from 'vue-router';
-  import { authStore, notesStore, uiStore, folderStore } from '@/store/stores';
+  import { authStore, notesStore, uiStore, folderStore } from '@/utils/stores';
   import {
     PhHouseLine,
     // PhInfo,

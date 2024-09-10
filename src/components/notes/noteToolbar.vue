@@ -78,8 +78,8 @@
   import NoteOptionDropdown from '@/components/ui/dropdown/noteOptionDropdown.vue';
   import Button from '@/components/ui/button.vue';
   import LastEditedButton from '@/components/ui/button/lastEditedButton.vue';
-  import { notesStore, uiStore } from '@/store/stores';
-  import { Note } from '@/store/types';
+  import { notesStore, uiStore } from '@/utils/stores';
+  import { Note } from '@/utils/types';
 
   const props = defineProps<{
     note: Note;

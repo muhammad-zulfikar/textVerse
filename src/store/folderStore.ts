@@ -1,8 +1,8 @@
 // stores/folderStore.ts
 
 import { defineStore } from 'pinia';
-import { DEFAULT_FOLDERS } from './constants';
-import { authStore, notesStore, uiStore, firebaseStore } from './stores';
+import { DEFAULT_FOLDERS } from '../utils/constants';
+import { authStore, notesStore, uiStore, firebaseStore } from '../utils/stores';
 import { off, onValue, ref } from 'firebase/database';
 import { db } from '@/firebase';
 

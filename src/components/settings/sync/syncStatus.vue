@@ -48,7 +48,7 @@
     PhSignIn,
     PhSignOut,
   } from '@phosphor-icons/vue';
-  import { authStore, uiStore } from '@/store/stores';
+  import { authStore, uiStore } from '@/utils/stores';
 
   const router = useRouter();
 

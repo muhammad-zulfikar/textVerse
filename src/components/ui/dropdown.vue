@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, watch } from 'vue';
-  import { uiStore } from '@/store/stores';
+  import { uiStore } from '@/utils/stores';
 
   const props = defineProps<{
     dropdownId: string;

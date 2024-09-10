@@ -76,12 +76,12 @@
               @click.stop="increaseColumns"
               :class="{
                 'text-gray-400 cursor-default':
-                  uiStore.columns >= (isMobile ? 2 : 4),
+                  uiStore.columns >= (isMobile ? 2 : 5),
                 'hover:bg-[#d9c698] dark:hover:bg-gray-600':
-                  uiStore.columns < (isMobile ? 2 : 4),
+                  uiStore.columns < (isMobile ? 2 : 5),
               }"
               class="text-center text-sm p-2 mb-1 rounded-md transition-colors duration-200"
-              :disabled="uiStore.columns >= (isMobile ? 2 : 4)"
+              :disabled="uiStore.columns >= (isMobile ? 2 : 5)"
             >
               <PhPlusCircle :size="16" />
             </button>
@@ -156,7 +156,7 @@
 
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted } from 'vue';
-  import { uiStore } from '@/store/stores';
+  import { uiStore } from '@/utils/stores';
   import {
     PhSquaresFour,
     PhTable,
@@ -187,13 +187,13 @@
   const setViewType = (viewType: 'card' | 'table' | 'mail' | 'folder') => {
     uiStore.setViewType(viewType);
     if (viewType !== 'card') {
-      uiStore.setColumns(isMobile.value ? 1 : 4);
+      uiStore.setColumns(isMobile.value ? 2 : 4);
     }
     closeModal();
   };
 
   const increaseColumns = () => {
-    if (uiStore.columns < (isMobile.value ? 2 : 4)) {
+    if (uiStore.columns < (isMobile.value ? 2 : 5)) {
       uiStore.setColumns(uiStore.columns + 1);
     }
     uiStore.setViewType('card');

@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-  import { uiStore } from '@/store/stores';
+  import { uiStore } from '@/utils/stores';
 
   defineProps({
     modelValue: {

@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
   import { PhDownload } from '@phosphor-icons/vue';
-  import { notesStore, uiStore } from '@/store/stores';
+  import { notesStore, uiStore } from '@/utils/stores';
 
   const downloadBackup = () => {
     notesStore.downloadBackup();

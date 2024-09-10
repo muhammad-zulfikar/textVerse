@@ -29,7 +29,7 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   import { PhTrash } from '@phosphor-icons/vue';
-  import { notesStore, uiStore } from '@/store/stores';
+  import { notesStore, uiStore } from '@/utils/stores';
   import AlertModal from '@/components/ui/modal/alertModal.vue';
 
   const showDeleteDataConfirmation = ref(false);

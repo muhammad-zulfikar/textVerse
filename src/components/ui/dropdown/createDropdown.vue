@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue';
-  import { uiStore, folderStore } from '@/store/stores';
+  import { uiStore, folderStore } from '@/utils/stores';
   import { PhPlus, PhFile, PhFolder } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
   import InputModal from '@/components/ui/modal/inputModal.vue';

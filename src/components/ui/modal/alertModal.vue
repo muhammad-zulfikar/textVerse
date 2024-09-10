@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
   import { PhProhibit, PhCheckCircle } from '@phosphor-icons/vue';
-  import { uiStore } from '@/store/stores';
+  import { uiStore } from '@/utils/stores';
   import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
 
   const props = defineProps<{

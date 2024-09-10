@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-  import { authStore } from '@/store/stores';
+  import { authStore } from '@/utils/stores';
   import { PhInfo, PhGithubLogo } from '@phosphor-icons/vue';
   import SyncStatus from '@/components/settings/sync/syncStatus.vue';
   import ImportNotes from '@/components/settings/sync/importNotes.vue';

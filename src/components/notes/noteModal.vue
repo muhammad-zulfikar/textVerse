@@ -36,9 +36,9 @@
   import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
   import { onValue, ref as dbRef } from 'firebase/database';
   import { db } from '@/firebase';
-  import { Note } from '@/store/types';
-  import { notesStore, folderStore, uiStore, authStore } from '@/store/stores';
-  import { DEFAULT_FOLDERS } from '@/store/constants';
+  import { Note } from '@/utils/types';
+  import { notesStore, folderStore, uiStore, authStore } from '@/utils/stores';
+  import { DEFAULT_FOLDERS } from '@/utils/constants';
   import { nanoid } from 'nanoid';
   import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
   import NoteToolbar from '@/components/notes/noteToolbar.vue';

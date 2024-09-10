@@ -117,8 +117,8 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted, onUnmounted } from 'vue';
-  import { notesStore, folderStore, uiStore } from '@/store/stores';
-  import { Note } from '@/store/types';
+  import { notesStore, folderStore, uiStore } from '@/utils/stores';
+  import { Note } from '@/utils/types';
   import {
     PhNotePencil,
     PhClipboardText,
@@ -135,7 +135,7 @@
   } from '@phosphor-icons/vue';
 
   import { CSSProperties } from 'vue';
-  import { DEFAULT_FOLDERS } from '@/store/constants';
+  import { DEFAULT_FOLDERS } from '@/utils/constants';
 
   const props = defineProps({
     visible: {

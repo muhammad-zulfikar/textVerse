@@ -1,153 +1,111 @@
 // firebaseStore.ts
 
+import { defineStore } from 'pinia';
 import { ref, set, get, remove, update, onValue } from 'firebase/database';
 import { db } from '@/firebase';
-import { Note } from './types';
+import { Note, PublicNote } from '../utils/types';
 
-export const saveNoteToFirebase = async (
-  userId: string,
-  note: Note
-): Promise<string> => {
-  const noteRef = ref(db, `users/${userId}/notes/${note.id}`);
-  await set(noteRef, note);
-  return note.id;
-};
+export const useFirebaseStore = defineStore('firebase', {
+  actions: {
+    async saveNoteToFirebase(userId: string, note: Note): Promise<string> {
+      const noteRef = ref(db, `users/${userId}/notes/${note.id}`);
+      await set(noteRef, note);
+      return note.id;
+    },
 
-export const updateNoteInFirebase = async (
-  userId: string,
-  noteId: string,
-  note: Partial<Note>
-): Promise<void> => {
-  const noteRef = ref(db, `users/${userId}/notes/${noteId}`);
-  await update(noteRef, note);
-};
+    async updateNoteInFirebase(userId: string, noteId: string, note: Partial<Note>): Promise<void> {
+      const noteRef = ref(db, `users/${userId}/notes/${noteId}`);
+      await update(noteRef, note);
+    },
 
-export const deleteNoteFromFirebase = async (
-  userId: string,
-  noteId: string
-): Promise<void> => {
-  const noteRef = ref(db, `users/${userId}/notes/${noteId}`);
-  await remove(noteRef);
-};
+    async deleteNoteFromFirebase(userId: string, noteId: string): Promise<void> {
+      const noteRef = ref(db, `users/${userId}/notes/${noteId}`);
+      await remove(noteRef);
+    },
 
-export const getNoteFromFirebase = async (
-  userId: string,
-  noteId: string
-): Promise<Note | null> => {
-  const noteRef = ref(db, `users/${userId}/notes/${noteId}`);
-  const snapshot = await get(noteRef);
-  return snapshot.val() as Note | null;
-};
+    async getNoteFromFirebase(userId: string, noteId: string): Promise<Note | null> {
+      const noteRef = ref(db, `users/${userId}/notes/${noteId}`);
+      const snapshot = await get(noteRef);
+      return snapshot.val() as Note | null;
+    },
 
-export const getAllNotesFromFirebase = async (
-  userId: string
-): Promise<Record<number, Note>> => {
-  const notesRef = ref(db, `users/${userId}/notes`);
-  const snapshot = await get(notesRef);
-  return (snapshot.val() as Record<number, Note>) || {};
-};
+    async getAllNotesFromFirebase(userId: string): Promise<Record<string, Note>> {
+      const notesRef = ref(db, `users/${userId}/notes`);
+      const snapshot = await get(notesRef);
+      return (snapshot.val() as Record<string, Note>) || {};
+    },
 
-export const saveFolderToFirebase = async (
-  userId: string,
-  folderName: string
-): Promise<void> => {
-  const folderRef = ref(db, `users/${userId}/folders/${folderName}`);
-  await set(folderRef, true);
-};
+    async saveFolderToFirebase(userId: string, folderName: string): Promise<void> {
+      const folderRef = ref(db, `users/${userId}/folders/${folderName}`);
+      await set(folderRef, true);
+    },
 
-export const deleteFolderFromFirebase = async (
-  userId: string,
-  folderName: string
-): Promise<void> => {
-  const folderRef = ref(db, `users/${userId}/folders/${folderName}`);
-  await remove(folderRef);
-};
+    async deleteFolderFromFirebase(userId: string, folderName: string): Promise<void> {
+      const folderRef = ref(db, `users/${userId}/folders/${folderName}`);
+      await remove(folderRef);
+    },
 
-export const getAllFoldersFromFirebase = async (
-  userId: string
-): Promise<string[]> => {
-  const foldersRef = ref(db, `users/${userId}/folders`);
-  const snapshot = await get(foldersRef);
-  return snapshot.val() ? Object.keys(snapshot.val()) : [];
-};
+    async getAllFoldersFromFirebase(userId: string): Promise<string[]> {
+      const foldersRef = ref(db, `users/${userId}/folders`);
+      const snapshot = await get(foldersRef);
+      return snapshot.val() ? Object.keys(snapshot.val()) : [];
+    },
 
-export const updateNoteFolderInFirebase = async (
-  userId: string,
-  noteId: string,
-  newFolder: string
-): Promise<void> => {
-  const noteRef = ref(db, `users/${userId}/notes/${noteId}`);
-  await update(noteRef, { folder: newFolder });
-};
+    async moveNoteToTrash(userId: string, note: Note): Promise<void> {
+      const noteRef = ref(db, `users/${userId}/trash/${note.id}`);
+      await set(noteRef, note);
+      await this.deleteNoteFromFirebase(userId, note.id);
+    },
 
-export const moveNoteToTrash = async (
-  userId: string,
-  note: Note
-): Promise<void> => {
-  const noteRef = ref(db, `users/${userId}/trash/${note.id}`);
-  await set(noteRef, note);
-  await deleteNoteFromFirebase(userId, note.id);
-};
+    async restoreNoteFromTrash(userId: string, note: Note): Promise<void> {
+      await this.saveNoteToFirebase(userId, note);
+      await remove(ref(db, `users/${userId}/trash/${note.id}`));
+    },
 
-export const restoreNoteFromTrash = async (
-  userId: string,
-  note: Note
-): Promise<void> => {
-  await saveNoteToFirebase(userId, note);
-  await remove(ref(db, `users/${userId}/trash/${note.id}`));
-};
+    async permanentlyDeleteNoteFromTrash(userId: string, noteId: string): Promise<void> {
+      await remove(ref(db, `users/${userId}/trash/${noteId}`));
+    },
 
-export const permanentlyDeleteNoteFromTrash = async (
-  userId: string,
-  noteId: string
-): Promise<void> => {
-  await remove(ref(db, `users/${userId}/trash/${noteId}`));
-};
+    async emptyTrashInFirebase(userId: string): Promise<void> {
+      const trashRef = ref(db, `users/${userId}/trash`);
+      await remove(trashRef);
+    },
 
-export const emptyTrashInFirebase = async (userId: string): Promise<void> => {
-  const trashRef = ref(db, `users/${userId}/trash`);
-  await remove(trashRef);
-};
+    async getDeletedNotesFromFirebase(userId: string): Promise<Record<string, Note>> {
+      const trashRef = ref(db, `users/${userId}/trash`);
+      const snapshot = await get(trashRef);
+      return (snapshot.val() as Record<string, Note>) || {};
+    },
 
-export const deleteOldTrashItems = async (userId: string): Promise<void> => {
-  const trashRef = ref(db, `users/${userId}/trash`);
-  const snapshot = await get(trashRef);
-  const trash = snapshot.val() as Record<string, Note>;
+    onNotesUpdate(userId: string, callback: (notes: Record<string, Note>) => void): (() => void) {
+      const notesRef = ref(db, `users/${userId}/notes`);
+      return onValue(notesRef, (snapshot) => {
+        const notes = snapshot.val() as Record<string, Note>;
+        callback(notes);
+      });
+    },
 
-  if (trash) {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    async savePublicNote(publicNote: PublicNote): Promise<void> {
+      const publicRef = ref(db, `publicNotes/${publicNote.publicId}`);
+      await set(publicRef, publicNote);
+    },
 
-    for (const [noteId, note] of Object.entries(trash)) {
-      const timeDeleted = note.time_deleted;
-      if (timeDeleted) {
-        const timeDeletedDate = new Date(timeDeleted);
-        if (
-          !isNaN(timeDeletedDate.getTime()) &&
-          timeDeletedDate < thirtyDaysAgo
-        ) {
-          await permanentlyDeleteNoteFromTrash(userId, noteId);
-        }
-      }
+    async removePublicNote(publicId: string): Promise<void> {
+      const publicRef = ref(db, `publicNotes/${publicId}`);
+      await remove(publicRef);
+    },
+
+    async getPublicNotes(): Promise<Record<string, PublicNote>> {
+      const publicNotesRef = ref(db, 'publicNotes');
+      const snapshot = await get(publicNotesRef);
+      return snapshot.val() as Record<string, PublicNote> || {};
+    },
+
+    async clearAllNotesFromFirebase(userId: string): Promise<void> {
+      const notesRef = ref(db, `users/${userId}/notes`);
+      const foldersRef = ref(db, `users/${userId}/folders`);
+      await remove(notesRef);
+      await remove(foldersRef);
     }
   }
-};
-
-export const getDeletedNotesFromFirebase = async (
-  userId: string
-): Promise<Record<number, Note>> => {
-  const trashRef = ref(db, `users/${userId}/trash`);
-  const snapshot = await get(trashRef);
-  return (snapshot.val() as Record<number, Note>) || {};
-};
-
-export const onNotesUpdate = (
-  userId: string,
-  callback: (notes: Record<string, Note>) => void
-): (() => void) => {
-  const notesRef = ref(db, `users/${userId}/notes`);
-  return onValue(notesRef, (snapshot) => {
-    const notes = snapshot.val() as Record<string, Note>;
-    callback(notes);
-  });
-};
+});

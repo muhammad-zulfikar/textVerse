@@ -37,7 +37,7 @@
 <script setup lang="ts">
   import { computed } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { authStore } from '@/store/stores';
+  import { authStore } from '@/utils/stores';
   import {
     PhTrash,
     PhHouseLine,

@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { notesStore, uiStore } from '@/store/stores';
+  import { notesStore, uiStore } from '@/utils/stores';
   import NoteModal from '@/components/notes/noteModal.vue';
   import NoteSidebar from '@/components/notes/noteSidebar.vue';
 </script>

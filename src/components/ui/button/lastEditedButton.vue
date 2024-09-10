@@ -36,7 +36,7 @@
   } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
   import Button from '@/components/ui/button.vue';
-  import { notesStore } from '@/store/stores';
+  import { notesStore } from '@/utils/stores';
 
   const props = defineProps<{
     lastEdited: string | Date;

@@ -20,7 +20,7 @@
 <script setup lang="ts">
   import { ref, onMounted, watch } from 'vue';
   import { useRouter } from 'vue-router';
-  import { authStore, uiStore, folderStore, notesStore } from './store/stores';
+  import { authStore, uiStore, folderStore, notesStore } from './utils/stores';
   import Navbar from '@/components/navbar/navbar.vue';
   import Toast from '@/components/ui/toast.vue';
   import LoadingSpinner from '@/components/ui/loadingSpinner.vue';

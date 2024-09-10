@@ -1,7 +1,7 @@
 // stores/uiStore.ts
 
 import { defineStore } from 'pinia';
-import { authStore, notesStore } from './stores';
+import { authStore, notesStore } from '../utils/stores';
 import { ref, set, onValue, off, get } from 'firebase/database';
 import { db } from '@/firebase';
 
@@ -25,8 +25,8 @@ interface UIState {
   isNoteModalOpen: boolean;
   isNoteSidebarOpen: boolean;
   isEditing: boolean;
-  isCreatingNote: boolean;
   isSyncing: boolean;
+  isSelectMode: boolean;
   settingsListener: (() => void) | null;
 }
 
@@ -46,8 +46,8 @@ export const useUIStore = defineStore('ui', {
     isNoteModalOpen: false,
     isNoteSidebarOpen: false,
     isEditing: false,
-    isCreatingNote: false,
     isSyncing: false,
+    isSelectMode: false,
     settingsListener: null,
   }),
 
@@ -313,6 +313,10 @@ export const useUIStore = defineStore('ui', {
       if (newColumns !== this.columns) {
         this.setColumns(newColumns);
       }
+    },
+
+    toggleSelectMode() {
+      this.isSelectMode = !this.isSelectMode;
     },
   },
 });

@@ -56,7 +56,7 @@
     PhMoon,
     PhCaretDown,
   } from '@phosphor-icons/vue';
-  import { uiStore } from '@/store/stores';
+  import { uiStore } from '@/utils/stores';
   import Dropdown from '@/components/ui/dropdown.vue';
 
   const isOpen = ref(false);

@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
   import { PhUpload } from '@phosphor-icons/vue';
-  import { notesStore, uiStore } from '@/store/stores';
+  import { notesStore, uiStore } from '@/utils/stores';
 
   const importNotes = () => {
     notesStore.importNotes();

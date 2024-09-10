@@ -20,7 +20,7 @@
     PhSignIn,
   } from '@phosphor-icons/vue';
   import { useRouter } from 'vue-router';
-  import { notesStore, authStore, uiStore } from '@/store/stores';
+  import { notesStore, authStore, uiStore } from '@/utils/stores';
   import Button from '@/components/ui/button.vue';
 
   const router = useRouter();

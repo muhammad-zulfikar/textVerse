@@ -2,7 +2,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
 import router from './router';
-import { initializeStores } from './store/stores';
+import { initializeStores } from './utils/stores';
 import 'tailwindcss/tailwind.css';
 import './style/style.css';
 import 'quill/dist/quill.snow.css';

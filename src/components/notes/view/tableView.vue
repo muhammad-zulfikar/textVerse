@@ -2,55 +2,6 @@
 
 <template>
   <div class="max-w-5xl mx-auto px-2 md:px-0 text-sm md:text-base mt-4 md:mt-0">
-    <div
-      class="flex justify-between items-center relative font-serif md:px-4 xl:px-0 mb-4 md:mb-0"
-    >
-      <div class="flex items-center">
-        <div class="mr-2 md:mr-4">
-          <Folder />
-        </div>
-      </div>
-      <div class="flex items-center">
-        <Dropdown
-          dropdownId="showDropdown"
-          contentWidth="w-fit"
-          direction="down"
-        >
-          <template #label>
-            <div
-              class="flex items-center text-sm mr-2 md:mr-4 px-2 py-1.5 custom-card hover:bg-[#d9c698] dark:hover:bg-gray-700"
-            >
-              <PhEye :size="20" class="size-5 mr-2" />
-              Show
-            </div>
-          </template>
-          <div class="px-[3px]">
-            <a
-              v-for="column in filteredColumns"
-              :key="column"
-              @click.stop="toggleColumn(column)"
-              class="text-sm px-3 py-2 cursor-pointer w-full text-left rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
-              role="menuitem"
-            >
-              <input
-                type="checkbox"
-                :checked="visibleColumns.includes(column)"
-                class="mr-2 cursor-pointer"
-                @click.stop="toggleColumn(column)"
-              />
-              {{ column }}
-            </a>
-          </div>
-        </Dropdown>
-        <button
-          @click="toggleSelectMode"
-          class="flex items-center text-sm px-2 py-1.5 custom-card hover:bg-[#d9c698] dark:hover:bg-gray-700"
-        >
-          <PhCheckCircle :size="20" class="size-5 mr-2" />
-          Select
-        </button>
-      </div>
-    </div>
     <div class="overflow-x-auto md:px-4 xl:px-0">
       <table
         class="min-w-[800px] w-full border-separate border-spacing-0 font-serif rounded-lg overflow-hidden"
@@ -58,7 +9,7 @@
         <thead>
           <tr class="bg-[#ebdfc0] dark:bg-gray-800">
             <th
-              v-if="isSelectMode"
+              v-if="uiStore.isSelectMode"
               class="p-3 text-left w-10 border-b-[1px] border-r-[1px] border-black dark:border-white"
             >
               <input
@@ -92,7 +43,7 @@
             class="bg-cream dark:bg-gray-750"
           >
             <td
-              v-if="isSelectMode"
+              v-if="uiStore.isSelectMode"
               class="p-3 w-10 border-b-[1px] border-r-[1px] border-black dark:border-white"
             >
               <input
@@ -107,13 +58,12 @@
               class="w-[250px] p-3 border-b-[1px] border-r-[1px] border-black dark:border-white relative group"
             >
               <div class="flex items-center">
-                <input
-                  :value="note.title"
-                  @input="updateNoteTitle(note, $event)"
-                  @blur="saveNoteIfChanged(note)"
+                <div
                   class="w-full bg-transparent outline-none"
                   :class="{ underline: note.pinned }"
-                />
+                >
+                  {{ note.title }}
+                </div>
                 <div @click="uiStore.openNote(note.id)">
                   <span
                     class="bg-[#ebdfc0] dark:bg-gray-800 hover:bg-[#d9c698] dark:hover:bg-gray-700 active:bg-cream dark:active:bg-gray-700 rounded-lg border-[1px] border-black dark:border-white shadow-md hover:shadow-xl transition-all duration-300 text-sm ml-2 px-2 py-1 absolute right-2 top-1/2 transform -translate-y-1/2 group-hover:inline-block md:group-hover:inline-block md:hidden cursor-pointer"
@@ -165,8 +115,6 @@
 <script setup lang="ts">
   import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
   import {
-    PhEye,
-    PhCheckCircle,
     PhArrowSquareOut,
     PhFolder,
     PhFolderMinus,
@@ -174,27 +122,13 @@
     PhArticle,
     PhCalendar,
   } from '@phosphor-icons/vue';
-  import { Note } from '@/store/types';
-  import { uiStore, notesStore, folderStore } from '@/store/stores';
-  import Folder from '@/components/ui/dropdown/folderDropdown.vue';
-  import Dropdown from '@/components/ui/dropdown.vue';
+  import { Note } from '@/utils/types';
+  import { uiStore, notesStore, folderStore } from '@/utils/stores';
   import DOMPurify from 'dompurify';
 
   const props = defineProps<{
     notes: Note[];
   }>();
-
-  const updatedNotes = ref<{
-    [key: string]: Partial<Note>;
-  }>({});
-
-  const updateNoteTitle = (note: Note, event: Event) => {
-    const newTitle = (event.target as HTMLInputElement).value;
-    if (!updatedNotes.value[note.id]) {
-      updatedNotes.value[note.id] = { ...note };
-    }
-    updatedNotes.value[note.id].title = newTitle;
-  };
 
   const sanitizeHtml = (content: string) => {
     return DOMPurify.sanitize(content);
@@ -204,16 +138,6 @@
     const div = document.createElement('div');
     div.innerHTML = content;
     return div.innerHTML;
-  };
-
-  const saveNoteIfChanged = (note: Note) => {
-    if (updatedNotes.value[note.id]) {
-      const updatedNote = { ...note, ...updatedNotes.value[note.id] };
-      if (notesStore.hasChanged(note, updatedNote)) {
-        notesStore.updateNote(updatedNote);
-      }
-      delete updatedNotes.value[note.id];
-    }
   };
 
   const getColumnIcon = (column: string) => {
@@ -233,15 +157,8 @@
 
   const availableColumns = ['Title', 'Content', 'Folder', 'Date'];
   const visibleColumns = ref(availableColumns);
-  const isSelectMode = ref(false);
   const selectedNotes = ref<string[]>([]);
   const isMobile = ref(window.innerWidth < 768);
-
-  const filteredColumns = computed(() => {
-    return isMobile.value
-      ? availableColumns.filter((col) => col !== 'Content')
-      : availableColumns;
-  });
 
   const allSelected = computed(() => {
     return (
@@ -266,30 +183,21 @@
       notesStore.removeSelectedNote(noteId);
     }
 
-    if (notesStore.selectedNotes.length > 0 && !isSelectMode.value) {
-      isSelectMode.value = true;
-    } else if (notesStore.selectedNotes.length === 0 && isSelectMode.value) {
-      isSelectMode.value = false;
+    if (notesStore.selectedNotes.length > 0 && !uiStore.isSelectMode) {
+      uiStore.isSelectMode = true;
+    } else if (notesStore.selectedNotes.length === 0 && uiStore.isSelectMode) {
+      uiStore.isSelectMode = false;
     }
   };
 
-  const toggleColumn = (column: string) => {
-    if (visibleColumns.value.includes(column)) {
-      visibleColumns.value = visibleColumns.value.filter((c) => c !== column);
-    } else {
-      visibleColumns.value.push(column);
+  watch(
+    () => uiStore.isSelectMode,
+    (newValue) => {
+      if (!newValue) {
+        notesStore.clearSelectedNotes();
+      }
     }
-    visibleColumns.value.sort(
-      (a, b) => availableColumns.indexOf(a) - availableColumns.indexOf(b)
-    );
-  };
-
-  const toggleSelectMode = () => {
-    isSelectMode.value = !isSelectMode.value;
-    if (!isSelectMode.value) {
-      notesStore.clearSelectedNotes();
-    }
-  };
+  );
 
   watch(
     () => props.notes,
@@ -315,7 +223,7 @@
     () => notesStore.selectedNotes,
     () => {
       if (notesStore.selectedNotes.length === 0) {
-        isSelectMode.value = false;
+        uiStore.isSelectMode = false;
       }
     }
   );

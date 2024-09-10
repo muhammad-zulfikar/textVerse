@@ -1,6 +1,6 @@
 <template>
   <div class="mb-[28px] md:mb-[46px]">
-    <template v-if="notesStore.filteredNotes.length > 0">
+    <template v-if="filteredNotes.length > 0">
       <transition name="slide-fade" mode="out-in">
         <keep-alive>
           <component
@@ -12,12 +12,19 @@
         </keep-alive>
       </transition>
     </template>
+    <template v-else>
+      <div class="flex flex-col items-center justify-center h-[60vh]">
+        <PhEmpty :size="100" class="text-gray-400 dark:text-gray-600 mb-4" />
+        <p class="text-gray-600 dark:text-gray-400 text-lg font-serif">Note empty</p>
+      </div>
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
   import { onMounted, watch, computed } from 'vue';
-  import { authStore, notesStore, folderStore, uiStore } from '@/store/stores';
+  import { authStore, notesStore, folderStore, uiStore } from '@/utils/stores';
+  import { PhEmpty } from '@phosphor-icons/vue';
   import cardView from './view/cardView.vue';
   import tableView from './view/tableView.vue';
   import mailView from './view/mailView.vue';

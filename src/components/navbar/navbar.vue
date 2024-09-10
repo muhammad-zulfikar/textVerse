@@ -65,7 +65,7 @@
               </Button>
               <span>{{ notesStore.selectedNotes.length }} selected</span>
             </div>
-            <div class="flex items-center ml-auto">
+            <div class="flex items-center ml-auto select-button">
               <Button @click="selectAllNotes" class="mr-2 md:mr-4">
                 <PhChecks :size="20" />
               </Button>
@@ -120,7 +120,7 @@
     PhChecks,
     PhArrowCounterClockwise,
   } from '@phosphor-icons/vue';
-  import { authStore, notesStore, uiStore } from '@/store/stores';
+  import { authStore, notesStore, uiStore } from '@/utils/stores';
   import Button from '@/components/ui/button.vue';
   import Separator from '@/components/ui/separator.vue';
   import SearchBar from '@/components/searchBar/searchBar.vue';

@@ -120,7 +120,7 @@
 <script setup lang="ts">
   import { ref, computed } from 'vue';
   import { PhFolder, PhFile, PhFolderDashed } from '@phosphor-icons/vue';
-  import { notesStore, folderStore, uiStore } from '@/store/stores';
+  import { notesStore, folderStore, uiStore } from '@/utils/stores';
 
   const currentView = ref('folders');
   const currentFolder = ref('');

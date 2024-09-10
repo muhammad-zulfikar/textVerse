@@ -153,7 +153,7 @@
     PhCheckCircle,
     PhX,
   } from '@phosphor-icons/vue';
-  import { notesStore, uiStore } from '@/store/stores';
+  import { notesStore, uiStore } from '@/utils/stores';
   import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
   import AlertModal from '@/components/ui/modal/alertModal.vue';
 
