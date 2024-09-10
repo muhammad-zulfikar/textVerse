@@ -15,7 +15,9 @@
     <template v-else>
       <div class="flex flex-col items-center justify-center h-[60vh]">
         <PhEmpty :size="100" class="text-gray-400 dark:text-gray-600 mb-4" />
-        <p class="text-gray-600 dark:text-gray-400 text-lg font-serif">Note empty</p>
+        <p class="text-gray-600 dark:text-gray-400 text-lg font-serif">
+          Note empty
+        </p>
       </div>
     </template>
   </div>

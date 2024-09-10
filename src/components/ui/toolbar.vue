@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import folderDropdown from '@/components/ui/dropdown/folderDropdown.vue';
-import selectButton from '@/components/ui/button/selectButton.vue';
-import sortDropdown from '@/components/ui/dropdown/sortDropdown.vue';
+  import folderDropdown from '@/components/ui/dropdown/folderDropdown.vue';
+  import selectButton from '@/components/ui/button/selectButton.vue';
+  import sortDropdown from '@/components/ui/dropdown/sortDropdown.vue';
 </script>

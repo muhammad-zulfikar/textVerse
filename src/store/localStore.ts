@@ -101,6 +101,6 @@ export const useLocalStore = defineStore('local', {
     clearAllNotesFromLocalStorage(): void {
       localStorage.removeItem('notes');
       localStorage.removeItem('folders');
-    }
-  }
+    },
+  },
 });

@@ -59,10 +59,15 @@ export function areValidNotes(notes: any[]): notes is Note[] {
 export function compareNotes(a: Note, b: Note): number {
   if (a.pinned && !b.pinned) return -1;
   if (!a.pinned && b.pinned) return 1;
-  return new Date(b.time_created).getTime() - new Date(a.time_created).getTime();
+  return (
+    new Date(b.time_created).getTime() - new Date(a.time_created).getTime()
+  );
 }
 
-export function hasChanged(originalNote: Note, editedNote: Partial<Note>): boolean {
+export function hasChanged(
+  originalNote: Note,
+  editedNote: Partial<Note>
+): boolean {
   const sanitizeAndNormalizeContent = (content: string) => {
     const sanitized = DOMPurify.sanitize(content);
     const div = document.createElement('div');

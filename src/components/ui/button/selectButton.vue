@@ -14,15 +14,15 @@
 </template>
 
 <script lang="ts" setup>
-import Button from '../button.vue';
-import { PhCheckCircle, PhXCircle } from '@phosphor-icons/vue';
-import { notesStore, uiStore } from '@/utils/stores';
+  import Button from '../button.vue';
+  import { PhCheckCircle, PhXCircle } from '@phosphor-icons/vue';
+  import { notesStore, uiStore } from '@/utils/stores';
 
-const toggleSelectMode = (event: Event) => {
-  event.stopPropagation();
-  uiStore.toggleSelectMode();
-  if (!uiStore.isSelectMode) {
-    notesStore.clearSelectedNotes();
-  }
-};
+  const toggleSelectMode = (event: Event) => {
+    event.stopPropagation();
+    uiStore.toggleSelectMode();
+    if (!uiStore.isSelectMode) {
+      notesStore.clearSelectedNotes();
+    }
+  };
 </script>

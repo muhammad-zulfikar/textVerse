@@ -3,7 +3,13 @@
 import { defineStore } from 'pinia';
 import { Note } from '../utils/types';
 import { DEFAULT_FOLDERS } from '../utils/constants';
-import { authStore, folderStore, uiStore, localStore, firebaseStore } from '../utils/stores';
+import {
+  authStore,
+  folderStore,
+  uiStore,
+  localStore,
+  firebaseStore,
+} from '../utils/stores';
 import initialNotes from '@/assets/initialNotes.json';
 import {
   createNoteObject,
@@ -13,7 +19,7 @@ import {
   compareNotes,
   hasChanged,
   localeDate,
-  createPublicNote
+  createPublicNote,
 } from '../utils/helpers';
 import DOMPurify from 'dompurify';
 import { nanoid } from 'nanoid';
@@ -262,10 +268,12 @@ export const useNotesStore = defineStore('notes', {
     // Helper methods (previously private)
     updateLocalNotes() {
       if (authStore.isLoggedIn) {
-        firebaseStore.getAllNotesFromFirebase(authStore.user!.uid).then((notes) => {
-          this.notes = Object.values(notes);
-          this.reorderNotes();
-        });
+        firebaseStore
+          .getAllNotesFromFirebase(authStore.user!.uid)
+          .then((notes) => {
+            this.notes = Object.values(notes);
+            this.reorderNotes();
+          });
       } else {
         this.notes = Object.values(localStore.getAllNotesFromLocalStorage());
         this.reorderNotes();
@@ -340,7 +348,7 @@ export const useNotesStore = defineStore('notes', {
 
     async makeNotePublic(note: Note) {
       const publicNote = createPublicNote(note, authStore.user!.uid);
-      
+
       await firebaseStore.savePublicNote(publicNote);
 
       this.publicNotes.set(note.id, publicNote.publicId);
@@ -430,7 +438,7 @@ export const useNotesStore = defineStore('notes', {
         }
       } else {
         this.notes = [...this.notes, ...notes];
-        notes.forEach(note => {
+        notes.forEach((note) => {
           localStore.saveNoteToLocalStorage(note);
         });
       }
@@ -483,14 +491,14 @@ export const useNotesStore = defineStore('notes', {
     async loadNotesFromFirebase() {
       this.isFirebaseNotesLoaded = false;
       const userId = authStore.user!.uid;
-      
+
       return new Promise<void>((resolve) => {
         const timeout = setTimeout(() => {
           console.warn('Firebase notes loading timed out');
           this.isFirebaseNotesLoaded = true;
           resolve();
         }, 10000);
-    
+
         this.notesListener = firebaseStore.onNotesUpdate(userId, (notes) => {
           clearTimeout(timeout);
           if (notes === null || notes === undefined) {
@@ -508,7 +516,9 @@ export const useNotesStore = defineStore('notes', {
     async loadNotesFromLocalStorage() {
       const notes = localStore.getAllNotesFromLocalStorage();
       this.notes = Object.values(notes);
-      this.deletedNotes = Object.values(localStore.getDeletedNotesFromLocalStorage());
+      this.deletedNotes = Object.values(
+        localStore.getDeletedNotesFromLocalStorage()
+      );
     },
 
     async loadInitialNotes() {
@@ -520,14 +530,14 @@ export const useNotesStore = defineStore('notes', {
         pinned: false,
         folder: note.folder || DEFAULT_FOLDERS.UNCATEGORIZED,
       }));
-    
+
       await this.importFolders(importedNotes);
       this.notes = importedNotes;
-    
+
       importedNotes.forEach((note) => {
         localStore.saveNoteToLocalStorage(note);
       });
-    
+
       localStore.setInitialNotesLoaded(true);
     },
 
