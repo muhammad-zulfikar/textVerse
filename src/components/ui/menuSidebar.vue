@@ -5,8 +5,8 @@
       v-if="isOpen"
       class="fixed inset-y-0 left-0 z-50 w-64 shadow-lg overflow-y-auto left-sidebar rounded-lg font-serif text-sm"
       :class="{
-        'custom-card-blur': uiStore.blurEnabled,
-        'custom-card': !uiStore.blurEnabled,
+        'card-blur': uiStore.blurEnabled,
+        card: !uiStore.blurEnabled,
       }"
     >
       <div
@@ -90,7 +90,7 @@
       <div v-if="authStore.isLoggedIn" class="p-2 absolute bottom-0 w-full">
         <button
           @click="toggleUserDropup"
-          class="w-full py-2 px-4 flex justify-between items-center custom-card transition-colors duration-200"
+          class="w-full py-2 px-4 flex justify-between items-center card transition-colors duration-200"
         >
           <div class="flex items-center">
             <img
@@ -111,7 +111,7 @@
         <transition name="fade">
           <div
             v-if="isUserDropupOpen"
-            class="dropup custom-card mt-2 p-2 mx-2 rounded shadow-lg z-60"
+            class="dropup card mt-2 p-2 mx-2 rounded shadow-lg z-60"
           >
             <p
               class="text-sm text-center text-gray-600 dark:text-gray-400 mb-2"

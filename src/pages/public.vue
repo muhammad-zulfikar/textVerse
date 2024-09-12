@@ -1,11 +1,11 @@
-<!--publicNoteView-->
+<!-- public.vue -->
 
 <template>
   <div
     v-if="isLoading"
     class="flex items-center justify-center h-screen -mt-10 font-serif"
   >
-    <p class="text-md custom-card px-4 py-2">Loading...</p>
+    <p class="text-md card px-4 py-2">Loading...</p>
   </div>
   <div
     v-else-if="note"
@@ -14,7 +14,7 @@
     <div
       :class="[
         'p-5 relative flex flex-col',
-        'custom-card-no-rounded-border w-full h-full',
+        'card-no-rounded-border w-full h-full',
       ]"
     >
       <div
@@ -29,14 +29,14 @@
         <div class="flex space-x-2 items-start md:items-center">
           <button
             @click="saveNote"
-            class="flex items-center px-2 py-1 custom-card hover:bg-[#d9c698] dark:hover:bg-gray-700"
+            class="flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700"
           >
             <PhFloppyDisk :size="20" class="size-5 md:mr-2" />
             <span class="hidden md:flex">Save as copy</span>
           </button>
           <button
             @click="closeNote"
-            class="flex items-center px-2 py-1 custom-card hover:bg-[#d9c698] dark:hover:bg-gray-700"
+            class="flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700"
           >
             <PhX :size="20" class="size-5 md:mr-2" />
             <span class="hidden md:flex">Close</span>
@@ -46,15 +46,13 @@
       <div
         class="bg-black dark:bg-gray-400 h-px transition-all duration-300"
       ></div>
-      <div
-        class="w-full pt-4 bg-transparent flex-grow overflow-hidden flex flex-col"
-      >
-        <div class="quill-container flex-grow overflow-hidden flex flex-col">
-          <div
-            ref="quillEditorRef"
-            class="min-h-[250px] flex-grow overflow-y-auto"
-          ></div>
-        </div>
+      <div class="w-full pt-4 flex-grow overflow-hidden flex flex-col">
+        <NoteForm
+          v-model="note.content"
+          :showToolbar="false"
+          :editable="false"
+          class="h-full flex-grow overflow-y-auto"
+        />
       </div>
     </div>
   </div>
@@ -62,19 +60,17 @@
     v-else
     class="flex items-center justify-center h-screen pb-20 font-serif"
   >
-    <p class="text-md custom-card px-4 py-2">
-      Note not found or not accessible.
-    </p>
+    <p class="text-md card px-4 py-2">Note not found or not accessible.</p>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, nextTick, onUnmounted, watch } from 'vue';
+  import { ref, onMounted, nextTick, onUnmounted } from 'vue';
   import { notesStore, uiStore } from '@/utils/stores';
   import { Note, PublicNote } from '@/utils/types';
+  import NoteForm from '@/components/notes/noteForm.vue';
   import { useRoute, useRouter } from 'vue-router';
   import { PhFloppyDisk, PhX } from '@phosphor-icons/vue';
-  import Quill from 'quill';
   import { ref as dbRef, onValue, off } from 'firebase/database';
   import { db } from '@/firebase';
 
@@ -82,8 +78,6 @@
   const router = useRouter();
   const note = ref<Note | null>(null);
   const isLoading = ref(true);
-  const quillEditorRef = ref<HTMLElement | null>(null);
-  let quillEditor: Quill | null = null;
   let noteListener: any = null;
 
   onMounted(async () => {
@@ -106,42 +100,12 @@
         noteListener = onValue(noteRef, (noteSnapshot) => {
           note.value = noteSnapshot.val() as Note | null;
           isLoading.value = false;
-          if (note.value && quillEditor) {
-            quillEditor.root.innerHTML = note.value.content || '';
-          }
         });
       } else {
         note.value = null;
         isLoading.value = false;
       }
     });
-  };
-
-  watch(note, async () => {
-    await nextTick();
-    initializeQuillEditor();
-  });
-
-  const initializeQuillEditor = () => {
-    if (quillEditorRef.value && !quillEditor) {
-      quillEditor = new Quill(quillEditorRef.value, {
-        theme: 'snow',
-        modules: {
-          toolbar: [
-            ['bold', 'italic', 'underline', 'strike'],
-            ['blockquote', 'code-block'],
-            [{ align: [] }, { indent: '-1' }, { indent: '+1' }],
-            [{ list: 'ordered' }, { list: 'bullet' }],
-            ['link', 'image'],
-            [{ header: [1, 2, 3, 4, 5, 6, false] }],
-            [{ script: 'sub' }, { script: 'super' }],
-            [{ color: [] }, { background: [] }],
-            ['clean'],
-          ],
-        },
-      });
-      quillEditor.root.innerHTML = note.value?.content || '';
-    }
   };
 
   const saveNote = async () => {
@@ -152,7 +116,7 @@
       > = {
         title: note.value.title,
         content: note.value.content,
-        folder: '-',
+        folder: 'No Folder',
       };
 
       try {
@@ -184,9 +148,6 @@
   };
 
   onUnmounted(() => {
-    if (quillEditor) {
-      quillEditor = null;
-    }
     if (noteListener) {
       const publicId = route.params.publicId as string;
       const publicRef = dbRef(db, `publicNotes/${publicId}`);

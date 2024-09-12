@@ -1,11 +1,11 @@
 <template>
-  <div class="p-4 custom-card mb-2">
+  <div class="p-4 card mb-2">
     <h2 class="text-2xl font-semibold mb-4">User Settings</h2>
     <div class="flex flex-col items-center">
       <img
         :src="userAvatar"
         alt="User Avatar"
-        class="w-24 h-24 rounded-full mb-4 custom-card-transparent-avatar object-cover cursor-pointer"
+        class="w-24 h-24 rounded-full mb-4 card-transparent-avatar object-cover cursor-pointer"
         @click="openAvatarViewer"
       />
       <h3 class="text-xl font-semibold">{{ username }}</h3>
@@ -18,7 +18,7 @@
         <button
           @click="openAvatarPicker"
           class="flex items-center justify-center py-2 px-4 text-sm md:text-base w-full sm:w-auto"
-          :class="[uiStore.blurEnabled ? 'custom-card-blur' : 'custom-card']"
+          :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
         >
           <PhSwap :size="20" class="mr-2" />
           Change Avatar
@@ -26,7 +26,7 @@
         <button
           @click="openNameEditor"
           class="flex items-center justify-center py-2 px-4 text-sm md:text-base w-full sm:w-auto"
-          :class="[uiStore.blurEnabled ? 'custom-card-blur' : 'custom-card']"
+          :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
         >
           <PhTextbox :size="20" class="mr-2" />
           Rename
@@ -34,7 +34,7 @@
         <button
           @click="confirmDeleteAccount"
           class="flex items-center justify-center text-red-600 dark:text-red-500 py-2 px-4 text-sm md:text-base w-full sm:w-auto"
-          :class="[uiStore.blurEnabled ? 'custom-card-blur' : 'custom-card']"
+          :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
         >
           <PhTrash :size="20" class="mr-2" />
           Delete Account

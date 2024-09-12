@@ -13,7 +13,7 @@
             <Button @click.stop="toggleSidebar">
               <PhList :size="20" />
             </Button>
-            <Path />
+            <Path v-if="!isPublicPage" />
           </div>
         </transition-group>
 
@@ -154,6 +154,10 @@
 
   const isHomePage = computed(() => {
     return route.path === '/' || route.name === 'Note';
+  });
+
+  const isPublicPage = computed(() => {
+    return route.path.startsWith('/public');
   });
 
   const isSelectModeActive = computed(

@@ -33,7 +33,7 @@
         @click.stop="handleNoteClick(note)"
       >
         <div
-          class="absolute top-0 -left-3 custom-card-rounded hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-opacity duration-200"
+          class="absolute top-0 -left-3 card-rounded hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-opacity duration-200"
           :class="{
             'opacity-100':
               notesStore.selectedNotes.includes(note.id) ||
@@ -74,16 +74,34 @@
               <span
                 v-if="note.pinned"
                 @click.stop="notesStore.unpinNote(note.id)"
-                class="justify-start px-2 py-1 hover:bg-[#d9c698] dark:hover:bg-gray-700 rounded-md custom-card mr-2"
+                class="justify-start px-2 py-1 hover:bg-[#d9c698] dark:hover:bg-gray-700 rounded-md card mr-2"
+                @mouseenter="hoveredPinId = note.id"
+                @mouseleave="hoveredPinId = null"
               >
-                <PhPushPin :size="16" class="text-[10px] md:text-xs" />
+                <PhPushPin
+                  v-if="hoveredPinId !== note.id"
+                  :size="16"
+                  class="text-[10px] md:text-xs"
+                />
+                <PhPushPinSlash
+                  v-else
+                  :size="16"
+                  class="text-[10px] md:text-xs"
+                />
               </span>
               <span
                 v-if="isNotePublic(note.id)"
                 @click.stop="togglePublic(note.id)"
-                class="justify-start px-2 py-1 hover:bg-[#d9c698] dark:hover:bg-gray-700 rounded-md custom-card"
+                class="justify-start px-2 py-1 hover:bg-[#d9c698] dark:hover:bg-gray-700 rounded-md card"
+                @mouseenter="hoveredGlobeId = note.id"
+                @mouseleave="hoveredGlobeId = null"
               >
-                <PhGlobe :size="16" class="text-[10px] md:text-xs" />
+                <PhGlobe
+                  v-if="hoveredGlobeId !== note.id"
+                  :size="16"
+                  class="text-[10px] md:text-xs"
+                />
+                <PhGlobeX v-else :size="16" class="text-[10px] md:text-xs" />
               </span>
             </div>
             <div
@@ -91,7 +109,7 @@
               class="ml-auto text-left text-[10px] md:text-xs"
             >
               <p
-                class="flex items-center px-2 py-1 cursor-pointer truncate custom-card hover:text-black dark:hover:text-white hover:bg-[#d9c698] dark:hover:bg-gray-700"
+                class="flex items-center px-2 py-1 cursor-pointer truncate card hover:text-black dark:hover:text-white hover:bg-[#d9c698] dark:hover:bg-gray-700"
                 @click.stop="folderStore.setCurrentFolder(note.folder)"
               >
                 <PhFolder :size="16" class="mr-2" />
@@ -122,7 +140,14 @@
 
 <script setup lang="ts">
   import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-  import { PhPushPin, PhFolder, PhGlobe, PhCheck } from '@phosphor-icons/vue';
+  import {
+    PhPushPin,
+    PhPushPinSlash,
+    PhFolder,
+    PhGlobe,
+    PhCheck,
+    PhGlobeX,
+  } from '@phosphor-icons/vue';
   import { notesStore, folderStore, uiStore } from '@/utils/stores';
   import { Note } from '@/utils/types';
   import { DEFAULT_FOLDERS } from '@/utils/constants';
@@ -145,6 +170,8 @@
 
   const showMenu = ref(false);
   const menuPosition = ref({ x: 0, y: 0 });
+  const hoveredPinId = ref<string | null>(null);
+  const hoveredGlobeId = ref<string | null>(null);
   const selectedNote = ref<Note | null>(null);
 
   const isNotePublic = (noteId: string) => {
@@ -266,6 +293,68 @@
   .content :deep(p img) {
     margin: 10px auto !important;
     display: block;
+  }
+
+  .content :deep(a) {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .dark .content :deep(a) {
+    color: #3b82f6;
+  }
+
+  .content :deep(ul),
+  .content :deep(ol) {
+    padding-left: 20px;
+    margin: 10px 0;
+  }
+
+  .content :deep(ul) {
+    list-style-type: disc;
+  }
+
+  .content :deep(ol) {
+    list-style-type: decimal;
+  }
+
+  .content :deep(h1) {
+    font-size: 2em;
+    font-weight: bold;
+    line-height: 1.1;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid black;
+  }
+
+  .dark .content :deep(h1) {
+    border-bottom: 1px solid white;
+  }
+
+  .content :deep(h2) {
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 1.05;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid black;
+  }
+
+  .dark .content :deep(h2) {
+    border-bottom: 1px solid white;
+  }
+
+  .content :deep(h3) {
+    font-size: 1.17em;
+    font-weight: bold;
+    margin-bottom: 6px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid black;
+  }
+
+  .dark .content :deep(h3) {
+    border-bottom: 1px solid white;
   }
 
   .shadow {

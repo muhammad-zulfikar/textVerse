@@ -1,4 +1,4 @@
-// stores/uiStore.ts
+// uiStore.ts
 
 import { defineStore } from 'pinia';
 import { authStore, notesStore } from '../utils/stores';
@@ -7,15 +7,16 @@ import { db } from '@/firebase';
 
 type Theme = 'light' | 'dark' | 'system';
 type ViewType = 'card' | 'table' | 'mail' | 'folder';
-type NoteOpenPreference = 'modal' | 'sidebar';
+type noteViewPreference = 'modal' | 'sidebar';
 type FolderViewType = 'grid' | 'list';
 
 interface UIState {
   theme: Theme;
   viewType: ViewType;
-  noteOpenPreference: NoteOpenPreference;
+  noteViewPreference: noteViewPreference;
   columns: number;
   folderViewType: FolderViewType;
+  sortType: 'date' | 'title';
   blurEnabled: boolean;
   isExpanded: boolean;
   activeDropdown: string | null;
@@ -34,9 +35,10 @@ export const useUIStore = defineStore('ui', {
   state: (): UIState => ({
     theme: 'system',
     viewType: 'card',
-    noteOpenPreference: 'modal',
+    noteViewPreference: 'modal',
     columns: 4,
     folderViewType: 'grid',
+    sortType: 'date',
     blurEnabled: false,
     isExpanded: false,
     activeDropdown: null,
@@ -69,15 +71,17 @@ export const useUIStore = defineStore('ui', {
       this.viewType = JSON.parse(
         localStorage.getItem('viewType') || '"card"'
       ) as ViewType;
-      this.noteOpenPreference = JSON.parse(
-        localStorage.getItem('noteOpenPreference') || '"modal"'
-      ) as NoteOpenPreference;
+      this.noteViewPreference = JSON.parse(
+        localStorage.getItem('noteViewPreference') || '"modal"'
+      ) as noteViewPreference;
       this.columns = this.getValidColumns(
         JSON.parse(localStorage.getItem('columns') || '4')
       );
       this.blurEnabled = JSON.parse(
         localStorage.getItem('blurEnabled') || 'false'
       );
+      this.sortType =
+        (localStorage.getItem('sortType') as 'date' | 'title') || 'date';
     },
 
     async loadFirebaseSettings() {
@@ -112,13 +116,15 @@ export const useUIStore = defineStore('ui', {
         this.saveSettings();
       }
       this.applyTheme();
+      notesStore.setSortType(this.sortType);
     },
 
     async saveSettings() {
       const settings = {
         theme: this.theme,
         viewType: this.viewType,
-        noteOpenPreference: this.noteOpenPreference,
+        noteViewPreference: this.noteViewPreference,
+        sortType: this.sortType,
         blurEnabled: this.blurEnabled,
       };
 
@@ -155,8 +161,8 @@ export const useUIStore = defineStore('ui', {
       this.saveSettings();
     },
 
-    setNoteOpenPreference(preference: NoteOpenPreference) {
-      this.noteOpenPreference = preference;
+    setnoteViewPreference(preference: noteViewPreference) {
+      this.noteViewPreference = preference;
       this.saveSettings();
     },
 
@@ -238,7 +244,7 @@ export const useUIStore = defineStore('ui', {
         window.history.pushState({}, '', `/${noteId}`);
       }
 
-      if (this.noteOpenPreference === 'modal') {
+      if (this.noteViewPreference === 'modal') {
         this.isNoteModalOpen = true;
       } else {
         this.isNoteSidebarOpen = true;
@@ -251,7 +257,7 @@ export const useUIStore = defineStore('ui', {
       notesStore.selectedNoteId = null;
       window.history.pushState({}, '', '/');
 
-      if (this.noteOpenPreference === 'modal') {
+      if (this.noteViewPreference === 'modal') {
         this.isNoteModalOpen = false;
       } else {
         this.isNoteSidebarOpen = false;
@@ -283,8 +289,8 @@ export const useUIStore = defineStore('ui', {
     loadUISettings() {
       this.theme = (localStorage.getItem('theme') as Theme) || 'system';
       this.viewType = (localStorage.getItem('viewType') as ViewType) || 'card';
-      this.noteOpenPreference =
-        (localStorage.getItem('noteOpenPreference') as NoteOpenPreference) ||
+      this.noteViewPreference =
+        (localStorage.getItem('noteViewPreference') as noteViewPreference) ||
         'modal';
       const storedColumns = parseInt(localStorage.getItem('columns') || '', 10);
       this.columns = this.getValidColumns(storedColumns);
@@ -298,7 +304,7 @@ export const useUIStore = defineStore('ui', {
       [
         'theme',
         'viewType',
-        'noteOpenPreference',
+        'noteViewPreference',
         'columns',
         'blurEnabled',
       ].forEach((key) => {

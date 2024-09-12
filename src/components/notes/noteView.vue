@@ -2,12 +2,12 @@
 <template>
   <div>
     <NoteModal
-      v-if="uiStore.noteOpenPreference === 'modal'"
+      v-if="uiStore.noteViewPreference === 'modal'"
       :note-id="notesStore.selectedNoteId"
       :is-open="uiStore.isNoteModalOpen"
     />
     <NoteSidebar
-      v-if="uiStore.noteOpenPreference === 'sidebar'"
+      v-if="uiStore.noteViewPreference === 'sidebar'"
       :note-id="notesStore.selectedNoteId"
       :is-open="uiStore.isNoteSidebarOpen"
     />

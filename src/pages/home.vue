@@ -1,3 +1,5 @@
+<!--home.vue-->
+
 <template>
   <div>
     <transition name="slide-fade" mode="out-in">

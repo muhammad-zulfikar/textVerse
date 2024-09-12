@@ -6,7 +6,7 @@
   >
     <div class="flex-grow flex flex-col gap-2 md:gap-8">
       <!-- Sync notes section -->
-      <div class="p-4 custom-card">
+      <div class="p-4 card">
         <h2 class="text-2xl font-semibold mb-4">Sync your notes</h2>
         <div class="flex flex-col gap-4">
           <SyncStatus />
@@ -15,18 +15,18 @@
       </div>
 
       <!-- Appearance section -->
-      <div class="p-4 custom-card">
+      <div class="p-4 card">
         <h2 class="text-2xl font-semibold mb-4">Appearance</h2>
         <div class="flex flex-col gap-4">
           <ThemeSelector />
           <ViewTypeSelector />
-          <NoteOpenPreferenceSelector />
+          <noteViewPreferenceSelector />
           <BlurToggle />
         </div>
       </div>
 
       <!-- Manage data section -->
-      <div class="p-4 custom-card">
+      <div class="p-4 card">
         <h2 class="text-2xl font-semibold mb-4">Manage your data</h2>
         <div class="flex flex-col gap-4">
           <BackupData />
@@ -69,7 +69,7 @@
   import ImportNotes from '@/components/settings/sync/importNotes.vue';
   import ThemeSelector from '@/components/settings/appearance/themeSelector.vue';
   import ViewTypeSelector from '@/components/settings/appearance/viewTypeSelector.vue';
-  import NoteOpenPreferenceSelector from '@/components/settings/appearance/noteOpenPreferenceSelector.vue';
+  import noteViewPreferenceSelector from '@/components/settings/appearance/noteViewPreferenceSelector.vue';
   import BlurToggle from '@/components/settings/appearance/blurToggle.vue';
   import BackupData from '@/components/settings/data/backupData.vue';
   import DeleteData from '@/components/settings/data/deleteData.vue';

@@ -23,7 +23,7 @@
             @focus="isFocused = true"
             @blur="isFocused = false"
             placeholder="Search..."
-            class="custom-card-transparent text-sm md:text-base px-2.5 md:px-2 py-1 pr-8 outline-none w-full transition-all duration-300"
+            class="card-transparent text-sm md:text-base px-2.5 md:px-2 py-1 pr-8 outline-none w-full transition-all duration-300"
             :class="{
               'placeholder-transparent': isFocused,
             }"
@@ -33,7 +33,7 @@
       <div
         @click="toggleExpand"
         class="px-2 py-1.5 cursor-pointer md:hidden z-10"
-        :class="{ 'custom-card': !isExpanded }"
+        :class="{ card: !isExpanded }"
       >
         <PhMagnifyingGlass :size="20" />
       </div>

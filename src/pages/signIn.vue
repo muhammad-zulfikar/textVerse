@@ -3,7 +3,7 @@
     class="fixed inset-0 flex items-center justify-center px-8 md:px-0 md:pt-12"
   >
     <div
-      class="font-serif custom-card px-10 py-8 md:p-8 relative flex flex-col mx-auto max-w-md w-full"
+      class="font-serif card px-10 py-8 md:p-8 relative flex flex-col mx-auto max-w-md w-full"
     >
       <transition :name="transitionName" mode="out-in">
         <div :key="isSignUp ? 'signup' : 'signin'">
@@ -45,7 +45,7 @@
             </div>
             <button
               type="submit"
-              class="flex w-full md:w-28 items-center justify-center px-4 py-2 mt-4 mx-auto custom-card"
+              class="flex w-full md:w-28 items-center justify-center px-4 py-2 mt-4 mx-auto card"
               :disabled="isLoading"
             >
               <template v-if="!isLoading">
@@ -62,7 +62,7 @@
           <div v-if="!isSignUp">
             <button
               @click="signInWithGoogle"
-              class="w-full md:w-fit custom-card text-gray-700 dark:text-white py-2 px-4 rounded flex items-center justify-center mb-6 mx-auto"
+              class="w-full md:w-fit card text-gray-700 dark:text-white py-2 px-4 rounded flex items-center justify-center mb-6 mx-auto"
               :disabled="isGoogleLoading"
             >
               <template v-if="!isGoogleLoading">

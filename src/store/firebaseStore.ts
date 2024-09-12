@@ -133,5 +133,26 @@ export const useFirebaseStore = defineStore('firebase', {
       await remove(notesRef);
       await remove(foldersRef);
     },
+
+    async saveSortPreference(userId: string, sortType: 'date' | 'title') {
+      try {
+        await set(ref(db, `users/${userId}/settings/sortType`), sortType);
+      } catch (error) {
+        console.error('Error saving sort preference to Firebase:', error);
+        throw error;
+      }
+    },
+
+    async loadSortPreference(userId: string): Promise<'date' | 'title' | null> {
+      try {
+        const snapshot = await get(
+          ref(db, `users/${userId}/settings/sortType`)
+        );
+        return snapshot.val() as 'date' | 'title' | null;
+      } catch (error) {
+        console.error('Error loading sort preference from Firebase:', error);
+        return null;
+      }
+    },
   },
 });

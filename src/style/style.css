@@ -8,68 +8,52 @@ body {
   scrollbar-width: none;
 }
 
-.custom-card {
+.card {
   @apply bg-cream dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.custom-card-rounded {
+.card-rounded {
   @apply bg-cream dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.custom-card-border-dashed {
+.card-border-dashed {
   @apply bg-cream dark:bg-gray-750 border-[1px] border-dashed border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.custom-card-blur {
+.card-blur {
   @apply bg-cream/50 dark:bg-gray-900/50 border-[1px] backdrop-blur-[5px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.custom-card-no-rounded-border {
+.card-no-rounded-border {
   @apply bg-cream dark:bg-gray-750 shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.custom-card-blur-no-rounded-border {
+.card-blur-no-rounded-border {
   @apply bg-cream/50 dark:bg-gray-900/50 backdrop-blur-[5px] shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.custom-card-transparent {
+.card-transparent {
   @apply bg-transparent border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.custom-card-no-color {
+.card-no-color {
   @apply border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.custom-card-switch {
+.card-switch {
   @apply border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.custom-card-transparent-avatar {
+.card-transparent-avatar {
   @apply bg-transparent border-[1px] border-black dark:border-gray-400 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.custom-card-no-transition {
+.card-no-transition {
   @apply bg-cream dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl;
 }
 
-.custom-card-no-transition-rounded {
+.card-no-transition-rounded {
   @apply bg-cream dark:bg-gray-750 shadow-lg hover:shadow-2xl;
-}
-
-.skeleton {
-  @apply bg-gray-400;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
 }
 
 .zoom-enter-active,
@@ -198,20 +182,6 @@ button:active {
   display: none;
 }
 
-/* ::-webkit-scrollbar {
-  width: 10px;
-}
-::-webkit-scrollbar-thumb {
-  border: 1px solid black;
-  border-radius: 10px;
-  background-clip: padding-box;
-  background-color: #f2ebd9;
-  -webkit-box-shadow:
-    inset -1px -1px 0px rgba(0, 0, 0, 0.05),
-    inset 1px 1px 0px rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-} */
-
 ::selection {
   background: #ebdfc0;
   color: black;
@@ -250,198 +220,69 @@ button:active {
   color: #fff;
 }
 
-.dark .ql-toolbar .ql-stroke {
-  fill: none;
-  stroke: #b4b4b4;
+.note-form {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #000;
+  border-radius: 4px;
+  height: 100%;
+  margin-bottom: 8px;
+  overflow: hidden;
 }
 
-.dark .ql-toolbar .ql-fill {
-  fill: #b4b4b4;
-  stroke: #b4b4b4;
+.dark .note-form {
+  border: 1px solid #b4b4b4;
 }
 
-.dark .ql-toolbar .ql-picker {
-  color: #b4b4b4;
+.toolbar {
+  display: flex;
+  padding: 8px;
+  border-bottom: 1px solid #000;
+  background-color: transparent;
+  position: sticky;
+  top: 0;
+  overflow-x: auto;
 }
 
-button:hover .ql-stroke,
-.ql-picker-label:hover .ql-stroke {
-  fill: none;
-  stroke: #bdaa7a !important;
+.dark .toolbar {
+  border-bottom: 1px solid #b4b4b4;
 }
 
-.dark button:hover .ql-stroke,
-.dark .ql-picker-label:hover .ql-stroke {
-  fill: none;
-  stroke: #e3e3e3 !important;
-}
-
-.ql-active .ql-stroke {
-  fill: none;
-  stroke: #bdaa7a !important;
-}
-
-.dark .ql-active .ql-stroke {
-  fill: none;
-  stroke: #e3e3e3 !important;
-}
-
-button:hover .ql-fill,
-.ql-picker-label:hover .ql-fill {
-  fill: #bdaa7a !important;
-  stroke: none;
-}
-
-.dark button:hover .ql-fill,
-.dark .ql-picker-label:hover .ql-fill {
-  fill: #e3e3e3 !important;
-  stroke: none;
-}
-
-.ql-active .ql-fill {
-  fill: #bdaa7a !important;
-  stroke: none;
-}
-
-.dark .ql-active .ql-fill {
-  fill: #e3e3e3 !important;
-  stroke: none;
-}
-
-.ql-toolbar .ql-picker-options {
-  background-color: #f2ebd9 !important;
-  border: 1px solid black;
-  border-radius: 10px;
-}
-
-.ql-toolbar .ql-picker-label:hover {
-  color: #bdaa7a !important;
-}
-
-.dark .ql-toolbar .ql-picker-label:hover,
-.dark .ql-toolbar .ql-picker-label:focus,
-.dark .ql-toolbar .ql-picker-label:active {
-  color: #fff !important;
-}
-
-.ql-toolbar .ql-picker-label,
-.ql-toolbar .ql-picker-label:active,
-.ql-toolbar .ql-picker-label:focus {
-  border: none !important;
-}
-
-.dark .ql-toolbar .ql-picker-options {
-  background-color: #212121 !important;
-  border: 1px solid white;
-  border-radius: 10px;
-}
-
-.ql-header .ql-picker-options .ql-picker-item,
-.ql-font .ql-picker-options .ql-picker-item,
-.ql-header .ql-picker-options .ql-picker-label,
-.ql-font .ql-picker-options .ql-picker-label {
-  border-radius: 5px;
-  padding: 1px 5px 1px 5px;
-  margin: 0 -5px 0 -5px;
-}
-
-.ql-header .ql-picker-options .ql-picker-item:hover,
-.ql-font .ql-picker-options .ql-picker-item:hover,
-.ql-header .ql-picker-options .ql-picker-label:hover,
-.ql-font .ql-picker-options .ql-picker-label:hover {
-  color: white !important;
-  background-color: #bdaa7a !important;
-}
-
-.dark .ql-header .ql-picker-options .ql-picker-item:hover,
-.dark .ql-font .ql-picker-options .ql-picker-item:hover,
-.dark .ql-header .ql-picker-options .ql-picker-label:hover,
-.dark .ql-font .ql-picker-options .ql-picker-label:hover {
-  color: white;
-  background-color: #424242 !important;
-}
-
-.dark .ql-toolbar .ql-picker-options {
-  background-color: #212121;
-}
-
-.ql-align .ql-picker-options .ql-picker-item:hover {
-  color: #bdaa7a !important;
-  border-radius: 5px;
-}
-
-.ql-align .ql-picker-options .ql-picker-item:hover svg .ql-stroke {
-  stroke: #bdaa7a !important;
-  fill: #bdaa7a !important;
-}
-
-.ql-align .ql-picker-options .ql-picker-item:hover svg {
-  fill: white !important;
-}
-
-.dark .ql-align .ql-picker-options .ql-picker-item:hover {
-  color: white !important;
-  border-radius: 5px;
-}
-
-.dark .ql-align .ql-picker-options .ql-picker-item:hover svg .ql-stroke {
-  stroke: white !important;
-  fill: white !important;
-}
-
-.dark .ql-align .ql-picker-options .ql-picker-item:hover svg {
-  fill: white !important;
-}
-
-.ql-picker-item.ql-active,
-.ql-picker-item.ql-active:hover {
-  color: #bdaa7a !important;
-}
-
-.dark .ql-picker-item.ql-active,
-.dark .ql-picker-item.ql-active:hover {
-  color: #fff;
-}
-
-.ql-editor {
-  font-family: serif;
-  font-size: medium;
-  padding: 10px 0 0 0 !important;
-}
-
-.ql-toolbar {
-  border: none !important;
-  border-bottom: 1px solid black !important;
-  padding: 0 0 10px 0 !important;
-  margin-top: -5px !important;
-  gap: 10px !important;
-  position: sticky !important;
-  z-index: 40;
-}
-
-.dark .ql-toolbar {
-  border-bottom: 1px solid #b4b4b4 !important;
-}
-
-.ql-snow:not(.ql-toolbar) {
-  border: none !important;
-}
-
-.ql-editor strong {
-  font-size: initial;
-}
-
-.ql-editor img {
-  display: block;
-  margin: 10px auto !important;
-  cursor: default !important;
-}
-
-.ql-editor img:hover {
+.toolbar button {
+  background: none;
+  border: none;
   cursor: pointer;
+  padding-inline: 5px;
+  padding-block: 4px;
+  border-radius: 4px;
 }
 
-.ql-editor ol li,
-.ql-editor ul li {
-  margin-left: -2rem !important;
+.toolbar button:hover {
+  background-color: #d9c698;
+}
+
+.dark .toolbar button:hover {
+  background-color: #424242;
+}
+
+.toolbar button.active {
+  background-color: #d9c698;
+}
+
+.dark .toolbar button.active {
+  background-color: #424242;
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.editor {
+  flex: 1;
+  padding: 12px;
+  outline: none;
+  cursor: text;
 }

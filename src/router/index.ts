@@ -14,11 +14,6 @@ const routes: Array<RouteRecordRaw> = [
     component: home,
   },
   {
-    path: '/:id',
-    name: 'Note',
-    component: home,
-  },
-  {
     path: '/about',
     name: 'About',
     component: about,
@@ -43,6 +38,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Public',
     component: publicNote,
     props: true,
+  },
+  {
+    path: '/:id',
+    name: 'Note',
+    component: home,
   },
   {
     path: '/:catchAll(.*)',

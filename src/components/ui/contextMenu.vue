@@ -7,9 +7,7 @@
       ref="menuRef"
       :style="menuStyle"
       class="z-60"
-      :class="[
-        uiStore.blurEnabled ? 'custom-card-blur' : 'custom-card-no-transition',
-      ]"
+      :class="[uiStore.blurEnabled ? 'card-blur' : 'card-no-transition']"
     >
       <ul class="font-serif text-sm min-w-[145px] w-fit p-1">
         <li

@@ -16,7 +16,6 @@ import {
   createUpdatedNoteObject,
   createDuplicateNoteObject,
   areValidNotes,
-  compareNotes,
   hasChanged,
   localeDate,
   createPublicNote,
@@ -24,14 +23,18 @@ import {
 import DOMPurify from 'dompurify';
 import { nanoid } from 'nanoid';
 
+type SortType = 'date' | 'title';
+
 interface NotesState {
   notes: Note[];
   deletedNotes: Note[];
   deletedNotesLoaded: boolean;
   selectedNotes: string[];
   selectedNoteId: string | null;
+  sortType: SortType;
   searchQuery: string;
   publicNotes: Map<string, string>;
+  pinnedNotes: Set<string>;
   notesListener: (() => void) | null;
   isFirebaseNotesLoaded: boolean;
 }
@@ -43,8 +46,10 @@ export const useNotesStore = defineStore('notes', {
     deletedNotesLoaded: false,
     selectedNotes: [],
     selectedNoteId: null,
+    sortType: 'date',
     searchQuery: '',
     publicNotes: new Map(),
+    pinnedNotes: new Set(),
     notesListener: null,
     isFirebaseNotesLoaded: false,
   }),
@@ -131,11 +136,11 @@ export const useNotesStore = defineStore('notes', {
     },
 
     async pinNote(noteId: string) {
-      await this.toggleNotePin(noteId, true);
+      await this.togglePin(noteId, true);
     },
 
     async unpinNote(noteId: string) {
-      await this.toggleNotePin(noteId, false);
+      await this.togglePin(noteId, false);
     },
 
     async moveNote(noteId: string, targetFolder: string) {
@@ -228,6 +233,7 @@ export const useNotesStore = defineStore('notes', {
       } else {
         await this.loadNotesFromLocalStorage();
       }
+      await this.loadSortPreference();
       this.reorderNotes();
     },
 
@@ -250,7 +256,50 @@ export const useNotesStore = defineStore('notes', {
     },
 
     reorderNotes() {
-      this.notes.sort(compareNotes);
+      if (this.sortType === 'date') {
+        this.notes.sort(
+          (a, b) =>
+            new Date(b.time_created).getTime() -
+            new Date(a.time_created).getTime()
+        );
+      } else if (this.sortType === 'title') {
+        this.notes.sort((a, b) => a.title.localeCompare(b.title));
+      }
+    },
+
+    setSortType(sortType: SortType) {
+      this.sortType = sortType;
+      this.reorderNotes();
+      this.saveSortPreference();
+    },
+
+    async saveSortPreference() {
+      if (authStore.isLoggedIn) {
+        await firebaseStore.saveSortPreference(
+          authStore.user!.uid,
+          this.sortType
+        );
+      } else {
+        localStorage.setItem('sortType', this.sortType);
+      }
+    },
+
+    async loadSortPreference() {
+      if (authStore.isLoggedIn) {
+        const sortType = await firebaseStore.loadSortPreference(
+          authStore.user!.uid
+        );
+        if (sortType) {
+          this.sortType = sortType;
+        }
+      } else {
+        const savedSortType = localStorage.getItem(
+          'sortType'
+        ) as SortType | null;
+        if (savedSortType) {
+          this.sortType = savedSortType;
+        }
+      }
     },
 
     setSearchQuery(query: string) {
@@ -265,19 +314,16 @@ export const useNotesStore = defineStore('notes', {
       return this.notes.find((note) => note.id === id);
     },
 
-    // Helper methods (previously private)
-    updateLocalNotes() {
+    async updateLocalNotes() {
       if (authStore.isLoggedIn) {
-        firebaseStore
-          .getAllNotesFromFirebase(authStore.user!.uid)
-          .then((notes) => {
-            this.notes = Object.values(notes);
-            this.reorderNotes();
-          });
+        const notes = await firebaseStore.getAllNotesFromFirebase(
+          authStore.user!.uid
+        );
+        this.notes = Object.values(notes);
       } else {
         this.notes = Object.values(localStore.getAllNotesFromLocalStorage());
-        this.reorderNotes();
       }
+      this.reorderNotes();
     },
 
     async saveNoteToStore(note: Note) {
@@ -287,6 +333,7 @@ export const useNotesStore = defineStore('notes', {
         localStore.saveNoteToLocalStorage(note);
       }
       this.updateLocalNotes();
+      this.reorderNotes();
     },
 
     removeNoteFromStore(noteId: string): Note | undefined {
@@ -322,10 +369,15 @@ export const useNotesStore = defineStore('notes', {
       return undefined;
     },
 
-    async toggleNotePin(noteId: string, pinned: boolean) {
+    async togglePin(noteId: string, pinned: boolean) {
       const note = this.notes.find((n) => n.id === noteId);
       if (note) {
         note.pinned = pinned;
+        if (pinned) {
+          this.pinnedNotes.add(noteId);
+        } else {
+          this.pinnedNotes.delete(noteId);
+        }
         await this.saveNoteToStore(note);
         uiStore.showToastMessage(
           `${note.title} ${pinned ? 'pinned' : 'unpinned'}`

@@ -1,4 +1,4 @@
-// notesHelpers.ts
+// helpers.ts
 
 import { Note, PublicNote } from './types';
 import { DEFAULT_FOLDERS } from './constants';
@@ -25,10 +25,12 @@ export function createNoteObject(
 }
 
 export function createUpdatedNoteObject(updatedNote: Note): Note {
+  const now = new Date().toISOString();
   return {
     ...updatedNote,
     content: DOMPurify.sanitize(updatedNote.content),
-    last_edited: new Date().toISOString(),
+    time_created: now,
+    last_edited: now,
   };
 }
 
@@ -53,14 +55,6 @@ export function areValidNotes(notes: any[]): notes is Note[] {
       note.last_edited &&
       typeof note.pinned === 'boolean' &&
       note.folder
-  );
-}
-
-export function compareNotes(a: Note, b: Note): number {
-  if (a.pinned && !b.pinned) return -1;
-  if (!a.pinned && b.pinned) return 1;
-  return (
-    new Date(b.time_created).getTime() - new Date(a.time_created).getTime()
   );
 }
 

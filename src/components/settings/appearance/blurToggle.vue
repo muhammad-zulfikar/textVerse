@@ -20,14 +20,14 @@
           'bg-cream dark:bg-gray-700': !uiStore.blurEnabled,
           'bg-[#ebdfc0] dark:bg-gray-800': uiStore.blurEnabled,
         }"
-        class="relative inline-block custom-card-switch w-16 h-9 cursor-pointer transition-colors duration-300"
+        class="relative inline-block card-switch w-16 h-9 cursor-pointer transition-colors duration-300"
       >
         <span
           :class="{
             'translate-x-[0.3px]': !uiStore.blurEnabled,
             'translate-x-[30px]': uiStore.blurEnabled,
           }"
-          class="absolute left-0 top-[0.2px] bottom-0 w-8 h-[34px] custom-card shadow-md transform transition-transform duration-300"
+          class="absolute left-0 top-[0.2px] bottom-0 w-8 h-[34px] card shadow-md transform transition-transform duration-300"
         ></span>
       </label>
     </div>

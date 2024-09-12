@@ -9,11 +9,11 @@
       <div
         @click.stop
         class="z-50 font-serif p-5 relative flex flex-col items-center p-16"
-        :class="[uiStore.blurEnabled ? 'custom-card-blur' : 'custom-card']"
+        :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
       >
         <img
           :src="avatarUrl"
-          class="w-64 h-64 rounded-full custom-card-transparent-avatar object-cover"
+          class="w-64 h-64 rounded-full card-transparent-avatar object-cover"
           alt="Avatar"
         />
       </div>

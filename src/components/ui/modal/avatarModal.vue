@@ -8,20 +8,20 @@
       <div @click="closeModal" class="absolute inset-0"></div>
       <div
         @click.stop
-        class="z-50 font-serif custom-card p-5 relative flex flex-col w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3"
+        class="z-50 font-serif card p-5 relative flex flex-col w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3"
       >
         <h1 class="text-xl font-bold mb-4">Select Avatar</h1>
         <div class="flex flex-col items-center mb-4 relative">
           <img
             v-if="avatarUrl"
             :src="avatarUrl"
-            class="w-32 h-32 rounded-full custom-card-transparent-avatar mb-4 object-cover"
+            class="w-32 h-32 rounded-full card-transparent-avatar mb-4 object-cover"
             alt="Avatar"
           />
           <div
             @dragover.prevent
             @drop.prevent="handleDrop"
-            class="custom-card-border-dashed w-full h-32 md:h-52 flex flex-col items-center justify-center text-gray-600 dark:text-gray-400 cursor-pointer"
+            class="card-border-dashed w-full h-32 md:h-52 flex flex-col items-center justify-center text-gray-600 dark:text-gray-400 cursor-pointer"
             @click="triggerFilePicker"
           >
             <p class="text-sm">Drag & drop your image here</p>
@@ -38,7 +38,7 @@
         <div class="flex justify-between mt-6 text-sm">
           <button
             @click.prevent="removeAvatar"
-            class="flex items-center px-2 py-1 custom-card text-red-500 hover:text-red-100 hover:bg-red-700/50 dark:hover:bg-red-800/60 mr-4 cursor-pointer"
+            class="flex items-center px-2 py-1 card text-red-500 hover:text-red-100 hover:bg-red-700/50 dark:hover:bg-red-800/60 mr-4 cursor-pointer"
           >
             <PhTrash :size="20" class="mr-2" />
             Remove Avatar
@@ -46,7 +46,7 @@
           <div class="flex">
             <button
               @click.prevent="closeModal"
-              class="flex items-center px-2 py-1 custom-card hover:bg-[#d9c698] dark:hover:bg-gray-700 mr-4 cursor-pointer"
+              class="flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700 mr-4 cursor-pointer"
             >
               <PhProhibit :size="20" class="mr-2" />
               Cancel
@@ -54,7 +54,7 @@
             <button
               :disabled="!avatarUrl"
               @click.prevent="confirmSelection"
-              class="flex items-center px-2 py-1 custom-card hover:bg-[#d9c698] dark:hover:bg-gray-700 cursor-pointer"
+              class="flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700 cursor-pointer"
             >
               <PhCheckCircle :size="20" class="mr-2" />
               Save

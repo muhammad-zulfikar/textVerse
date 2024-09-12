@@ -10,7 +10,7 @@
           v-for="folder in folders"
           :key="folder"
           @click="openFolder(folder)"
-          class="custom-card p-4 rounded-lg cursor-pointer mx-2"
+          class="card p-4 rounded-lg cursor-pointer mx-2"
           :class="
             uiStore.folderViewType === 'grid'
               ? 'flex flex-col items-center'
@@ -77,7 +77,7 @@
           v-for="note in folderNotes"
           :key="note.id"
           @click="uiStore.openNote(note.id)"
-          class="custom-card p-4 rounded-lg cursor-pointer mx-2"
+          class="card p-4 rounded-lg cursor-pointer mx-2"
           :class="
             uiStore.folderViewType === 'grid'
               ? 'flex flex-col items-center'

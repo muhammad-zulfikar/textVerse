@@ -44,8 +44,6 @@
     PhInfo,
     PhGear,
     PhSignIn,
-    PhGlobe,
-    PhQuestion,
   } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
   import Button from '@/components/ui/button.vue';
@@ -58,28 +56,11 @@
   });
 
   const currentPathName = computed(() => {
-    return availableRoutes.value.some((r) => r.name === currentPath.value)
-      ? currentPath.value
-      : 'Not Found';
+    return currentPath.value;
   });
 
   const currentIcon = computed(() => {
-    switch (currentPathName.value) {
-      case 'Home':
-        return PhHouseLine;
-      case 'Settings':
-        return PhGear;
-      case 'Trash':
-        return PhTrash;
-      case 'Sign In':
-        return PhSignIn;
-      case 'Public':
-        return PhGlobe;
-      case 'Not Found':
-        return PhQuestion;
-      default:
-        return PhInfo;
-    }
+    return getIconForRoute(currentPathName.value);
   });
 
   const availableRoutes = computed(() =>
@@ -87,9 +68,9 @@
       (route) =>
         route.name &&
         route.name !== 'NotFound' &&
-        route.name !== 'Public' &&
         route.name !== 'About' &&
         route.name !== 'Note' &&
+        route.name !== 'Public' &&
         !(route.name === 'Sign In' && authStore.isLoggedIn)
     )
   );
@@ -104,8 +85,6 @@
         return PhTrash;
       case 'Sign In':
         return PhSignIn;
-      case 'Public':
-        return PhGlobe;
       default:
         return PhInfo;
     }

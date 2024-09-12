@@ -12,7 +12,7 @@
         v-if="isOpen"
         :class="[
           'z-50 absolute',
-          uiStore.blurEnabled ? 'custom-card-blur' : 'custom-card',
+          uiStore.blurEnabled ? 'card-blur' : 'card',
           'dropdown-content',
           `dropdown-${props.direction || 'down'}`,
           `dropdown-${props.position || 'left'}`,
@@ -34,7 +34,6 @@
   const props = defineProps<{
     dropdownId: string;
     contentWidth?: string;
-    showArrow?: 'true' | 'false';
     direction?: 'up' | 'down';
     position?: 'left' | 'center' | 'right';
   }>();

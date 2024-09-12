@@ -1,7 +1,7 @@
 <template>
   <div class="fixed inset-0 flex items-center justify-center p-4">
     <div
-      class="font-serif custom-card px-10 py-8 md:p-8 relative flex flex-col mx-auto max-w-md w-full"
+      class="font-serif card px-10 py-8 md:p-8 relative flex flex-col mx-auto max-w-md w-full"
     >
       <h2 class="text-2xl font-bold mb-4 flex justify-center">
         Page Not Found
@@ -11,7 +11,7 @@
       </p>
       <button
         @click="goHome"
-        class="flex w-full md:w-fit items-center justify-center px-4 py-2 mt-4 mx-auto custom-card"
+        class="flex w-full md:w-fit items-center justify-center px-4 py-2 mt-4 mx-auto card"
       >
         <PhHouseLine :size="20" class="mr-2" />
         Go to Home

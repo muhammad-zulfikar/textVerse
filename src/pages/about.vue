@@ -6,7 +6,7 @@
       class="mx-auto grid max-w-2xl grid-cols-6 gap-6 px-2 select-none my-8 md:my-24"
     >
       <div
-        class="flex flex-col col-span-6 md:col-span-4 h-58 md:h-60 overflow-hidden rounded-lg p-5 md:p-6 custom-card"
+        class="flex flex-col col-span-6 md:col-span-4 h-58 md:h-60 overflow-hidden rounded-lg p-5 md:p-6 card"
       >
         <a
           href="https://github.com/muhammad-zulfikar/vue-notes"
@@ -37,9 +37,7 @@
         </p>
       </div>
       <div class="col-span-6 md:col-span-2">
-        <div
-          class="p-4 justify-center rounded-lg dark:text-white md:h-60 custom-card"
-        >
+        <div class="p-4 justify-center rounded-lg dark:text-white md:h-60 card">
           <p class="text-sm font-serif font-bold">TODO(S):</p>
           <ul class="list-disc pl-4 mt-2 space-y-1">
             <li class="text-sm font-serif line-through">
@@ -50,7 +48,7 @@
         </div>
       </div>
       <div class="col-span-6">
-        <div class="p-4 justify-center rounded-lg dark:text-white custom-card">
+        <div class="p-4 justify-center rounded-lg dark:text-white card">
           <p class="text-sm font-serif font-bold">Features:</p>
           <ul class="list-disc pl-4 mt-2 columns-2 gap-6 md:gap-12 space-y-2">
             <li class="text-sm font-serif">

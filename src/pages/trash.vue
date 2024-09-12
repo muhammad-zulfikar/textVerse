@@ -25,7 +25,7 @@
           class="flex flex-col md:flex-row md:justify-center items-center mb-6 md:mb-8 mx-2"
         >
           <p
-            class="custom-card px-4 py-2 md:px-2 md:py-1.5 w-full md:w-auto text-sm text-gray-800 dark:text-gray-400 text-center"
+            class="card px-4 py-2 md:px-2 md:py-1.5 w-full md:w-auto text-sm text-gray-800 dark:text-gray-400 text-center"
           >
             Notes in trash will be permanently deleted after 30 days.
           </p>
@@ -69,7 +69,7 @@
             @click.stop="toggleNoteSelection(note.id)"
           >
             <div
-              class="absolute top-0 -left-3 custom-card-rounded hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-opacity duration-200"
+              class="absolute top-0 -left-3 card-rounded hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-opacity duration-200"
               :class="{
                 'opacity-100': notesStore.selectedNotes.includes(note.id),
                 'opacity-0 group-hover:opacity-100':
@@ -100,13 +100,13 @@
                 <div class="flex items-center text-left text-[10px] md:text-xs">
                   <div
                     @click.stop="permanentlyDeleteNote(note.id)"
-                    class="flex items-center px-2 py-1 mr-2 cursor-pointer truncate custom-card text-red-500 hover:text-red-100 hover:bg-red-700/50 dark:hover:bg-red-800/60"
+                    class="flex items-center px-2 py-1 mr-2 cursor-pointer truncate card text-red-500 hover:text-red-100 hover:bg-red-700/50 dark:hover:bg-red-800/60"
                   >
                     <PhTrash :size="16" />
                   </div>
                   <div
                     @click.stop="restoreNote(note.id)"
-                    class="flex items-center px-2 py-1 cursor-pointer truncate custom-card hover:text-black dark:hover:text-white hover:bg-[#d9c698] dark:hover:bg-gray-700"
+                    class="flex items-center px-2 py-1 cursor-pointer truncate card hover:text-black dark:hover:text-white hover:bg-[#d9c698] dark:hover:bg-gray-700"
                   >
                     <PhClockClockwise :size="16" />
                   </div>
@@ -114,7 +114,7 @@
                 <div class="text-left text-[10px] md:text-xs">
                   <p
                     v-if="note.folder !== DEFAULT_FOLDERS.UNCATEGORIZED"
-                    class="flex items-center px-2 py-1 cursor-pointer truncate custom-card"
+                    class="flex items-center px-2 py-1 cursor-pointer truncate card"
                   >
                     <PhFolder :size="16" class="mr-2" />
                     {{ note.folder }}

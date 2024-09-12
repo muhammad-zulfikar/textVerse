@@ -1,7 +1,7 @@
 <template>
   <button
     :class="[
-      'flex items-center custom-card px-2 py-1.5',
+      'flex items-center card px-2 py-1.5',
       variantClasses[variant as keyof typeof variantClasses],
       { 'opacity-50 cursor-not-allowed': disabled },
     ]"

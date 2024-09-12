@@ -12,7 +12,7 @@
         @submit.prevent="handleSubmit"
         @click.stop
         class="z-50 font-serif p-5 relative flex flex-col w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3"
-        :class="[uiStore.blurEnabled ? 'custom-card-blur' : 'custom-card']"
+        :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
       >
         <h1 class="text-xl font-bold mb-4">{{ modalTitle }}</h1>
         <input
@@ -34,7 +34,7 @@
         <div class="flex justify-end mt-6">
           <button
             @click.prevent="closeModal"
-            class="flex items-center px-2 py-1 custom-card hover:bg-[#d9c698] dark:hover:bg-gray-700 mr-4 cursor-pointer"
+            class="flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700 mr-4 cursor-pointer"
           >
             <PhProhibit :size="20" class="mr-2" />
             <span class="text-sm">Cancel</span>
@@ -43,7 +43,7 @@
             :disabled="!isValid"
             type="submit"
             :class="[
-              'text-sm flex items-center px-2 py-1 custom-card hover:bg-[#d9c698] dark:hover:bg-gray-700',
+              'text-sm flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700',
               {
                 'text-blue-500 hover:text-blue-600 hover:bg-blue-700': isValid,
                 'text-gray-400 cursor-default': !isValid,

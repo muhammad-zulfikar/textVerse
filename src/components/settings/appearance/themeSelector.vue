@@ -21,7 +21,7 @@
           @click="toggleDropdown"
           :class="[
             'mt-2 md:mt-0 text-sm md:text-base px-4 py-2 flex items-center relative',
-            uiStore.blurEnabled ? 'custom-card-blur' : 'custom-card',
+            uiStore.blurEnabled ? 'card-blur' : 'card',
           ]"
         >
           <component :is="currentThemeIcon" :size="20" class="mr-2" />

@@ -10,7 +10,7 @@
     </div>
     <Dropdown
       label="Note Open Preference"
-      dropdownId="noteOpenPreference"
+      dropdownId="noteViewPreference"
       contentWidth="9rem"
       direction="down"
     >
@@ -19,7 +19,7 @@
           @click="toggleDropdown"
           :class="[
             'mt-2 md:mt-0 text-sm md:text-base px-4 py-2 flex items-center relative',
-            uiStore.blurEnabled ? 'custom-card-blur' : 'custom-card',
+            uiStore.blurEnabled ? 'card-blur' : 'card',
           ]"
         >
           <component :is="currentPreferenceIcon" :size="20" class="mr-2" />
@@ -57,12 +57,12 @@
 
   const currentPreferenceText = computed(
     () =>
-      uiStore.noteOpenPreference.charAt(0).toUpperCase() +
-      uiStore.noteOpenPreference.slice(1)
+      uiStore.noteViewPreference.charAt(0).toUpperCase() +
+      uiStore.noteViewPreference.slice(1)
   );
 
   const currentPreferenceIcon = computed(() => {
-    return uiStore.noteOpenPreference === 'modal' ? PhCardsThree : PhSidebar;
+    return uiStore.noteViewPreference === 'modal' ? PhCardsThree : PhSidebar;
   });
 
   const preferenceIcon = (preference: string) => {
@@ -70,7 +70,7 @@
   };
 
   const setPreference = (preference: 'modal' | 'sidebar') => {
-    uiStore.setNoteOpenPreference(preference);
+    uiStore.setnoteViewPreference(preference);
     isOpen.value = false;
     uiStore.showToastMessage('Note Open type updated');
   };
@@ -81,7 +81,7 @@
 
   const handleClickOutside = (event: MouseEvent) => {
     const target = event.target as Element;
-    if (!target.closest('[dropdown-id="noteOpenPreference"]')) {
+    if (!target.closest('[dropdown-id="noteViewPreference"]')) {
       isOpen.value = false;
     }
   };

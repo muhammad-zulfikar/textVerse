@@ -1,3 +1,5 @@
+<!--noteModal-->
+
 <template>
   <ModalBackdrop v-model="props.isOpen" />
   <transition name="zoom">
@@ -8,24 +10,19 @@
       <div @click="handleOutsideClick" class="absolute inset-0"></div>
       <div ref="modalContainer" :class="modalClasses">
         <div class="flex w-full py-4 select-none">
-          <NoteToolbar
-            v-bind="toolbarProps"
-            @delete-note="deleteNote"
-            @update-folder="updateNoteFolder"
-            @update-title="updateNoteTitle"
-            @start-title-edit="isTitleEditing = true"
-            @finish-title-edit="finishTitleEdit"
-          />
+          <NoteToolbar v-bind="toolbarProps" />
         </div>
         <Separator />
         <div
-          class="w-full bg-transparent pt-4 pb-1 flex-grow overflow-y-auto flex flex-col"
+          class="w-full bg-transparent pt-4 pb-2 flex-grow overflow-y-auto flex flex-col"
         >
-          <div
-            ref="quillEditorRef"
-            class="w-full flex-grow"
-            :class="{ 'max-h-[500px]': !uiStore.isExpanded }"
-          ></div>
+          <NoteForm
+            v-model="editedNote.content"
+            @update:modelValue="updateNoteContent"
+            :showToolbar="true"
+            :editable="true"
+            class="h-full flex-grow overflow-y-auto"
+          />
         </div>
       </div>
     </div>
@@ -41,8 +38,9 @@
   import { DEFAULT_FOLDERS } from '@/utils/constants';
   import { nanoid } from 'nanoid';
   import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
-  import NoteToolbar from '@/components/notes/noteToolbar.vue';
   import Separator from '@/components/ui/separator.vue';
+  import NoteForm from '@/components/notes/noteForm.vue';
+  import NoteToolbar from './noteToolbar.vue';
 
   const props = defineProps<{ noteId: string | null; isOpen: boolean }>();
 
@@ -52,40 +50,28 @@
   const editedNote = ref<Note>(createEmptyNote());
   const originalNote = ref<Note | null>(null);
   const modalContainer = ref<HTMLElement | null>(null);
-  const quillEditor = ref<any | null>(null);
-  const quillEditorRef = ref<HTMLElement | null>(null);
-  const isTitleEditing = ref(false);
 
-  let Quill: any;
   let saveNoteTimeout: ReturnType<typeof setTimeout> | null = null;
 
   const modalClasses = computed(() => [
     'px-4 relative flex flex-col',
     {
-      'custom-card-no-rounded-border w-full h-full':
+      'card-no-rounded-border w-full h-full':
         uiStore.isExpanded && !uiStore.blurEnabled,
-      'custom-card-blur-no-rounded-border w-full h-full':
+      'card-blur-no-rounded-border w-full h-full':
         uiStore.isExpanded && uiStore.blurEnabled,
-      'custom-card w-11/12 md:w-3/4 lg:w-1/2 xl:w-3/5':
+      'card w-11/12 md:w-3/4 lg:w-1/2 xl:w-3/5':
         !uiStore.isExpanded && !uiStore.blurEnabled,
-      'custom-card-blur w-11/12 md:w-3/4 lg:w-1/2 xl:w-3/5':
+      'card-blur w-11/12 md:w-3/4 lg:w-1/2 xl:w-3/5':
         !uiStore.isExpanded && uiStore.blurEnabled,
     },
   ]);
 
   const toolbarProps = computed(() => ({
-    noteId: props.noteId,
-    title: editedNote.value.title,
-    content: editedNote.value.content,
-    folder: editedNote.value.folder,
-    note: editedNote.value,
-    isTitleEditing: isTitleEditing.value,
+    note: editedNote,
     isEditMode: isEditMode.value,
     isValid: true,
     hasChanges: hasChanges.value,
-    lastEditedDate:
-      editedNote.value.last_edited || editedNote.value.time_created,
-    isPinned: editedNote.value.pinned,
     isSaving: isSaving.value,
   }));
 
@@ -110,23 +96,11 @@
     };
   }
 
-  async function deleteNote() {
-    try {
-      if (editedNote.value.id) {
-        await notesStore.deleteNote(editedNote.value.id);
-        uiStore.closeNote();
-      }
-    } catch (error) {
-      console.error('Error deleting note:', error);
-      uiStore.showToastMessage('Failed to delete note. Please try again.');
-    }
-  }
-
   function debouncedSaveNote() {
     if (saveNoteTimeout) {
       clearTimeout(saveNoteTimeout);
     }
-    saveNoteTimeout = setTimeout(saveNote, 100);
+    saveNoteTimeout = setTimeout(saveNote, 500);
   }
 
   async function saveNote() {
@@ -163,19 +137,8 @@
     }
   }
 
-  function updateNoteTitle(newTitle: string) {
-    editedNote.value.title = newTitle;
-    debouncedSaveNote();
-  }
-
-  function updateNoteContent() {
-    if (!notesStore.isContentEmpty(editedNote.value.content)) {
-      debouncedSaveNote();
-    }
-  }
-
-  function updateNoteFolder(newFolder: string) {
-    editedNote.value.folder = newFolder;
+  function updateNoteContent(newContent: string) {
+    editedNote.value.content = newContent;
     debouncedSaveNote();
   }
 
@@ -196,11 +159,6 @@
     uiStore.closeNote();
   }
 
-  function finishTitleEdit(newTitle: string) {
-    isTitleEditing.value = false;
-    updateNoteTitle(newTitle);
-  }
-
   function setupNoteListener(noteId: string) {
     if (authStore.isLoggedIn && noteId && authStore.user) {
       const noteRef = dbRef(db, `users/${authStore.user.uid}/notes/${noteId}`);
@@ -209,109 +167,8 @@
         if (updatedNote && updatedNote.id === editedNote.value.id) {
           editedNote.value = { ...updatedNote };
           originalNote.value = { ...updatedNote };
-          if (
-            quillEditor.value &&
-            quillEditor.value.root.innerHTML !== updatedNote.content
-          ) {
-            const currentSelection = quillEditor.value.getSelection();
-            quillEditor.value.root.innerHTML = updatedNote.content;
-            if (currentSelection) {
-              quillEditor.value.setSelection(currentSelection);
-            }
-          }
         }
       });
-    }
-  }
-
-  async function loadQuill() {
-    if (!Quill) {
-      const quillModule = await import('quill');
-      Quill = quillModule.default;
-    }
-  }
-
-  async function initializeQuillEditor() {
-    if (quillEditorRef.value && !quillEditor.value) {
-      await loadQuill();
-      quillEditor.value = new Quill(quillEditorRef.value, {
-        theme: 'snow',
-        modules: {
-          toolbar:
-            !isMobile.value || uiStore.isExpanded
-              ? [
-                  ['bold', 'italic', 'underline', 'strike'],
-                  ['blockquote', 'code-block'],
-                  [{ align: [] }, { indent: '-1' }, { indent: '+1' }],
-                  [{ list: 'ordered' }, { list: 'bullet' }],
-                  ['link', 'image'],
-                  [{ header: [1, 2, 3, 4, 5, 6, false] }],
-                  [{ color: [] }, { background: [] }],
-                  ['clean'],
-                ]
-              : false,
-        },
-      });
-
-      quillEditor.value.on(
-        'text-change',
-        (_delta: any, _oldDelta: any, source: string) => {
-          if (source === 'user' && quillEditor.value) {
-            editedNote.value.content = quillEditor.value.root.innerHTML;
-            updateNoteContent();
-          }
-        }
-      );
-
-      if (editedNote.value.content) {
-        quillEditor.value.root.innerHTML = editedNote.value.content;
-      }
-    }
-  }
-
-  function updateQuillEditorHeight() {
-    if (quillEditorRef.value && modalContainer.value) {
-      const containerRect = modalContainer.value.getBoundingClientRect();
-      const editorTop = quillEditorRef.value.offsetTop;
-      const newHeight = window.innerHeight - containerRect.top - editorTop - 20;
-      quillEditorRef.value.style.height = `${newHeight}px`;
-    }
-  }
-
-  const resizeObserver = new ResizeObserver(updateQuillEditorHeight);
-
-  watch(
-    () => props.isOpen,
-    (isOpen) => {
-      if (isOpen) {
-        if (isMobile.value) {
-          uiStore.isExpanded = true;
-        }
-        nextTick(() => {
-          updateQuillEditorHeight();
-          if (modalContainer.value) {
-            resizeObserver.observe(modalContainer.value);
-          }
-        });
-      } else {
-        if (modalContainer.value) {
-          resizeObserver.unobserve(modalContainer.value);
-        }
-      }
-    }
-  );
-
-  function cleanupQuillEditor() {
-    if (quillEditor.value) {
-      quillEditor.value.off('text-change');
-      const toolbar = quillEditor.value.getModule('toolbar');
-      if (toolbar) {
-        toolbar.container.remove();
-      }
-      quillEditor.value = null;
-      if (quillEditorRef.value) {
-        quillEditorRef.value.innerHTML = '';
-      }
     }
   }
 
@@ -319,6 +176,9 @@
     [() => props.isOpen, () => props.noteId],
     async ([isOpen, newNoteId]) => {
       if (isOpen) {
+        if (isMobile.value) {
+          uiStore.isExpanded = true;
+        }
         await nextTick();
         if (newNoteId !== null) {
           const note = notesStore.notes.find((n) => n.id === newNoteId);
@@ -333,9 +193,6 @@
           originalNote.value = null;
           isEditMode.value = false;
         }
-        await initializeQuillEditor();
-      } else {
-        cleanupQuillEditor();
       }
     }
   );
@@ -343,25 +200,15 @@
   onMounted(() => {
     window.addEventListener('resize', () => {
       isMobile.value = window.innerWidth <= 768;
-      updateQuillEditorHeight();
     });
-    if (props.isOpen) {
-      nextTick(() => {
-        initializeQuillEditor();
-        updateQuillEditorHeight();
-        if (modalContainer.value) {
-          resizeObserver.observe(modalContainer.value);
-        }
-      });
-    }
   });
 
   onUnmounted(() => {
-    window.removeEventListener('resize', updateQuillEditorHeight);
-    resizeObserver.disconnect();
+    window.removeEventListener('resize', () => {
+      isMobile.value = window.innerWidth <= 768;
+    });
     if (saveNoteTimeout) {
       clearTimeout(saveNoteTimeout);
     }
-    cleanupQuillEditor();
   });
 </script>
