@@ -20,7 +20,7 @@
     PhSignIn,
   } from '@phosphor-icons/vue';
   import { useRouter } from 'vue-router';
-  import { notesStore, authStore, uiStore } from '@/utils/stores';
+  import { firebaseStore, authStore, uiStore } from '@/utils/stores';
   import Button from '@/components/ui/button.vue';
 
   const router = useRouter();
@@ -54,7 +54,7 @@
 
     try {
       await Promise.all([
-        notesStore.syncNotesFromFirebase(authStore.user!.uid),
+        firebaseStore.syncNotesFromFirebase(authStore.user!.uid),
         new Promise((resolve) => setTimeout(resolve, 800)),
       ]);
       syncStatus.value = 'idle';
@@ -65,6 +65,7 @@
       setTimeout(() => {
         isSyncing.value = false;
         isSpinning.value = false;
+        uiStore.showToastMessage('Notes synced successfully');
         uiStore.setSyncing(false);
       }, 100);
     }

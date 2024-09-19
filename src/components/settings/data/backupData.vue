@@ -10,8 +10,7 @@
     </div>
     <button
       @click="downloadBackup"
-      class="flex items-center justify-center w-full md:w-auto text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
-      :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
+      class="card flex items-center justify-center w-full md:w-auto text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
     >
       <PhDownload :size="20" class="mr-2" />
       Download a backup

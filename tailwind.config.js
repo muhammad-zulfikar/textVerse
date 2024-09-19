@@ -3,12 +3,23 @@ export default {
   darkMode: 'class',
   content: [
     "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
+    "./src/**/*.{vue,js,ts}",
   ],
   theme: {
     extend: {
       colors: {
-        cream: '#f2ebd9',
+        cream: {
+          50:  '#f7f4e4',
+          100: '#f2ebd9',
+          200: '#ebdfc0',
+          300: '#d9c698',
+          400: '#BC8A5F',
+          500: '#A47148',
+          600: '#8B5E34',
+          700: '#6F4518',
+          800: '#603808',
+          900: '583101',
+        },   
         gray: {
           50: '#f9f9f9',
           100: '#ececec',
@@ -21,15 +32,7 @@ export default {
           750: '#2f2f2f',
           800: '#212121',
           900: '#171717',
-          950: '#0d0d0d',
         },
-      },
-      gridTemplateColumns: {
-        '1': 'repeat(1, minmax(0, 1fr))',
-        '2': 'repeat(2, minmax(0, 1fr))',
-        '3': 'repeat(3, minmax(0, 1fr))',
-        '4': 'repeat(4, minmax(0, 1fr))',
-        '5': 'repeat(5, minmax(0, 1fr))',
       },
     },
   },

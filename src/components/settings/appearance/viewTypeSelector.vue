@@ -18,15 +18,14 @@
         <button
           @click="toggleDropdown"
           :class="[
-            'mt-2 md:mt-0 text-sm md:text-base px-4 py-2 flex items-center relative',
-            uiStore.blurEnabled ? 'card-blur' : 'card',
+            'card flex items-center relative mt-2 md:mt-0 text-sm md:text-base px-4 py-2',
           ]"
         >
           <component :is="currentViewIcon" :size="20" class="mr-2" />
           {{ viewTypeText }}
           <div
-            class="p-1 ml-2 rounded-full hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-transform duration-200"
-            :class="{ 'rotate-180': isOpen }"
+            class="p-1 ml-2 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
+            :class="{ 'rotate-180 bg-cream-300 dark:bg-gray-600': isOpen }"
           >
             <PhCaretDown class="size-4" />
           </div>
@@ -34,9 +33,9 @@
       </template>
       <div class="px-1 text-sm">
         <div
-          class="w-full rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200"
+          class="w-full rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
           :class="{
-            'bg-[#ebdfc0] dark:bg-gray-700': expandedOption === 'card',
+            'bg-cream-200 dark:bg-gray-700': expandedOption === 'card',
           }"
         >
           <div class="flex items-center justify-between">
@@ -49,7 +48,7 @@
             </button>
             <button
               @click.stop="toggleOptions('card')"
-              class="mr-2 p-1 rounded-full hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-transform duration-200"
+              class="mr-2 p-1 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
               :class="{ 'rotate-180': expandedOption === 'card' }"
             >
               <PhCaretDown :size="16" />
@@ -64,7 +63,7 @@
                 @click.stop="decreaseColumns"
                 :class="{
                   'text-gray-400 cursor-default': uiStore.columns <= 1,
-                  'hover:bg-[#d9c698] dark:hover:bg-gray-600':
+                  'hover:bg-cream-300 dark:hover:bg-gray-600':
                     uiStore.columns > 1,
                 }"
                 class="text-center text-sm p-2 mb-1 rounded-md transition-colors duration-200"
@@ -82,7 +81,7 @@
                 :class="{
                   'text-gray-400 cursor-default':
                     uiStore.columns >= (isMobile ? 2 : 4),
-                  'hover:bg-[#d9c698] dark:hover:bg-gray-600':
+                  'hover:bg-cream-300 dark:hover:bg-gray-600':
                     uiStore.columns < (isMobile ? 2 : 4),
                 }"
                 class="text-center text-sm p-2 mb-1 rounded-md transition-colors duration-200"
@@ -95,23 +94,20 @@
         </div>
         <button
           @click="setViewType('table')"
-          class="w-full text-left p-2 rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+          class="w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
         >
           <PhTable :size="20" class="mr-2" />
           Table
         </button>
         <button
           @click="setViewType('mail')"
-          class="w-full text-left p-2 rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+          class="w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
         >
           <PhEnvelopeSimple :size="20" class="mr-2" />
           Mail
         </button>
         <div
-          class="w-full rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200"
-          :class="{
-            'bg-[#ebdfc0] dark:bg-gray-700': expandedOption === 'folder',
-          }"
+          class="w-full rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
         >
           <div class="flex items-center justify-between">
             <button
@@ -121,32 +117,7 @@
               <PhFolder :size="20" class="mr-2" />
               Folder
             </button>
-            <button
-              @click.stop="toggleOptions('folder')"
-              class="mr-2 p-1 rounded-full hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-transform duration-200"
-              :class="{ 'rotate-180': expandedOption === 'folder' }"
-            >
-              <PhCaretDown :size="16" />
-            </button>
           </div>
-          <Transition name="expand">
-            <div v-if="expandedOption === 'folder'" class="">
-              <button
-                @click.stop="setFolderViewType('grid')"
-                class="w-full flex items-center text-center text-sm p-2 rounded-md text-gray-750 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-colors duration-200"
-              >
-                <PhGridFour :size="20" class="mr-2" />
-                <span>Grid</span>
-              </button>
-              <button
-                @click.stop="setFolderViewType('list')"
-                class="w-full flex items-center text-center text-sm p-2 rounded-md text-gray-750 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-colors duration-200"
-              >
-                <PhList :size="20" class="mr-2" />
-                <span>List</span>
-              </button>
-            </div>
-          </Transition>
         </div>
       </div>
     </Dropdown>
@@ -163,15 +134,12 @@
     PhCaretDown,
     PhMinusCircle,
     PhPlusCircle,
-    PhGridFour,
-    PhList,
   } from '@phosphor-icons/vue';
   import { uiStore } from '@/utils/stores';
   import Dropdown from '@/components/ui/dropdown.vue';
 
   const isOpen = ref(false);
   const isMobile = ref(window.innerWidth < 640);
-  const expandedOption = ref('');
 
   const viewTypeText = computed(
     () => uiStore.viewType.charAt(0).toUpperCase() + uiStore.viewType.slice(1)
@@ -195,6 +163,8 @@
   const toggleDropdown = () => {
     isOpen.value = !isOpen.value;
   };
+
+  const expandedOption = ref('');
 
   const toggleOptions = (option: string) => {
     expandedOption.value = expandedOption.value === option ? '' : option;
@@ -224,15 +194,7 @@
     uiStore.setViewType('card');
   };
 
-  const setFolderViewType = (viewType: 'grid' | 'list') => {
-    uiStore.setFolderViewType(viewType);
-    uiStore.setViewType('folder');
-    uiStore.showToastMessage(`Folder view set to ${viewType}`);
-    isOpen.value = false;
-    expandedOption.value = '';
-  };
-
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleOutsideClick = (event: MouseEvent) => {
     const target = event.target as Element;
     if (!target.closest('[dropdown-id="viewtype"]')) {
       isOpen.value = false;
@@ -253,13 +215,13 @@
   };
 
   onMounted(() => {
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('click', handleOutsideClick);
     window.addEventListener('resize', handleResize);
     handleResize();
   });
 
   onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClickOutside);
+    document.removeEventListener('click', handleOutsideClick);
     window.removeEventListener('resize', handleResize);
   });
 </script>

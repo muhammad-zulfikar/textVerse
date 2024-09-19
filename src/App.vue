@@ -20,10 +20,16 @@
 <script setup lang="ts">
   import { ref, onMounted, watch } from 'vue';
   import { useRouter } from 'vue-router';
-  import { authStore, uiStore, folderStore, notesStore } from './utils/stores';
+  import {
+    authStore,
+    localStore,
+    uiStore,
+    notesStore,
+    folderStore,
+  } from './utils/stores';
   import Navbar from '@/components/navbar/navbar.vue';
   import Toast from '@/components/ui/toast.vue';
-  import LoadingSpinner from '@/components/ui/loadingSpinner.vue';
+  import LoadingSpinner from '@/components/ui/loading.vue';
 
   const router = useRouter();
   const routeOrder = ['Home', 'Settings', 'Trash', 'Sign In', 'About'];
@@ -40,26 +46,32 @@
     { immediate: true }
   );
 
+  watch(
+    () => authStore.user,
+    async (newUser, oldUser) => {
+      if (newUser !== oldUser) {
+        await uiStore.initializeUI();
+        await notesStore.initializeNotes();
+        await folderStore.initializeFolders();
+      }
+    }
+  );
+
   onMounted(async () => {
     const startTime = Date.now();
 
     try {
-      authStore.initializeAuth();
-      await uiStore.initializeSettings();
+      await authStore.initializeAuth();
+      await uiStore.initializeUI();
+      await notesStore.initializeNotes();
+      await folderStore.initializeFolders();
 
-      if (authStore.isLoggedIn) {
-        await Promise.all([folderStore.loadFolders(), notesStore.loadNotes()]);
-      } else {
-        await Promise.all([
-          folderStore.loadFoldersFromLocalStorage(),
-          notesStore.loadNotesFromLocalStorage(),
-        ]);
+      if (!localStore.initialNotesLoaded) {
+        await localStore.loadInitialNotes();
       }
     } catch (error) {
       console.error('Error loading app:', error);
-      uiStore.showToastMessage(
-        'An error occurred while loading the app. Please try again.'
-      );
+      uiStore.showToastMessage('An error occurred while loading the app');
     } finally {
       const elapsedTime = Date.now() - startTime;
       const remainingTime = Math.max(2000 - elapsedTime, 0);
@@ -69,18 +81,6 @@
       }, remainingTime);
     }
   });
-
-  watch(
-    () => authStore.isLoggedIn,
-    async (newValue) => {
-      if (newValue) {
-        await uiStore.initializeSettings();
-      } else {
-        uiStore.clearSettingsListener();
-        uiStore.loadLocalSettings();
-      }
-    }
-  );
 </script>
 
 <style>

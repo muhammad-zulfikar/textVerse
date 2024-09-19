@@ -15,14 +15,14 @@
     <div class="w-full text-sm px-1 space-y-1">
       <li
         @click.stop="openNoteForm"
-        class="w-full text-left cursor-pointer p-2 rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+        class="w-full text-left cursor-pointer p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
       >
         <PhFile :size="20" class="mr-2" />
         Note
       </li>
       <li
         @click.stop="openFolderForm"
-        class="w-full text-left cursor-pointer p-2 rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+        class="w-full text-left cursor-pointer p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
       >
         <PhFolder :size="20" class="mr-2" />
         Folder
@@ -40,17 +40,20 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
-  import { uiStore, folderStore } from '@/utils/stores';
+  import { ref, defineAsyncComponent } from 'vue';
+  import { uiStore, notesStore, folderStore } from '@/utils/stores';
   import { PhPlus, PhFile, PhFolder } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
-  import InputModal from '@/components/ui/modal/inputModal.vue';
   import Button from '@/components/ui/button.vue';
+
+  const InputModal = defineAsyncComponent(
+    () => import('@/components/ui/modal/inputModal.vue')
+  );
 
   const isFolderFormOpen = ref(false);
 
   const openNoteForm = () => {
-    uiStore.openNote(null);
+    notesStore.openNote(null);
     uiStore.setActiveDropdown(null);
   };
 

@@ -1,53 +1,46 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import home from '@/pages/home.vue';
-import about from '@/pages/about.vue';
-import settings from '@/pages/settings.vue';
-import trash from '@/pages/trash.vue';
-import signIn from '@/pages/signIn.vue';
-import publicNote from '@/pages/public.vue';
-import notFound from '@/pages/notFound.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    component: home,
+    component: () => import('@/pages/home.vue'),
   },
   {
     path: '/about',
     name: 'About',
-    component: about,
+    component: () => import('@/pages/about.vue'),
   },
   {
     path: '/settings',
     name: 'Settings',
-    component: settings,
+    component: () => import('@/pages/settings.vue'),
   },
   {
     path: '/trash',
     name: 'Trash',
-    component: trash,
+    component: () => import('@/pages/trash.vue'),
   },
   {
     path: '/sign-in',
     name: 'Sign In',
-    component: signIn,
+    component: () => import('@/pages/signIn.vue'),
   },
   {
     path: '/public/:publicId',
     name: 'Public',
-    component: publicNote,
+    component: () => import('@/pages/public.vue'),
     props: true,
   },
   {
     path: '/:id',
     name: 'Note',
-    component: home,
+    component: () => import('@/pages/home.vue'),
   },
   {
     path: '/:catchAll(.*)',
     name: 'NotFound',
-    component: notFound,
+    component: () => import('@/pages/notFound.vue'),
   },
 ];
 

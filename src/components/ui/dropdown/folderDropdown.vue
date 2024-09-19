@@ -29,16 +29,16 @@
       <div
         v-for="folder in sortedFolders"
         :key="folder"
-        class="w-full rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200"
+        class="w-full rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
         :class="{
-          'bg-[#ebdfc0] dark:bg-gray-700':
+          'bg-cream-200 dark:bg-gray-700':
             expandedFolder === folder || folder === selectedFolder,
         }"
       >
         <div class="flex items-center justify-between">
           <li
             @click.stop="selectFolder(folder)"
-            class="text-sm cursor-pointer w-full text-left p-2 rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+            class="text-sm cursor-pointer w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
           >
             <PhFolder
               v-if="folder !== DEFAULT_FOLDERS.UNCATEGORIZED"
@@ -54,8 +54,11 @@
               folder !== DEFAULT_FOLDERS.UNCATEGORIZED
             "
             @click.stop="toggleOptions(folder)"
-            class="mr-2 p-1 rounded-full hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-transform duration-200"
-            :class="{ 'rotate-180': expandedFolder === folder }"
+            class="mr-2 p-1 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
+            :class="{
+              'rotate-180 bg-cream-300 dark:bg-gray-600':
+                expandedFolder === folder,
+            }"
           >
             <PhCaretDown :size="16" />
           </button>
@@ -104,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue';
+  import { ref, computed } from 'vue';
   import { notesStore, folderStore, uiStore } from '@/utils/stores';
   import {
     PhFolder,
@@ -210,8 +213,4 @@
     folderStore.deleteFolder(folderToDelete.value);
     closeAlert();
   };
-
-  onMounted(async () => {
-    await folderStore.loadFolders();
-  });
 </script>

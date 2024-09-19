@@ -29,7 +29,7 @@
   const emit = defineEmits(['click']);
 
   const variantClasses = {
-    default: 'hover:bg-[#ebdfc0] dark:hover:bg-gray-700',
+    default: 'hover:bg-cream-200 dark:hover:bg-gray-700',
     danger:
       'hover:bg-red-700/50 dark:hover:bg-red-800/60 text-red-500 hover:text-red-100',
     confirm: '',

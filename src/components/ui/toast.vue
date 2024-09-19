@@ -2,7 +2,7 @@
   <div
     v-if="visible"
     @click="hideToast"
-    class="fixed z-[10000] bottom-[1rem] right-[1rem] cursor-pointer shadow-md text-sm md:text-base cursor-default hover:shadow-xl rounded-lg py-[.5rem] px-[1rem] bg-cream dark:bg-gray-750 font-serif border-[1px] border-black dark:border-white transition-all duration-300"
+    class="fixed z-[10000] bottom-[1rem] right-[1rem] cursor-pointer shadow-md text-sm md:text-base cursor-default hover:shadow-xl rounded-lg py-[.5rem] px-[1rem] bg-cream-300 dark:bg-gray-750 font-serif border-[1px] border-black dark:border-white transition-all duration-300"
   >
     {{ message }}
   </div>

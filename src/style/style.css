@@ -3,45 +3,25 @@
 @import 'tailwindcss/utilities';
 
 body {
-  @apply bg-[#f7f4e4] dark:bg-gray-700 text-black dark:text-white;
+  @apply bg-cream-50 dark:bg-gray-700 text-black dark:text-white;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 .card {
-  @apply bg-cream dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
+  @apply bg-cream-100 dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
 .card-rounded {
-  @apply bg-cream dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300;
+  @apply bg-cream-100 dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
-.card-border-dashed {
-  @apply bg-cream dark:bg-gray-750 border-[1px] border-dashed border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
-}
-
-.card-blur {
-  @apply bg-cream/50 dark:bg-gray-900/50 border-[1px] backdrop-blur-[5px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
-}
-
-.card-no-rounded-border {
-  @apply bg-cream dark:bg-gray-750 shadow-lg hover:shadow-2xl transition-all duration-300;
-}
-
-.card-blur-no-rounded-border {
-  @apply bg-cream/50 dark:bg-gray-900/50 backdrop-blur-[5px] shadow-lg hover:shadow-2xl transition-all duration-300;
+.card-fullscreen {
+  @apply bg-cream-100 dark:bg-gray-750 shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
 .card-transparent {
   @apply bg-transparent border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
-}
-
-.card-no-color {
-  @apply border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
-}
-
-.card-switch {
-  @apply border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
 }
 
 .card-transparent-avatar {
@@ -49,11 +29,7 @@ body {
 }
 
 .card-no-transition {
-  @apply bg-cream dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl;
-}
-
-.card-no-transition-rounded {
-  @apply bg-cream dark:bg-gray-750 shadow-lg hover:shadow-2xl;
+  @apply bg-cream-100 dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl;
 }
 
 .zoom-enter-active,
@@ -174,12 +150,13 @@ button:active {
   transition-duration: 200ms;
 }
 
-.modal-open {
+.modal {
   overflow: hidden;
 }
 
 ::-webkit-scrollbar {
-  display: none;
+  width: 0;
+  height: 0;
 }
 
 ::selection {
@@ -207,82 +184,7 @@ button:active {
   color: black;
 }
 
-.z-60 {
-  z-index: 60;
-}
-
-.z-50 {
-  z-index: 50;
-}
-
 .dark ::-webkit-selection {
   background: #171717;
   color: #fff;
-}
-
-.note-form {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #000;
-  border-radius: 4px;
-  height: 100%;
-  margin-bottom: 8px;
-  overflow: hidden;
-}
-
-.dark .note-form {
-  border: 1px solid #b4b4b4;
-}
-
-.toolbar {
-  display: flex;
-  padding: 8px;
-  border-bottom: 1px solid #000;
-  background-color: transparent;
-  position: sticky;
-  top: 0;
-  overflow-x: auto;
-}
-
-.dark .toolbar {
-  border-bottom: 1px solid #b4b4b4;
-}
-
-.toolbar button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding-inline: 5px;
-  padding-block: 4px;
-  border-radius: 4px;
-}
-
-.toolbar button:hover {
-  background-color: #d9c698;
-}
-
-.dark .toolbar button:hover {
-  background-color: #424242;
-}
-
-.toolbar button.active {
-  background-color: #d9c698;
-}
-
-.dark .toolbar button.active {
-  background-color: #424242;
-}
-
-.editor-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-.editor {
-  flex: 1;
-  padding: 12px;
-  outline: none;
-  cursor: text;
 }

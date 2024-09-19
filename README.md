@@ -1,6 +1,6 @@
 # textVerse
 
-![Screenshot](screenshot.png)
+![Screenshot](/public/screenshot.png)
 
 Responsive notes app built in Vue 3, TypeScript, Vite, Pinia. [Live Preview](https://textverse.web.app).
 

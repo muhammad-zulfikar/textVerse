@@ -1,5 +1,3 @@
-<!-- trash.vue -->
-
 <template>
   <div class="trashContainer">
     <div
@@ -22,10 +20,10 @@
 
       <div v-else class="mx-2 md:mx-4">
         <div
-          class="flex flex-col md:flex-row md:justify-center items-center mb-6 md:mb-8 mx-2"
+          class="flex flex-col md:flex-row md:justify-center items-center mb-6 md:mb-8 mx-2 select-none"
         >
           <p
-            class="card px-4 py-2 md:px-2 md:py-1.5 w-full md:w-auto text-sm text-gray-800 dark:text-gray-400 text-center"
+            class="card px-2 py-2 md:px-2 md:py-1.5 w-full md:w-auto text-sm text-gray-800 dark:text-gray-400 text-center"
           >
             Notes in trash will be permanently deleted after 30 days.
           </p>
@@ -58,7 +56,7 @@
           <li
             v-for="note in deletedNotes"
             :key="note.id"
-            class="notes bg-cream dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 break-inside-avoid h-min mb-[9px] p-2 cursor-pointer relative group select-none"
+            class="notes bg-cream-300 dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 break-inside-avoid h-min mb-[9px] p-2 cursor-pointer relative group select-none"
             :class="{
               'z-50': showMenu && notesStore.selectedNote?.id === note.id,
               shadow: notesStore.selectedNotes.includes(note.id),
@@ -66,16 +64,16 @@
                 notesStore.selectedNotes.includes(note.id),
               [computedMb]: true,
             }"
-            @click.stop="toggleNoteSelection(note.id)"
+            @click="(event) => toggleNoteSelection(event, note.id)"
           >
             <div
-              class="absolute top-0 -left-3 card-rounded hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-opacity duration-200"
+              class="absolute top-0 -left-3 card-rounded hover:bg-cream-200 dark:hover:bg-gray-700 transition-opacity duration-200"
               :class="{
                 'opacity-100': notesStore.selectedNotes.includes(note.id),
                 'opacity-0 group-hover:opacity-100':
                   !notesStore.selectedNotes.includes(note.id),
               }"
-              @click.stop="toggleNoteSelection(note.id)"
+              @click="(event) => toggleNoteSelection(event, note.id)"
               style="transform: translateY(-50%)"
             >
               <div class="p-1 rounded-full flex items-center justify-center">
@@ -106,7 +104,7 @@
                   </div>
                   <div
                     @click.stop="restoreNote(note.id)"
-                    class="flex items-center px-2 py-1 cursor-pointer truncate card hover:text-black dark:hover:text-white hover:bg-[#d9c698] dark:hover:bg-gray-700"
+                    class="flex items-center px-2 py-1 cursor-pointer truncate card hover:text-black dark:hover:text-white hover:bg-cream-200 dark:hover:bg-gray-700"
                   >
                     <PhClockClockwise :size="16" />
                   </div>
@@ -118,6 +116,15 @@
                   >
                     <PhFolder :size="16" class="mr-2" />
                     {{ note.folder }}
+                  </p>
+                </div>
+                <div class="text-left text-[10px] md:text-xs">
+                  <p
+                    v-if="!isMobile && uiStore.columns < 5"
+                    class="flex items-center px-2 py-1 cursor-pointer truncate card"
+                  >
+                    <PhCalendarBlank :size="16" class="mr-2" />
+                    {{ localeDate(note.last_edited) }}
                   </p>
                 </div>
               </div>
@@ -146,20 +153,23 @@
 <script lang="ts" setup>
   import { ref, computed, onMounted, onUnmounted } from 'vue';
   import { notesStore, uiStore } from '@/utils/stores';
-  import LoadingSpinner from '@/components/ui/loadingSpinner.vue';
+  import LoadingSpinner from '@/components/ui/loading.vue';
   import AlertModal from '@/components/ui/modal/alertModal.vue';
   import {
     PhCheck,
     PhFolder,
     PhTrash,
     PhClockClockwise,
+    PhCalendarBlank,
   } from '@phosphor-icons/vue';
   import DOMPurify from 'dompurify';
   import Button from '@/components/ui/button.vue';
   import { DEFAULT_FOLDERS } from '@/utils/constants';
+  import { localeDate } from '@/utils/helpers';
 
   const showMenu = ref(false);
   const selectedNotes = ref<string[]>([]);
+  const isMobile = window.innerWidth <= 768;
 
   const deletedNotes = computed(() => notesStore.deletedNotes);
 
@@ -185,14 +195,15 @@
 
   const isSelectMode = ref(false);
 
-  const toggleNoteSelection = (noteId: string) => {
+  const toggleNoteSelection = (event: Event, noteId: string) => {
+    event.stopPropagation();
+    notesStore.toggleNoteSelection(noteId);
+
     const index = selectedNotes.value.indexOf(noteId);
     if (index === -1) {
       selectedNotes.value.push(noteId);
-      notesStore.addSelectedNote(noteId);
     } else {
       selectedNotes.value.splice(index, 1);
-      notesStore.removeSelectedNote(noteId);
     }
 
     if (!isSelectMode.value) {
@@ -217,9 +228,6 @@
     if (noteToDelete.value) {
       try {
         await notesStore.permanentlyDeleteNote(noteToDelete.value);
-        notesStore.deletedNotes = notesStore.deletedNotes.filter(
-          (note) => note.id !== noteToDelete.value
-        );
         uiStore.showToastMessage('Note permanently deleted');
       } catch (error) {
         console.error('Error deleting note:', error);
@@ -265,19 +273,34 @@
     }
   };
 
-  onMounted(async () => {
-    if (!notesStore.deletedNotesLoaded) {
-      await notesStore.loadDeletedNotes();
+  const closeSelectMode = () => {
+    isSelectMode.value = false;
+    selectedNotes.value = [];
+    notesStore.clearSelectedNotes();
+  };
+
+  const handleGlobalClick = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    const noteElement = target.closest('.notes');
+
+    if (!noteElement) {
+      closeSelectMode();
     }
+  };
+
+  onMounted(async () => {
+    await notesStore.loadNotes();
   });
 
   onMounted(() => {
     window.addEventListener('resize', uiStore.handleResize);
+    document.addEventListener('click', handleGlobalClick);
     uiStore.handleResize();
   });
 
   onUnmounted(() => {
     window.removeEventListener('resize', uiStore.handleResize);
+    document.removeEventListener('click', handleGlobalClick);
   });
 </script>
 

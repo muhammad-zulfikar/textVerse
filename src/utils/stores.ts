@@ -1,11 +1,11 @@
-// src/store/stores.ts
+// src/utils/stores.ts
 
 import { useAuthStore } from '@/store/authStore';
 import { useNotesStore } from '@/store/notesStore';
+import { useFirebaseStore } from '@/store/notesStore/stores/firebaseStore';
+import { useLocalStore } from '@/store/notesStore/stores/localStore';
 import { useFolderStore } from '@/store/folderStore';
 import { useUIStore } from '@/store/uiStore';
-import { useFirebaseStore } from '@/store/firebaseStore';
-import { useLocalStore } from '@/store/localStore';
 
 export let authStore: ReturnType<typeof useAuthStore>;
 export let notesStore: ReturnType<typeof useNotesStore>;

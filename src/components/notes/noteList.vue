@@ -1,66 +1,46 @@
 <template>
   <div class="mb-[28px] md:mb-[46px]">
-    <template v-if="filteredNotes.length > 0">
-      <transition name="slide-fade" mode="out-in">
-        <keep-alive>
-          <component
-            v-if="currentView"
-            :key="uiStore.viewType"
-            :is="currentView"
-            :notes="filteredNotes"
-          />
-        </keep-alive>
-      </transition>
-    </template>
-    <template v-else>
-      <div class="flex flex-col items-center justify-center h-[60vh]">
+    <transition name="slide-fade" mode="out-in">
+      <component
+        v-if="currentView && notesStore.notesLoaded && filteredNotes.length > 0"
+        :key="uiStore.viewType"
+        :is="currentView"
+        :notes="filteredNotes"
+      />
+      <div
+        v-else-if="notesStore.notesLoaded && filteredNotes.length === 0"
+        class="flex flex-col items-center justify-center h-[60vh]"
+      >
         <PhEmpty :size="100" class="text-gray-400 dark:text-gray-600 mb-4" />
         <p class="text-gray-600 dark:text-gray-400 text-lg font-serif">
-          Note empty
+          No notes found
         </p>
       </div>
-    </template>
+    </transition>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch, computed } from 'vue';
-  import { authStore, notesStore, folderStore, uiStore } from '@/utils/stores';
+  import { computed, defineAsyncComponent } from 'vue';
+  import { notesStore, uiStore } from '@/utils/stores';
   import { PhEmpty } from '@phosphor-icons/vue';
-  import cardView from './view/cardView.vue';
-  import tableView from './view/tableView.vue';
-  import mailView from './view/mailView.vue';
-  import folderView from './view/folderView.vue';
 
-  const filteredNotes = computed(() =>
-    notesStore.filteredNotes(folderStore.currentFolder)
-  );
+  const props = defineProps<{
+    notes: ReturnType<typeof notesStore.filteredNotes>;
+  }>();
 
-  const loadNotes = async () => {
-    await notesStore.loadNotes();
-  };
-
-  onMounted(async () => {
-    await loadNotes();
-  });
-
-  watch(
-    () => authStore.user,
-    async () => {
-      await loadNotes();
-    }
-  );
+  const filteredNotes = computed(() => props.notes);
 
   const currentView = computed(() => {
     switch (uiStore.viewType) {
       case 'card':
-        return cardView;
+        return defineAsyncComponent(() => import('@/view/cardView.vue'));
       case 'table':
-        return tableView;
+        return defineAsyncComponent(() => import('@/view/tableView.vue'));
       case 'mail':
-        return mailView;
+        return defineAsyncComponent(() => import('@/view/mailView.vue'));
       case 'folder':
-        return folderView;
+        return defineAsyncComponent(() => import('@/view/folderView.vue'));
       default:
         return null;
     }

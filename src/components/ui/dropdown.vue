@@ -11,9 +11,7 @@
       <div
         v-if="isOpen"
         :class="[
-          'z-50 absolute',
-          uiStore.blurEnabled ? 'card-blur' : 'card',
-          'dropdown-content',
+          'card z-50 absolute dropdown-content',
           `dropdown-${props.direction || 'down'}`,
           `dropdown-${props.position || 'left'}`,
         ]"
@@ -53,7 +51,7 @@
     uiStore.setActiveDropdown(null);
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleOutsideClick = (event: MouseEvent) => {
     if (
       dropdownRef.value &&
       !dropdownRef.value.contains(event.target as Node)
@@ -62,8 +60,8 @@
     }
   };
 
-  onMounted(() => document.addEventListener('click', handleClickOutside));
-  onUnmounted(() => document.removeEventListener('click', handleClickOutside));
+  onMounted(() => document.addEventListener('click', handleOutsideClick));
+  onUnmounted(() => document.removeEventListener('click', handleOutsideClick));
 
   watch(
     () => uiStore.activeDropdown,

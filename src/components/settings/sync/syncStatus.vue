@@ -22,8 +22,7 @@
     <button
       v-if="authStore.isLoggedIn"
       @click="confirmSignout"
-      class="w-full md:w-auto flex items-center justify-center text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
-      :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
+      class="card flex items-center justify-center w-full md:w-auto text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
     >
       <PhSignOut :size="20" class="mr-2" />
       Sign out
@@ -31,8 +30,7 @@
     <router-link
       v-else
       to="/sign-in"
-      class="w-full md:w-auto flex items-center justify-center text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
-      :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
+      class="card flex items-center justify-center w-full md:w-auto text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
     >
       <PhSignIn :size="20" class="mr-2" />
       Sign in

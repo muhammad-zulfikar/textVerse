@@ -20,15 +20,14 @@
         <button
           @click="toggleDropdown"
           :class="[
-            'mt-2 md:mt-0 text-sm md:text-base px-4 py-2 flex items-center relative',
-            uiStore.blurEnabled ? 'card-blur' : 'card',
+            'card flex items-center relative mt-2 md:mt-0 text-sm md:text-base px-4 py-2',
           ]"
         >
           <component :is="currentThemeIcon" :size="20" class="mr-2" />
           {{ currentThemeText }}
           <div
-            class="p-1 ml-2 rounded-full hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-transform duration-200"
-            :class="{ 'rotate-180': isOpen }"
+            class="p-1 ml-2 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
+            :class="{ 'rotate-180 bg-cream-300 dark:bg-gray-600': isOpen }"
           >
             <PhCaretDown class="size-4" />
           </div>
@@ -38,7 +37,7 @@
         v-for="theme in themes"
         :key="theme"
         @click="setTheme(theme as 'light' | 'dark' | 'system')"
-        class="flex items-center flex-grow flex-shrink mx-1 p-2 hover:bg-[#d9c698] dark:hover:bg-gray-700 text-sm md:text-base rounded-md cursor-pointer"
+        class="flex items-center flex-grow flex-shrink mx-1 p-2 hover:bg-cream-200 dark:hover:bg-gray-700 text-sm md:text-base rounded-md cursor-pointer"
         role="menuitem"
       >
         <component :is="themeIcon(theme)" :size="20" class="mr-2" />
@@ -97,7 +96,7 @@
     isOpen.value = !isOpen.value;
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleOutsideClick = (event: MouseEvent) => {
     const target = event.target as Element;
     if (!target.closest('[dropdown-id="theme"]')) {
       isOpen.value = false;
@@ -105,10 +104,10 @@
   };
 
   onMounted(() => {
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('click', handleOutsideClick);
   });
 
   onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClickOutside);
+    document.removeEventListener('click', handleOutsideClick);
   });
 </script>

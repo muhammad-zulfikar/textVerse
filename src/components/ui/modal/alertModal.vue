@@ -1,5 +1,3 @@
-<!-- alertModal.vue -->
-
 <template>
   <ModalBackdrop v-model="props.isOpen" class="z-60" />
   <transition name="zoom">
@@ -8,15 +6,14 @@
       class="fixed inset-0 z-60 flex items-center justify-center"
     >
       <div
-        class="p-5 relative flex flex-col w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3 font-serif"
-        :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
+        class="card flex flex-col relative p-5 w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3 font-serif"
       >
         <h1 class="text-xl font-bold mb-4 relative mt-2">Confirmation</h1>
         <p class="mb-6">{{ message }}</p>
         <div class="flex justify-end">
           <button
             @click="$emit('cancel')"
-            class="flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700 mr-4 cursor-pointer"
+            class="flex items-center px-2 py-1 card hover:bg-cream-300 dark:hover:bg-gray-700 mr-4 cursor-pointer"
           >
             <PhProhibit :size="20" class="mr-2" />
             <span class="text-sm">Cancel</span>
@@ -36,7 +33,6 @@
 
 <script setup lang="ts">
   import { PhProhibit, PhCheckCircle } from '@phosphor-icons/vue';
-  import { uiStore } from '@/utils/stores';
   import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
 
   const props = defineProps<{
@@ -49,3 +45,9 @@
     (e: 'confirm'): void;
   }>();
 </script>
+
+<style scoped>
+  .z-60 {
+    z-index: 60;
+  }
+</style>

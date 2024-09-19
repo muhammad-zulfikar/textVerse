@@ -8,14 +8,13 @@
       <div @click="closeModal" class="absolute inset-0"></div>
       <div
         @click.stop
-        class="z-50 font-serif p-5 relative flex flex-col w-11/12 md:w-3/4 lg:w-2/3 xl:w-1/2 max-h-[90vh] overflow-y-auto"
-        :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
+        class="card z-50 font-serif p-5 relative flex flex-col w-11/12 md:w-3/4 lg:w-2/3 xl:w-1/2 max-h-[90vh] overflow-y-auto"
       >
         <div class="flex justify-between mb-2">
           <h1 class="text-xl font-bold">Trash</h1>
           <button
             @click="closeModal"
-            class="px-2 py-1 card flex items-center hover:bg-[#d9c698] dark:hover:bg-gray-700"
+            class="px-2 py-1 card flex items-center hover:bg-cream-300 dark:hover:bg-gray-700"
           >
             <PhX :size="20" />
           </button>
@@ -31,7 +30,7 @@
 
         <div class="mb-4 flex justify-between items-center">
           <div
-            class="px-3 md:px-2 py-1 card flex items-center hover:bg-[#d9c698] dark:hover:bg-gray-700 cursor-pointer"
+            class="px-3 md:px-2 py-1 card flex items-center hover:bg-cream-300 dark:hover:bg-gray-700 cursor-pointer"
           >
             <button @click="toggleSelectAll" class="flex text-sm">
               <PhCheckCircle :size="20" class="md:mr-2" />
@@ -42,7 +41,7 @@
           </div>
           <div class="flex">
             <div
-              class="px-3 md:px-2 py-1 card flex items-center hover:bg-[#d9c698] dark:hover:bg-gray-700 cursor-pointer mr-4"
+              class="px-3 md:px-2 py-1 card flex items-center hover:bg-cream-300 dark:hover:bg-gray-700 cursor-pointer mr-4"
             >
               <button
                 @click="restoreSelectedNotes"
@@ -108,7 +107,7 @@
                   >
                     <button
                       @click="restoreNote(note.id)"
-                      class="flex justify-center text-center w-full p-2 card text-sm mb-4 hover:bg-[#d9c698] dark:hover:bg-gray-700"
+                      class="flex justify-center text-center w-full p-2 card text-sm mb-4 hover:bg-cream-300 dark:hover:bg-gray-700"
                     >
                       <PhArrowCounterClockwise :size="20" class="md:mr-2" />
                       Restore

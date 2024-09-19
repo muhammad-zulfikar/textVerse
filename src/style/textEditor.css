@@ -1,0 +1,87 @@
+.text-editor {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #000;
+  border-radius: 6px;
+  height: 100%;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.dark .text-editor {
+  border: 1px solid #b4b4b4;
+}
+
+.toolbar {
+  display: flex;
+  padding: 8px;
+  border-bottom: 1px solid #000;
+  background-color: transparent;
+  position: sticky;
+  top: 0;
+  overflow-x: auto;
+}
+
+.dark .toolbar {
+  border-bottom: 1px solid #b4b4b4;
+}
+
+.editor-container::-webkit-scrollbar {
+  width: 5px;
+}
+
+.toolbar::-webkit-scrollbar {
+  width: 8px;
+  height: 3px;
+}
+
+.editor-container::-webkit-scrollbar-thumb,
+.toolbar::-webkit-scrollbar-thumb {
+  background-color: #ebdfc0;
+  border-radius: 4px;
+}
+
+.dark .editor-container::-webkit-scrollbar-thumb,
+.dark .toolbar::-webkit-scrollbar-thumb {
+  background-color: #6b6a6a;
+  border-radius: 4px;
+}
+
+.toolbar button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding-inline: 5px;
+  padding-block: 4px;
+  border-radius: 6px;
+}
+
+.toolbar button:hover {
+  background-color: #ebdfc0;
+}
+
+.dark .toolbar button:hover {
+  background-color: #424242;
+}
+
+.toolbar button.active {
+  background-color: #ebdfc0;
+}
+
+.dark .toolbar button.active {
+  background-color: #424242;
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.editor {
+  flex: 1;
+  padding: 12px;
+  outline: none;
+  cursor: text;
+}

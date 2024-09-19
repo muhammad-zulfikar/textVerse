@@ -1,5 +1,3 @@
-<!--noteModal-->
-
 <template>
   <ModalBackdrop v-model="props.isOpen" />
   <transition name="zoom">
@@ -9,14 +7,13 @@
     >
       <div @click="handleOutsideClick" class="absolute inset-0"></div>
       <div ref="modalContainer" :class="modalClasses">
-        <div class="flex w-full py-4 select-none">
+        <div class="flex w-full pt-2 md:pt-4 select-none">
           <NoteToolbar v-bind="toolbarProps" />
         </div>
-        <Separator />
         <div
-          class="w-full bg-transparent pt-4 pb-2 flex-grow overflow-y-auto flex flex-col"
+          class="w-full bg-transparent pt-2 md:pt-4 md:pb-2 flex-grow overflow-y-auto flex flex-col"
         >
-          <NoteForm
+          <TextEditor
             v-model="editedNote.content"
             @update:modelValue="updateNoteContent"
             :showToolbar="true"
@@ -35,65 +32,51 @@
   import { db } from '@/firebase';
   import { Note } from '@/utils/types';
   import { notesStore, folderStore, uiStore, authStore } from '@/utils/stores';
-  import { DEFAULT_FOLDERS } from '@/utils/constants';
-  import { nanoid } from 'nanoid';
+  import { createNoteObject, hasChanged } from '@/utils/helpers';
+  import { isContentEmpty } from '@/store/notesStore/helpers';
   import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
-  import Separator from '@/components/ui/separator.vue';
-  import NoteForm from '@/components/notes/noteForm.vue';
   import NoteToolbar from './noteToolbar.vue';
+  import TextEditor from '@/components/textEditor/textEditor.vue';
 
-  const props = defineProps<{ noteId: string | null; isOpen: boolean }>();
+  const props = defineProps<{
+    noteId: string | null;
+    isOpen: boolean;
+  }>();
 
   const isMobile = ref(window.innerWidth <= 768);
-  const isEditMode = ref(false);
+  const isEditing = ref(false);
   const isSaving = ref(false);
   const editedNote = ref<Note>(createEmptyNote());
-  const originalNote = ref<Note | null>(null);
+  const initialNote = ref<Note | null>(null);
   const modalContainer = ref<HTMLElement | null>(null);
 
   let saveNoteTimeout: ReturnType<typeof setTimeout> | null = null;
 
   const modalClasses = computed(() => [
-    'px-4 relative flex flex-col',
+    'flex flex-col relative px-2 md:px-4',
     {
-      'card-no-rounded-border w-full h-full':
-        uiStore.isExpanded && !uiStore.blurEnabled,
-      'card-blur-no-rounded-border w-full h-full':
-        uiStore.isExpanded && uiStore.blurEnabled,
-      'card w-11/12 md:w-3/4 lg:w-1/2 xl:w-3/5':
-        !uiStore.isExpanded && !uiStore.blurEnabled,
-      'card-blur w-11/12 md:w-3/4 lg:w-1/2 xl:w-3/5':
-        !uiStore.isExpanded && uiStore.blurEnabled,
+      'card-fullscreen w-full h-full': uiStore.isExpanded,
+      'card w-11/12 md:w-3/4 lg:w-1/2 xl:w-3/5': !uiStore.isExpanded,
     },
   ]);
 
   const toolbarProps = computed(() => ({
     note: editedNote,
-    isEditMode: isEditMode.value,
-    isValid: true,
+    isEditing: isEditing.value,
     hasChanges: hasChanges.value,
     isSaving: isSaving.value,
   }));
 
   const hasChanges = computed(() =>
-    originalNote.value
-      ? notesStore.hasChanged(originalNote.value, editedNote.value)
-      : false
+    initialNote.value ? hasChanged(initialNote.value, editedNote.value) : false
   );
 
   function createEmptyNote(): Note {
-    return {
-      id: nanoid(),
+    return createNoteObject({
       title: 'Untitled',
       content: '',
-      time_created: new Date().toISOString(),
-      last_edited: new Date().toISOString(),
-      pinned: false,
-      folder:
-        folderStore.currentFolder !== DEFAULT_FOLDERS.ALL_NOTES
-          ? folderStore.currentFolder
-          : DEFAULT_FOLDERS.UNCATEGORIZED,
-    };
+      folder: folderStore.currentFolder,
+    });
   }
 
   function debouncedSaveNote() {
@@ -104,28 +87,28 @@
   }
 
   async function saveNote() {
-    if (notesStore.isContentEmpty(editedNote.value.content)) {
+    if (isContentEmpty(editedNote.value.content)) {
       if (editedNote.value.id) {
         await notesStore.deleteNote(editedNote.value.id);
       }
       uiStore.showToastMessage('Empty note discarded');
       return;
     }
-    if (isEditMode.value && !hasChanges.value) return;
+    if (isEditing.value && !hasChanges.value) return;
 
     try {
       isSaving.value = true;
       const saveStartTime = Date.now();
 
-      if (isEditMode.value) {
-        await notesStore.updateNote(editedNote.value);
+      if (isEditing.value) {
+        await notesStore.updateNote(editedNote.value.id, editedNote.value);
       } else {
-        const newNote = await notesStore.addNote(editedNote.value);
+        const newNote = await notesStore.createNote(editedNote.value);
         editedNote.value.id = newNote.id;
-        isEditMode.value = true;
+        isEditing.value = true;
       }
 
-      originalNote.value = { ...editedNote.value };
+      initialNote.value = { ...editedNote.value };
       await new Promise((resolve) =>
         setTimeout(resolve, Math.max(0, 500 - (Date.now() - saveStartTime)))
       );
@@ -143,20 +126,20 @@
   }
 
   async function handleOutsideClick() {
-    if (notesStore.isContentEmpty(editedNote.value.content)) {
+    if (isContentEmpty(editedNote.value.content)) {
       if (editedNote.value.id) {
         await notesStore.deleteNote(editedNote.value.id);
       }
-      uiStore.closeNote();
+      notesStore.closeNote();
       uiStore.showToastMessage('Empty note discarded');
       return;
     }
-    if (isEditMode.value && !hasChanges.value) {
-      uiStore.closeNote();
+    if (isEditing.value && !hasChanges.value) {
+      notesStore.closeNote();
       return;
     }
     await saveNote();
-    uiStore.closeNote();
+    notesStore.closeNote();
   }
 
   function setupNoteListener(noteId: string) {
@@ -166,7 +149,7 @@
         const updatedNote = snapshot.val();
         if (updatedNote && updatedNote.id === editedNote.value.id) {
           editedNote.value = { ...updatedNote };
-          originalNote.value = { ...updatedNote };
+          initialNote.value = { ...updatedNote };
         }
       });
     }
@@ -184,14 +167,14 @@
           const note = notesStore.notes.find((n) => n.id === newNoteId);
           if (note) {
             editedNote.value = { ...note };
-            originalNote.value = { ...note };
+            initialNote.value = { ...note };
             setupNoteListener(newNoteId);
-            isEditMode.value = true;
+            isEditing.value = true;
           }
         } else {
           editedNote.value = createEmptyNote();
-          originalNote.value = null;
-          isEditMode.value = false;
+          initialNote.value = null;
+          isEditing.value = false;
         }
       }
     }

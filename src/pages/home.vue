@@ -1,91 +1,50 @@
-<!--home.vue-->
-
 <template>
-  <div>
-    <transition name="slide-fade" mode="out-in">
-      <div>
-        <div v-if="notesLoaded">
-          <Toolbar />
-          <NoteList :notes="notesStore.filteredNotes" />
-        </div>
-        <LoadingSpinner v-else />
+  <div class="relative">
+    <Transition name="fade" mode="out-in">
+      <div
+        v-if="!notesStore.notesLoaded || uiStore.isSyncing"
+        class="absolute inset-0 z-10 flex items-center justify-center"
+      >
+        <LoadingSpinner />
       </div>
-    </transition>
+    </Transition>
+    <Transition name="fade" mode="out-in">
+      <div :class="{ 'opacity-0': uiStore.isSyncing }">
+        <Toolbar />
+        <NoteList :notes="filteredNotes" />
+      </div>
+    </Transition>
     <NoteView />
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted, onUnmounted, watch } from 'vue';
-  import {
-    notesStore,
-    folderStore,
-    uiStore,
-    authStore,
-    localStore,
-  } from '@/utils/stores';
+  import { onMounted, onUnmounted, watch, computed } from 'vue';
+  import { notesStore, folderStore, uiStore } from '@/utils/stores';
   import Toolbar from '@/components/ui/toolbar.vue';
   import NoteList from '@/components/notes/noteList.vue';
   import NoteView from '@/components/notes/noteView.vue';
-  import LoadingSpinner from '@/components/ui/loadingSpinner.vue';
-  import { DEFAULT_FOLDERS } from '@/utils/constants';
-  import { nanoid } from 'nanoid';
+  import LoadingSpinner from '@/components/ui/loading.vue';
   import { useRoute } from 'vue-router';
+  import { createNoteObject } from '@/utils/helpers';
 
   const route = useRoute();
-  const notesLoaded = ref(false);
 
-  const loadNotes = async () => {
-    try {
-      notesLoaded.value = false;
-
-      if (authStore.isLoggedIn) {
-        await notesStore.loadNotesFromFirebase();
-      } else {
-        await notesStore.loadNotesFromLocalStorage();
-
-        // Check if initial notes have never been loaded before
-        if (
-          notesStore.notes.length === 0 &&
-          !localStore.getInitialNotesLoaded()
-        ) {
-          await notesStore.loadInitialNotes();
-          localStore.setInitialNotesLoaded(true);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading notes:', error);
-    } finally {
-      notesLoaded.value = true;
-    }
-  };
+  const filteredNotes = computed(() =>
+    notesStore.filteredNotes(folderStore.currentFolder)
+  );
 
   const handlePopState = () => {
     if (location.pathname === '/') {
-      uiStore.closeNote();
+      notesStore.closeNote();
     }
   };
 
   const openNoteWithDelay = (noteId: string, delay: number = 600) => {
     setTimeout(() => {
-      uiStore.openNote(noteId);
+      notesStore.openNote(noteId);
     }, delay);
   };
-
-  onMounted(async () => {
-    await loadNotes();
-    if (route.name === 'Note') {
-      const noteId = route.params.id as string;
-      openNoteWithDelay(noteId);
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('popstate', handlePopState);
-  });
-
-  onUnmounted(() => {
-    document.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('popstate', handlePopState);
-  });
 
   watch(
     () => route.params.id,
@@ -93,54 +52,81 @@
       if (newId) {
         openNoteWithDelay(newId as string);
       } else {
-        uiStore.closeNote();
+        notesStore.closeNote();
       }
     }
   );
 
-  const handlePaste = async (clipboardText: string) => {
-    if (clipboardText) {
-      const newNote = {
-        id: nanoid(),
-        title: 'Untitled',
-        content: clipboardText,
-        time_created: new Date().toISOString(),
-        last_edited: new Date().toISOString(),
-        pinned: false,
-        folder:
-          folderStore.currentFolder !== DEFAULT_FOLDERS.ALL_NOTES
-            ? folderStore.currentFolder
-            : DEFAULT_FOLDERS.UNCATEGORIZED,
-      };
+  const handlePaste = async () => {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      if (clipboardText) {
+        const newNote = createNoteObject({
+          title: 'Untitled',
+          content: clipboardText,
+          folder: folderStore.currentFolder,
+        });
 
-      try {
-        await notesStore.addNote(newNote);
+        await notesStore.createNote(newNote);
         uiStore.showToastMessage('New note created from clipboard');
-      } catch (error) {
-        console.error('Error creating note:', error);
-        uiStore.showToastMessage('Failed to create note from clipboard');
+      } else {
+        uiStore.showToastMessage('Clipboard is empty');
       }
+    } catch (error) {
+      console.error('Error creating note from clipboard:', error);
+      uiStore.showToastMessage('Failed to create note from clipboard');
     }
   };
 
-  const handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = async (event: KeyboardEvent) => {
     if (!uiStore.isNoteModalOpen && !uiStore.isNoteSidebarOpen) {
       if ((event.ctrlKey || event.metaKey) && event.key === 'v') {
-        navigator.clipboard.readText().then(handlePaste);
+        event.preventDefault();
+        await handlePaste();
       }
     }
   };
+
+  const loadNotesAndSetLoading = async () => {
+    try {
+      await notesStore.loadNotes();
+    } catch (error) {
+      console.error('Error loading notes:', error);
+      uiStore.showToastMessage('Failed to load notes');
+    }
+  };
+
+  const setupEventListeners = () => {
+    document.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('popstate', handlePopState);
+  };
+
+  const removeEventListeners = () => {
+    document.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('popstate', handlePopState);
+  };
+
+  onMounted(async () => {
+    await loadNotesAndSetLoading();
+
+    if (route.name === 'Note') {
+      const noteId = route.params.id as string;
+      openNoteWithDelay(noteId);
+    }
+    setupEventListeners();
+  });
+
+  onUnmounted(removeEventListeners);
 </script>
 
 <style scoped>
-  .slide-fade-enter-active,
-  .slide-fade-leave-active {
-    transition: all 0.3s ease;
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.3s ease;
   }
 
-  .slide-fade-enter-from,
-  .slide-fade-leave-to {
+  .fade-enter-from,
+  .fade-leave-to {
     opacity: 0;
-    transform: translateY(20px);
   }
 </style>

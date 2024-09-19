@@ -1,5 +1,3 @@
-<!-- public.vue -->
-
 <template>
   <div
     v-if="isLoading"
@@ -12,10 +10,7 @@
     class="fixed inset-0 flex items-center justify-center font-serif mt-14"
   >
     <div
-      :class="[
-        'p-5 relative flex flex-col',
-        'card-no-rounded-border w-full h-full',
-      ]"
+      :class="['p-5 relative flex flex-col', 'card-fullscreen w-full h-full']"
     >
       <div
         class="flex justify-between text-sm mb-4 select-none items-start md:items-center"
@@ -23,20 +18,20 @@
         <h1 class="text-3xl font-bold flex-grow">
           {{ note.title }}
           <span class="text-sm font-normal text-gray-500 ml-2">
-            {{ notesStore.localeDate(note.last_edited || note.time_created) }}
+            {{ localeDate(note.last_edited || note.time_created) }}
           </span>
         </h1>
         <div class="flex space-x-2 items-start md:items-center">
           <button
             @click="saveNote"
-            class="flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700"
+            class="flex items-center px-2 py-1 card hover:bg-cream-200 dark:hover:bg-gray-700"
           >
             <PhFloppyDisk :size="20" class="size-5 md:mr-2" />
             <span class="hidden md:flex">Save as copy</span>
           </button>
           <button
             @click="closeNote"
-            class="flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700"
+            class="flex items-center px-2 py-1 card hover:bg-cream-200 dark:hover:bg-gray-700"
           >
             <PhX :size="20" class="size-5 md:mr-2" />
             <span class="hidden md:flex">Close</span>
@@ -47,7 +42,7 @@
         class="bg-black dark:bg-gray-400 h-px transition-all duration-300"
       ></div>
       <div class="w-full pt-4 flex-grow overflow-hidden flex flex-col">
-        <NoteForm
+        <TextEditor
           v-model="note.content"
           :showToolbar="false"
           :editable="false"
@@ -68,11 +63,12 @@
   import { ref, onMounted, nextTick, onUnmounted } from 'vue';
   import { notesStore, uiStore } from '@/utils/stores';
   import { Note, PublicNote } from '@/utils/types';
-  import NoteForm from '@/components/notes/noteForm.vue';
+  import TextEditor from '@/components/textEditor/textEditor.vue';
   import { useRoute, useRouter } from 'vue-router';
   import { PhFloppyDisk, PhX } from '@phosphor-icons/vue';
   import { ref as dbRef, onValue, off } from 'firebase/database';
   import { db } from '@/firebase';
+  import { localeDate } from '@/utils/helpers';
 
   const route = useRoute();
   const router = useRouter();
@@ -120,7 +116,7 @@
       };
 
       try {
-        await notesStore.addNote(newNote);
+        await notesStore.createNote(newNote);
         uiStore.showToastMessage('Note saved as a new copy.');
 
         await nextTick();
@@ -131,7 +127,7 @@
 
         if (addedNote) {
           await router.push('/');
-          uiStore.openNote(addedNote.id);
+          notesStore.openNote(addedNote.id);
         } else {
           console.error('Failed to find the newly added note');
           uiStore.showToastMessage('Error: Failed to open the new note.');

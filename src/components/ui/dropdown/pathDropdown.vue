@@ -18,9 +18,10 @@
         v-for="route in availableRoutes"
         :key="route.path"
         :to="route.path"
-        class="block w-full text-left text-sm p-2 rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200"
+        @click="closeDropdown"
+        class="block w-full text-left text-sm p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
         :class="{
-          'bg-[#ebdfc0] dark:bg-gray-700': currentPath === route.name,
+          'bg-cream-200 dark:bg-gray-700': currentPath === route.name,
         }"
       >
         <component
@@ -37,7 +38,7 @@
 <script setup lang="ts">
   import { computed } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { authStore } from '@/utils/stores';
+  import { authStore, uiStore } from '@/utils/stores';
   import {
     PhTrash,
     PhHouseLine,
@@ -88,5 +89,9 @@
       default:
         return PhInfo;
     }
+  };
+
+  const closeDropdown = () => {
+    uiStore.setActiveDropdown(null);
   };
 </script>

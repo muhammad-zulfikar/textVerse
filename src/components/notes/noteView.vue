@@ -1,13 +1,14 @@
 <!--noteView-->
+
 <template>
   <div>
     <NoteModal
-      v-if="uiStore.noteViewPreference === 'modal'"
+      v-if="uiStore.noteViewType === 'modal'"
       :note-id="notesStore.selectedNoteId"
       :is-open="uiStore.isNoteModalOpen"
     />
     <NoteSidebar
-      v-if="uiStore.noteViewPreference === 'sidebar'"
+      v-if="uiStore.noteViewType === 'sidebar'"
       :note-id="notesStore.selectedNoteId"
       :is-open="uiStore.isNoteSidebarOpen"
     />
@@ -15,7 +16,14 @@
 </template>
 
 <script lang="ts" setup>
+  import { defineAsyncComponent } from 'vue';
   import { notesStore, uiStore } from '@/utils/stores';
-  import NoteModal from '@/components/notes/noteModal.vue';
-  import NoteSidebar from '@/components/notes/noteSidebar.vue';
+
+  const NoteModal = defineAsyncComponent(
+    () => import('@/components/notes/noteModal.vue')
+  );
+
+  const NoteSidebar = defineAsyncComponent(
+    () => import('@/components/notes/noteSidebar.vue')
+  );
 </script>

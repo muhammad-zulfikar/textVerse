@@ -17,24 +17,21 @@
       >
         <button
           @click="openAvatarPicker"
-          class="flex items-center justify-center py-2 px-4 text-sm md:text-base w-full sm:w-auto"
-          :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
+          class="card flex items-center justify-center py-2 px-4 text-sm md:text-base w-full sm:w-auto"
         >
           <PhSwap :size="20" class="mr-2" />
           Change Avatar
         </button>
         <button
           @click="openNameEditor"
-          class="flex items-center justify-center py-2 px-4 text-sm md:text-base w-full sm:w-auto"
-          :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
+          class="card flex items-center justify-center py-2 px-4 text-sm md:text-base w-full sm:w-auto"
         >
           <PhTextbox :size="20" class="mr-2" />
           Rename
         </button>
         <button
           @click="confirmDeleteAccount"
-          class="flex items-center justify-center text-red-600 dark:text-red-500 py-2 px-4 text-sm md:text-base w-full sm:w-auto"
-          :class="[uiStore.blurEnabled ? 'card-blur' : 'card']"
+          class="card flex items-center justify-center text-red-600 dark:text-red-500 py-2 px-4 text-sm md:text-base w-full sm:w-auto"
         >
           <PhTrash :size="20" class="mr-2" />
           Delete Account
@@ -58,7 +55,7 @@
     @close="showAvatarPicker = false"
   />
 
-  <AvatarViewModal
+  <ImageViewModal
     :is-open="showAvatarViewer"
     :avatar-url="userAvatar"
     @close="showAvatarViewer = false"
@@ -80,7 +77,7 @@
   import { authStore, uiStore } from '@/utils/stores';
   import AlertModal from '@/components/ui/modal/alertModal.vue';
   import AvatarModal from '@/components/ui/modal/avatarModal.vue';
-  import AvatarViewModal from '@/components/ui/modal/avatarViewModal.vue';
+  import ImageViewModal from '@/components/ui/modal/imageViewModal.vue';
   import InputModal from '@/components/ui/modal/inputModal.vue';
 
   const router = useRouter();

@@ -1,5 +1,3 @@
-<!-- Home.vue -->
-
 <template>
   <div>
     <main

@@ -14,14 +14,14 @@
     <div class="w-full text-sm px-1 space-y-1">
       <li
         @click.stop="saveNote"
-        class="w-full text-left cursor-pointer p-2 rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+        class="w-full text-left cursor-pointer p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
       >
         <PhFloppyDisk :size="20" class="mr-2" />
         Save as copy
       </li>
       <li
         @click.stop="closeNote"
-        class="w-full text-left cursor-pointer p-2 rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+        class="w-full text-left cursor-pointer p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
       >
         <PhArrowLeft :size="20" class="mr-2" />
         Back to home
@@ -60,7 +60,7 @@
       };
 
       try {
-        await notesStore.addNote(newNote);
+        await notesStore.createNote(newNote);
         uiStore.showToastMessage('Note saved as a new copy.');
 
         await nextTick();
@@ -71,7 +71,7 @@
 
         if (addedNote) {
           await router.push('/');
-          uiStore.openNote(addedNote.id);
+          notesStore.openNote(addedNote.id);
         } else {
           console.error('Failed to find the newly added note');
           uiStore.showToastMessage('Error: Failed to open the new note.');

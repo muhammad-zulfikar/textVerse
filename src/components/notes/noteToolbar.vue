@@ -6,7 +6,7 @@
       <div
         class="flex items-center mr-2 md:mr-4 px-2 py-1.5 card"
         :class="{
-          'hover:bg-[#d9c698] dark:hover:bg-gray-600': !isEditingTitle,
+          'hover:bg-cream-200 dark:hover:bg-gray-600': !isEditingTitle,
         }"
       >
         <PhFile :size="20" class="size-5 flex-shrink-0" />
@@ -38,33 +38,74 @@
             class="cursor-text truncate border-b border-transparent hover:border-b hover:border-gray-600"
             @click="editTitle"
           >
-            {{ title }}
+            {{ truncatedTitle }}
           </h1>
         </div>
       </div>
+    </div>
 
+    <div class="flex">
+      <Button
+        v-if="isNotePinned"
+        class="ml-2 md:ml-4"
+        @mouseenter="hoverPin = true"
+        @mouseleave="hoverPin = false"
+        @click="togglePin"
+      >
+        <PhPushPin v-if="!hoverPin" :size="20" class="size-5" />
+        <PhPushPinSlash v-else :size="20" class="size-5" />
+      </Button>
+      <Button
+        v-if="isNotePublic"
+        class="ml-2 md:ml-4"
+        @mouseenter="hoverPublic = true"
+        @mouseleave="hoverPublic = false"
+        @click="togglePublic"
+      >
+        <PhGlobe v-if="!hoverPublic" :size="20" class="size-5" />
+        <PhGlobeX v-else :size="20" class="size-5" />
+      </Button>
+      <Button class="items-center flex mx-2 md:mx-4" title="Last Edited">
+        <PhSpinnerGap v-if="isSaving" :size="20" class="animate-spin" />
+        <PhCalendarCheck v-else :size="20" />
+        <span class="hidden md:flex md:ml-2">
+          {{ localeDate(note.value.last_edited || note.value.time_created) }}
+        </span>
+      </Button>
       <Dropdown
         ref="dropdownRef"
         dropdownId="noteOptionsDropdown"
         contentWidth="9rem"
-        position="left"
+        position="right"
         direction="down"
       >
         <template #label>
           <div
-            class="flex items-center px-2 py-1.5 cursor-pointer card hover:bg-[#d9c698] dark:hover:bg-gray-600"
+            class="flex items-center px-2 py-1.5 cursor-pointer card hover:bg-cream-200 dark:hover:bg-gray-600"
           >
             <PhDotsThreeCircle :size="20" class="size-5" />
           </div>
         </template>
 
         <div
+          @click="closeNote"
+          class="block px-1 text-sm cursor-pointer"
+          role="menuitem"
+        >
+          <span
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhX :size="20" class="size-5 mr-2" />
+            Close
+          </span>
+        </div>
+        <div
           @click="copyNote"
           class="block px-1 text-sm cursor-pointer"
           role="menuitem"
         >
           <span
-            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
           >
             <PhClipboardText :size="20" class="mr-2" />
             Copy
@@ -76,7 +117,7 @@
           role="menuitem"
         >
           <span
-            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
           >
             <PhCopy :size="20" class="mr-2" />
             Duplicate
@@ -84,12 +125,12 @@
         </div>
         <div
           v-if="!isNotePinned"
-          @click="pinNote"
+          @click="togglePin"
           class="block px-1 text-sm cursor-pointer"
           role="menuitem"
         >
           <span
-            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
           >
             <PhPushPin :size="20" class="size-5 mr-2" />
             Pin
@@ -97,12 +138,12 @@
         </div>
         <div
           v-if="isNotePinned"
-          @click="unpinNote"
+          @click="togglePin"
           class="block px-1 text-sm cursor-pointer"
           role="menuitem"
         >
           <span
-            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
           >
             <PhPushPinSlash :size="20" class="size-5 mr-2" />
             Unpin
@@ -115,7 +156,7 @@
           role="menuitem"
         >
           <span
-            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
           >
             <PhGlobe v-if="isNotePublic" :size="20" class="size-5 mr-2" />
             <PhLock v-else :size="20" class="size-5 mr-2" />
@@ -133,22 +174,28 @@
           >
             <div
               @click="togglePublic"
-              class="p-2 cursor-pointer rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+              class="p-2 cursor-pointer rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+              :class="{
+                'bg-cream-200 dark:bg-gray-700': !isNotePublic,
+              }"
             >
               <PhLock :size="20" class="size-5 mr-2" />
               Private
             </div>
             <div
               @click="togglePublic"
-              class="p-2 cursor-pointer rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+              class="p-2 cursor-pointer rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+              :class="{
+                'bg-cream-200 dark:bg-gray-700': isNotePublic,
+              }"
             >
               <PhGlobe :size="20" class="size-5 mr-2" />
               Public
             </div>
             <div
               v-if="isNotePublic"
-              @click="copyPublicLink"
-              class="p-2 cursor-pointer rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+              @click="copyLink"
+              class="p-2 cursor-pointer rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
             >
               <PhCopy :size="20" class="size-5 mr-2" />
               Copy link
@@ -161,7 +208,7 @@
           role="menuitem"
         >
           <span
-            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
           >
             <PhFolder :size="20" class="size-5 mr-2" />
             {{ folderValue }}
@@ -180,7 +227,10 @@
               v-for="folder in availableFolders"
               :key="folder"
               @click="updateFolder(folder)"
-              class="p-2 cursor-pointer rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+              class="p-2 cursor-pointer rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+              :class="{
+                'bg-cream-200 dark:bg-gray-700': folder === folderValue,
+              }"
             >
               <PhFolder :size="20" class="size-5 mr-2" />
               {{ folder }}
@@ -195,7 +245,7 @@
           role="menuitem"
         >
           <span
-            class="p-2 w-full text-left rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+            class="p-2 w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
           >
             <PhArrowsIn v-if="isExpanded" :size="20" class="size-5 mr-2" />
             <PhArrowsOut v-else :size="20" class="size-5 mr-2" />
@@ -204,7 +254,7 @@
         </div>
 
         <div
-          v-if="isEditMode"
+          v-if="isEditing"
           @click="deleteNote"
           class="block px-1 text-sm cursor-pointer text-red-500 hover:text-red-100"
           role="menuitem"
@@ -217,44 +267,6 @@
           </span>
         </div>
       </Dropdown>
-    </div>
-
-    <div class="flex">
-      <Button
-        v-if="isNotePinned"
-        class="ml-2 md:ml-4"
-        @mouseenter="hoverPin = true"
-        @mouseleave="hoverPin = false"
-        @click="unpinNote"
-      >
-        <PhPushPin v-if="!hoverPin" :size="20" class="size-5" />
-        <PhPushPinSlash v-else :size="20" class="size-5" />
-      </Button>
-      <Button
-        v-if="isNotePublic"
-        class="ml-2 md:ml-4"
-        @mouseenter="hoverPublic = true"
-        @mouseleave="hoverPublic = false"
-        @click="togglePublic"
-      >
-        <PhGlobe v-if="!hoverPublic" :size="20" class="size-5" />
-        <PhGlobeX v-else :size="20" class="size-5" />
-      </Button>
-      <Button
-        class="items-center hidden md:flex ml-2 md:ml-4"
-        title="Last Edited"
-      >
-        <PhSpinnerGap v-if="isSaving" :size="20" class="mr-2 animate-spin" />
-        <PhCalendarBlank v-else :size="20" class="mr-2" />
-        {{
-          notesStore.localeDate(
-            note.value.last_edited || note.value.time_created
-          )
-        }}
-      </Button>
-      <Button class="ml-4" @click="closeNote">
-        <PhX :size="20" class="size-5" />
-      </Button>
     </div>
   </div>
 </template>
@@ -285,40 +297,66 @@
     PhLock,
     PhDotsThreeCircle,
     PhSpinnerGap,
-    PhCalendarBlank,
     PhX,
+    PhCalendarCheck,
   } from '@phosphor-icons/vue';
-  import { notesStore, uiStore, folderStore, authStore } from '@/utils/stores';
+  import { uiStore, folderStore, authStore, notesStore } from '@/utils/stores';
   import Dropdown from '@/components/ui/dropdown.vue';
   import Button from '@/components/ui/button.vue';
   import { DEFAULT_FOLDERS } from '@/utils/constants';
-  import { useNotesManagement } from '@/utils/useNotesManagement';
   import { Note } from '@/utils/types';
+  import { localeDate } from '@/utils/helpers';
+  import {
+    copyNoteContentToClipboard,
+    copyPublicLink,
+  } from '@/store/notesStore/actions';
+  import { isContentEmpty } from '@/store/notesStore/helpers';
 
   const props = defineProps<{
     note: Ref<Note>;
-    isEditMode: boolean;
-    isValid: boolean;
+    isEditing: boolean;
     hasChanges: boolean;
     isSaving: boolean;
   }>();
 
-  const {
-    title,
-    folder,
-    isNotePublic,
-    isNotePinned,
-    togglePublic,
-    copyPublicLink,
-    copyNote,
-    duplicateNote,
-    pinNote,
-    unpinNote,
-    updateTitle,
-    updateFolder,
-    deleteNote,
-    closeNote,
-  } = useNotesManagement(props.note);
+  const title = computed(() => props.note.value.title);
+  const folder = computed(() => props.note.value.folder);
+  const isNotePublic = computed(() =>
+    notesStore.publicNotes.has(props.note.value.id)
+  );
+  const isNotePinned = computed(() =>
+    notesStore.pinnedNotes.has(props.note.value.id)
+  );
+
+  const togglePublic = () => notesStore.togglePublic(props.note.value.id);
+  const togglePin = () => notesStore.togglePin(props.note.value.id);
+  const copyLink = () => copyPublicLink(props.note.value.id);
+  const copyNote = () => copyNoteContentToClipboard(props.note.value);
+  const duplicateNote = () => notesStore.duplicateNote(props.note.value);
+
+  const updateFolder = (folder: string) =>
+    notesStore.updateNote(props.note.value.id, { ...props.note.value, folder });
+
+  const deleteNote = async () => {
+    await notesStore.deleteNote(props.note.value.id);
+    notesStore.closeNote();
+  };
+
+  const updateTitle = (newTitle: string) =>
+    notesStore.updateNote(props.note.value.id, {
+      ...props.note.value,
+      title: newTitle,
+    });
+
+  const closeNote = async () => {
+    if (isContentEmpty(props.note.value.content)) {
+      if (props.note.value.id) {
+        await notesStore.deleteNote(props.note.value.id);
+      }
+      uiStore.showToastMessage('Empty note discarded');
+    }
+    notesStore.closeNote();
+  };
 
   const titleRef = ref<HTMLElement | null>(null);
   const titleInputRef = ref<HTMLInputElement | null>(null);
@@ -326,6 +364,28 @@
   const isEditingTitle = ref(false);
   const editedTitle = ref(title.value);
   const titleWidth = ref(0);
+  const hoverPin = ref(false);
+  const hoverPublic = ref(false);
+
+  const truncatedTitle = computed(() => {
+    const mobileMaxLength = 18;
+    const midMaxLength = 25;
+    const defaultMaxLength = 35;
+
+    const truncate = (length: number) => {
+      if (title.value.length <= length) return title.value;
+      return title.value.slice(0, length - 3) + '...';
+    };
+
+    switch (true) {
+      case isMobile.value && isNotePublic.value && isNotePinned.value:
+        return truncate(mobileMaxLength);
+      case isNotePublic.value || isNotePinned.value:
+        return truncate(midMaxLength);
+      default:
+        return truncate(defaultMaxLength);
+    }
+  });
 
   const updateTitleWidth = () => {
     if (isEditingTitle && titleMeasure.value) {
@@ -334,9 +394,6 @@
       titleWidth.value = titleRef.value.offsetWidth;
     }
   };
-
-  const hoverPin = ref(false);
-  const hoverPublic = ref(false);
 
   const editTitle = () => {
     if (!isEditingTitle.value) {
@@ -352,7 +409,7 @@
 
   const saveTitle = () => {
     isEditingTitle.value = false;
-    if (editedTitle.value !== title.value) {
+    if (editedTitle.value !== title.value && props.note.value.id) {
       updateTitle(editedTitle.value);
     }
   };

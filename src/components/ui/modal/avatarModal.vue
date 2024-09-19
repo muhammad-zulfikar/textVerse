@@ -21,7 +21,7 @@
           <div
             @dragover.prevent
             @drop.prevent="handleDrop"
-            class="card-border-dashed w-full h-32 md:h-52 flex flex-col items-center justify-center text-gray-600 dark:text-gray-400 cursor-pointer"
+            class="w-full h-32 md:h-52 flex flex-col items-center justify-center text-gray-600 dark:text-gray-400 cursor-pointer bg-cream-300 dark:bg-gray-750 border-[1px] border-dashed border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300"
             @click="triggerFilePicker"
           >
             <p class="text-sm">Drag & drop your image here</p>
@@ -46,7 +46,7 @@
           <div class="flex">
             <button
               @click.prevent="closeModal"
-              class="flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700 mr-4 cursor-pointer"
+              class="flex items-center px-2 py-1 card hover:bg-cream-300 dark:hover:bg-gray-700 mr-4 cursor-pointer"
             >
               <PhProhibit :size="20" class="mr-2" />
               Cancel
@@ -54,7 +54,7 @@
             <button
               :disabled="!avatarUrl"
               @click.prevent="confirmSelection"
-              class="flex items-center px-2 py-1 card hover:bg-[#d9c698] dark:hover:bg-gray-700 cursor-pointer"
+              class="flex items-center px-2 py-1 card hover:bg-cream-300 dark:hover:bg-gray-700 cursor-pointer"
             >
               <PhCheckCircle :size="20" class="mr-2" />
               Save

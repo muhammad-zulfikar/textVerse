@@ -28,9 +28,9 @@
     </template>
     <div class="px-1 space-y-1 text-sm">
       <div
-        class="w-full rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200"
+        class="w-full rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
         :class="{
-          'bg-[#ebdfc0] dark:bg-gray-700':
+          'bg-cream-200 dark:bg-gray-700':
             expandedOption === 'card' || uiStore.viewType === 'card',
         }"
       >
@@ -44,8 +44,11 @@
           </button>
           <button
             @click.stop="toggleOptions('card')"
-            class="mr-2 p-1 rounded-full hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-transform duration-200"
-            :class="{ 'rotate-180': expandedOption === 'card' }"
+            class="mr-2 p-1 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
+            :class="{
+              'rotate-180 bg-cream-300 dark:bg-gray-600':
+                expandedOption === 'card',
+            }"
           >
             <PhCaretDown :size="16" />
           </button>
@@ -59,7 +62,7 @@
               @click.stop="decreaseColumns"
               :class="{
                 'text-gray-400 cursor-default': uiStore.columns <= 1,
-                'hover:bg-[#d9c698] dark:hover:bg-gray-600':
+                'hover:bg-cream-300 dark:hover:bg-gray-600':
                   uiStore.columns > 1,
               }"
               class="text-center text-sm p-2 mb-1 rounded-md transition-colors duration-200"
@@ -77,7 +80,7 @@
               :class="{
                 'text-gray-400 cursor-default':
                   uiStore.columns >= (isMobile ? 2 : 5),
-                'hover:bg-[#d9c698] dark:hover:bg-gray-600':
+                'hover:bg-cream-300 dark:hover:bg-gray-600':
                   uiStore.columns < (isMobile ? 2 : 5),
               }"
               class="text-center text-sm p-2 mb-1 rounded-md transition-colors duration-200"
@@ -90,9 +93,9 @@
       </div>
       <button
         @click="setViewType('table')"
-        class="w-full text-left p-2 rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+        class="w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
         :class="{
-          'bg-[#ebdfc0] dark:bg-gray-700': uiStore.viewType === 'table',
+          'bg-cream-200 dark:bg-gray-700': uiStore.viewType === 'table',
         }"
       >
         <PhTable :size="20" class="mr-2" />
@@ -100,20 +103,16 @@
       </button>
       <button
         @click="setViewType('mail')"
-        class="w-full text-left p-2 rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+        class="w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
         :class="{
-          'bg-[#ebdfc0] dark:bg-gray-700': uiStore.viewType === 'mail',
+          'bg-cream-200 dark:bg-gray-700': uiStore.viewType === 'mail',
         }"
       >
         <PhEnvelopeSimple :size="20" class="mr-2" />
         Mail
       </button>
       <div
-        class="w-full rounded-md hover:bg-[#ebdfc0] dark:hover:bg-gray-700 transition-colors duration-200"
-        :class="{
-          'bg-[#ebdfc0] dark:bg-gray-700':
-            expandedOption === 'folder' || uiStore.viewType === 'folder',
-        }"
+        class="w-full rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
       >
         <div class="flex items-center justify-between">
           <button
@@ -123,32 +122,7 @@
             <PhFolder :size="20" class="mr-2" />
             Folder
           </button>
-          <button
-            @click.stop="toggleOptions('folder')"
-            class="mr-2 p-1 rounded-full hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-transform duration-200"
-            :class="{ 'rotate-180': expandedOption === 'folder' }"
-          >
-            <PhCaretDown :size="16" />
-          </button>
         </div>
-        <Transition name="expand">
-          <div v-if="expandedOption === 'folder'">
-            <button
-              @click.stop="setFolderViewType('grid')"
-              class="w-full flex items-center text-center text-sm p-2 rounded-md text-gray-750 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-colors duration-200"
-            >
-              <PhGridFour :size="20" class="mr-2" />
-              <span>Grid</span>
-            </button>
-            <button
-              @click.stop="setFolderViewType('list')"
-              class="w-full flex items-center text-center text-sm p-2 rounded-md text-gray-750 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-[#d9c698] dark:hover:bg-gray-600 transition-colors duration-200"
-            >
-              <PhList :size="20" class="mr-2" />
-              <span>List</span>
-            </button>
-          </div>
-        </Transition>
       </div>
     </div>
   </Dropdown>
@@ -165,8 +139,6 @@
     PhCaretDown,
     PhMinusCircle,
     PhPlusCircle,
-    PhGridFour,
-    PhList,
   } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
   import Button from '@/components/ui/button.vue';
@@ -206,11 +178,6 @@
     uiStore.setViewType('card');
   };
 
-  const setFolderViewType = (viewType: 'grid' | 'list') => {
-    uiStore.setFolderViewType(viewType);
-    uiStore.setViewType('folder');
-  };
-
   const handleResize = () => {
     const newIsMobile = window.innerWidth < 640;
     if (newIsMobile !== isMobile.value) {
@@ -218,7 +185,7 @@
       if (isMobile.value && uiStore.columns > 2) {
         uiStore.setColumns(2);
       } else if (!isMobile.value && uiStore.columns < 3) {
-        uiStore.setColumns(4);
+        uiStore.setColumns(5);
       }
     }
   };
