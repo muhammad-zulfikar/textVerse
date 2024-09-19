@@ -1,5 +1,3 @@
-// src/utils/stores.ts
-
 import { useAuthStore } from '@/store/authStore';
 import { useNotesStore } from '@/store/notesStore';
 import { useFirebaseStore } from '@/store/notesStore/stores/firebaseStore';

@@ -130,7 +130,7 @@
 
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted } from 'vue';
-  import { uiStore } from '@/utils/stores';
+  import { uiStore } from '@/store';
   import {
     PhSquaresFour,
     PhTable,

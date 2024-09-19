@@ -18,7 +18,7 @@
         <h1 class="text-3xl font-bold flex-grow">
           {{ note.title }}
           <span class="text-sm font-normal text-gray-500 ml-2">
-            {{ localeDate(note.last_edited || note.time_created) }}
+            {{ localeDate(note.last_edited) }}
           </span>
         </h1>
         <div class="flex space-x-2 items-start md:items-center">
@@ -61,14 +61,14 @@
 
 <script setup lang="ts">
   import { ref, onMounted, nextTick, onUnmounted } from 'vue';
-  import { notesStore, uiStore } from '@/utils/stores';
-  import { Note, PublicNote } from '@/utils/types';
+  import { notesStore, uiStore } from '@/store';
+  import { Note, PublicNote } from '@/store/notesStore/types';
   import TextEditor from '@/components/textEditor/textEditor.vue';
   import { useRoute, useRouter } from 'vue-router';
   import { PhFloppyDisk, PhX } from '@phosphor-icons/vue';
   import { ref as dbRef, onValue, off } from 'firebase/database';
   import { db } from '@/firebase';
-  import { localeDate } from '@/utils/helpers';
+  import { localeDate } from '@/store/notesStore/helpers';
 
   const route = useRoute();
   const router = useRouter();
@@ -106,10 +106,7 @@
 
   const saveNote = async () => {
     if (note.value) {
-      const newNote: Omit<
-        Note,
-        'id' | 'time_created' | 'last_edited' | 'pinned'
-      > = {
+      const newNote: Omit<Note, 'id' | 'last_edited' | 'pinned'> = {
         title: note.value.title,
         content: note.value.content,
         folder: 'No Folder',

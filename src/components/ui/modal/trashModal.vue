@@ -95,8 +95,6 @@
                   <div class="text-[12px] md:text-xs text-gray-500 mb-4">
                     <span>Folder: {{ note.folder }}</span>
                     |
-                    <span>Created: {{ formatDate(note.time_created) }}</span>
-                    |
                     <span>Deleted: {{ formatDate(note.time_deleted) }}</span>
                   </div>
                 </div>
@@ -152,7 +150,7 @@
     PhCheckCircle,
     PhX,
   } from '@phosphor-icons/vue';
-  import { notesStore, uiStore } from '@/utils/stores';
+  import { notesStore, uiStore } from '@/store';
   import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
   import AlertModal from '@/components/ui/modal/alertModal.vue';
 

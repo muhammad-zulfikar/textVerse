@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
   import { defineAsyncComponent } from 'vue';
-  import { notesStore, uiStore } from '@/utils/stores';
+  import { notesStore, uiStore } from '@/store';
 
   const NoteModal = defineAsyncComponent(
     () => import('@/components/notes/noteModal.vue')

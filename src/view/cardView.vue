@@ -136,7 +136,7 @@
                 <PhCalendarBlank
                   class="mr-1 md:mr-[6px] size-[14px] md:size-5"
                 />
-                {{ localeDate(note.time_created || note.last_edited) }}
+                {{ localeDate(note.last_edited) }}
               </p>
             </div>
           </div>
@@ -178,13 +178,13 @@
     PhGlobeX,
     PhCalendarBlank,
   } from '@phosphor-icons/vue';
-  import { notesStore, folderStore, uiStore } from '@/utils/stores';
-  import { Note } from '@/utils/types';
-  import { DEFAULT_FOLDERS } from '@/utils/constants';
+  import { notesStore, folderStore, uiStore } from '@/store';
+  import { Note } from '@/store/notesStore/types';
+  import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
   import ContextMenu from '@/components/contextMenu/contextMenu.vue';
   import DOMPurify from 'dompurify';
   import Separator from '@/components/ui/separator.vue';
-  import { localeDate } from '@/utils/helpers';
+  import { localeDate } from '@/store/notesStore/helpers';
 
   const computedMb = computed(() => {
     if (uiStore.columns === 4) {

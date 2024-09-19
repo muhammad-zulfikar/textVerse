@@ -20,7 +20,7 @@ import {
   deleteUser,
   signInWithPopup,
 } from 'firebase/auth';
-import { uiStore } from '@/utils/stores';
+import { uiStore } from '@/store';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({

@@ -30,10 +30,13 @@
   import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
   import { onValue, ref as dbRef } from 'firebase/database';
   import { db } from '@/firebase';
-  import { Note } from '@/utils/types';
-  import { notesStore, folderStore, uiStore, authStore } from '@/utils/stores';
-  import { createNoteObject, hasChanged } from '@/utils/helpers';
-  import { isContentEmpty } from '@/store/notesStore/helpers';
+  import { Note } from '@/store/notesStore/types';
+  import { notesStore, folderStore, uiStore, authStore } from '@/store';
+  import {
+    createNoteObject,
+    hasChanged,
+    isContentEmpty,
+  } from '@/store/notesStore/helpers';
   import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
   import NoteToolbar from './noteToolbar.vue';
   import TextEditor from '@/components/textEditor/textEditor.vue';

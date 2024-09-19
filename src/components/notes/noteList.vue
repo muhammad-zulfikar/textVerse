@@ -22,7 +22,7 @@
 
 <script lang="ts" setup>
   import { computed, defineAsyncComponent } from 'vue';
-  import { notesStore, uiStore } from '@/utils/stores';
+  import { notesStore, uiStore } from '@/store';
   import { PhEmpty } from '@phosphor-icons/vue';
 
   const props = defineProps<{

@@ -1,4 +1,3 @@
-<!-- components/LoadingSpinner.vue -->
 <template>
   <div class="loading">
     <div></div>
@@ -22,7 +21,7 @@
       width: 1rem;
       height: 1rem;
       margin: 2rem 0.3rem;
-      @apply bg-cream-300 dark:bg-gray-750 border border-[1px] border-black dark:border-white;
+      @apply bg-cream-100 dark:bg-gray-750 border border-[1px] border-black dark:border-white;
       border-radius: 50%;
       animation: 0.9s bounce infinite alternate;
 

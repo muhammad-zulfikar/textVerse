@@ -5,7 +5,7 @@ import stateFactory from './state';
 import getters from './getters';
 import * as actions from './actions';
 import * as helpers from './helpers';
-import { NotesState } from '@/utils/types';
+import { NotesState } from './state';
 
 type ActionType = typeof actions & typeof helpers;
 

@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-  import { uiStore } from '@/utils/stores';
+  import { uiStore } from '@/store';
   import { ref } from 'vue';
   import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
   import { PhTrash, PhProhibit, PhCheckCircle } from '@phosphor-icons/vue';

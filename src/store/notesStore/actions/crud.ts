@@ -1,18 +1,20 @@
-import { Note, NotesState } from '@/utils/types';
+import { Note } from '../types';
+import { NotesState } from '../state';
+import { uiStore, authStore, firebaseStore, localStore } from '@/store';
+import { moveNoteToTrash } from '.';
 import {
   createNoteObject,
   createUpdatedNoteObject,
   createDuplicateNoteObject,
   createPublicNote,
   sanitizeNoteContent,
-} from '@/utils/helpers';
-import { uiStore, authStore, firebaseStore, localStore } from '@/utils/stores';
-import { moveNoteToTrash } from '.';
-import { getNoteById, reorderNotes } from '../helpers';
+  getNoteById,
+  reorderNotes,
+} from '../helpers';
 
 export const createNote = async (
   state: NotesState,
-  newNote: Omit<Note, 'id' | 'time_created' | 'last_edited' | 'pinned'>
+  newNote: Omit<Note, 'id' | 'last_edited' | 'pinned'>
 ): Promise<Note> => {
   const note = createNoteObject(newNote);
   await saveNoteToStore(state, note);

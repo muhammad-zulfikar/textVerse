@@ -1,7 +1,9 @@
 <!-- tableView.vue -->
 
 <template>
-  <div class="max-w-5xl mx-auto px-2 md:px-0 text-sm md:text-base mt-4 md:mt-0 select-none">
+  <div
+    class="max-w-5xl mx-auto px-2 md:px-0 text-sm md:text-base mt-4 md:mt-0 select-none"
+  >
     <div class="overflow-x-auto md:px-4 xl:px-0">
       <table
         class="min-w-[800px] w-full border-separate border-spacing-0 font-serif rounded-lg overflow-hidden"
@@ -103,7 +105,7 @@
               v-if="visibleColumns.includes('Date')"
               class="p-3 border-b-[1px] border-r-[1px] border-black dark:border-white whitespace-nowrap"
             >
-              {{ localeDate(note.last_edited || note.time_created) }}
+              {{ localeDate(note.last_edited) }}
             </td>
           </tr>
         </transition-group>
@@ -122,10 +124,10 @@
     PhArticle,
     PhCalendar,
   } from '@phosphor-icons/vue';
-  import { Note } from '@/utils/types';
-  import { uiStore, notesStore, folderStore } from '@/utils/stores';
+  import { Note } from '@/store/notesStore/types';
+  import { uiStore, notesStore, folderStore } from '@/store';
   import DOMPurify from 'dompurify';
-  import { localeDate } from '@/utils/helpers';
+  import { localeDate } from '@/store/notesStore/helpers';
 
   const props = defineProps<{
     notes: Note[];

@@ -20,13 +20,13 @@
 
 <script lang="ts" setup>
   import { onMounted, onUnmounted, watch, computed } from 'vue';
-  import { notesStore, folderStore, uiStore } from '@/utils/stores';
+  import { notesStore, folderStore, uiStore } from '@/store';
   import Toolbar from '@/components/ui/toolbar.vue';
   import NoteList from '@/components/notes/noteList.vue';
   import NoteView from '@/components/notes/noteView.vue';
   import LoadingSpinner from '@/components/ui/loading.vue';
   import { useRoute } from 'vue-router';
-  import { createNoteObject } from '@/utils/helpers';
+  import { createNoteObject } from '@/store/notesStore/helpers';
 
   const route = useRoute();
 

@@ -1,22 +1,13 @@
 import { defineStore } from 'pinia';
-import { DEFAULT_FOLDERS } from '@/utils/constants';
-import { authStore, notesStore, uiStore, firebaseStore } from '@/utils/stores';
+import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
+import { authStore, notesStore, uiStore, firebaseStore } from '@/store';
 import { off, onValue, ref, set, get } from 'firebase/database';
 import { db } from '@/firebase';
-import { Note } from '@/utils/types';
-
-interface FolderState {
-  folders: string[];
-  currentFolder: string;
-  folderListener: (() => void) | null;
-}
+import { Note } from '@/store/notesStore/types';
+import stateFactory from './state';
 
 export const useFolderStore = defineStore('folders', {
-  state: (): FolderState => ({
-    folders: [DEFAULT_FOLDERS.ALL_NOTES, DEFAULT_FOLDERS.UNCATEGORIZED],
-    currentFolder: DEFAULT_FOLDERS.ALL_NOTES,
-    folderListener: null,
-  }),
+  state: stateFactory,
 
   actions: {
     async addFolder(folderName: string) {

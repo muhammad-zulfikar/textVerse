@@ -16,7 +16,7 @@
 <script lang="ts" setup>
   import Button from '../button.vue';
   import { PhCheckCircle, PhXCircle } from '@phosphor-icons/vue';
-  import { notesStore, uiStore } from '@/utils/stores';
+  import { notesStore, uiStore } from '@/store';
 
   const toggleSelectMode = (event: Event) => {
     event.stopPropagation();

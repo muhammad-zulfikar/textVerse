@@ -6,7 +6,7 @@ import {
   SortType,
 } from '@/utils/types';
 import { applyTheme, getValidColumns } from '.';
-import { authStore } from '@/utils/stores';
+import { authStore } from '@/store';
 import { ref, set, onValue, off, get } from 'firebase/database';
 import { db } from '@/firebase';
 

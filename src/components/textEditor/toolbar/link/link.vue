@@ -17,7 +17,7 @@
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted } from 'vue';
   import { PhLink } from '@phosphor-icons/vue';
-  import { uiStore } from '@/utils/stores';
+  import { uiStore } from '@/store';
   import InputModal from '@/components/ui/modal/inputModal.vue';
 
   const isActive = ref(false);

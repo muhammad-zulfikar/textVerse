@@ -1,13 +1,17 @@
-import { DEFAULT_FOLDERS } from '@/utils/constants';
-import { areValidNotes, createBackupFileName } from '@/utils/helpers';
+import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
+import {
+  areValidNotes,
+  createBackupFileName,
+} from '@/store/notesStore/helpers';
 import {
   authStore,
   firebaseStore,
   folderStore,
   localStore,
   uiStore,
-} from '@/utils/stores';
-import { Note, NotesState } from '@/utils/types';
+} from '@/store';
+import { Note } from '../types';
+import { NotesState } from '../state';
 import { loadNotes } from '.';
 
 export const importNotes = async (state: NotesState, jsonString: string) => {

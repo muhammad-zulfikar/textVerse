@@ -32,12 +32,12 @@
 
 <script setup lang="ts">
   import { nextTick, PropType } from 'vue';
-  import { uiStore, notesStore } from '@/utils/stores';
+  import { uiStore, notesStore } from '@/store';
   import { PhFloppyDisk, PhArrowLeft, PhFile } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
   import Button from '@/components/ui/button.vue';
   import { useRouter } from 'vue-router';
-  import { Note } from '@/utils/types';
+  import { Note } from '@/store/notesStore/types';
 
   const router = useRouter();
 
@@ -50,10 +50,7 @@
 
   const saveNote = async () => {
     if (props.note) {
-      const newNote: Omit<
-        Note,
-        'id' | 'time_created' | 'last_edited' | 'pinned'
-      > = {
+      const newNote: Omit<Note, 'id' | 'last_edited' | 'pinned'> = {
         title: props.note.title,
         content: props.note.content,
         folder: 'No Folder',

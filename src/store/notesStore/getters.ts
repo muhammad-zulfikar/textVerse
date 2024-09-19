@@ -1,5 +1,6 @@
-import { NotesState, Note } from '@/utils/types';
-import { filterNotes } from '@/utils/helpers';
+import { Note } from '@/store/notesStore/types';
+import { NotesState } from './state';
+import { filterNotes } from '@/store/notesStore/helpers';
 
 export default {
   selectedNote: (state: NotesState): Note | undefined =>

@@ -3,7 +3,7 @@
 import { defineStore } from 'pinia';
 import { ref, set, get, remove, update, onValue } from 'firebase/database';
 import { db } from '@/firebase';
-import { Note, PublicNote } from '@/utils/types';
+import { Note, PublicNote } from '../types';
 
 export const useFirebaseStore = defineStore('firebase', {
   actions: {

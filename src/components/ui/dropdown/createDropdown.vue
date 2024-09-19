@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
   import { ref, defineAsyncComponent } from 'vue';
-  import { uiStore, notesStore, folderStore } from '@/utils/stores';
+  import { uiStore, notesStore, folderStore } from '@/store';
   import { PhPlus, PhFile, PhFolder } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
   import Button from '@/components/ui/button.vue';

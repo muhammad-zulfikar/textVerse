@@ -79,7 +79,7 @@
   import { ref, computed, defineAsyncComponent } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { PhX } from '@phosphor-icons/vue';
-  import { authStore, notesStore } from '@/utils/stores';
+  import { authStore, notesStore } from '@/store';
   import Button from '@/components/ui/button.vue';
   import Separator from '@/components/ui/separator.vue';
   import SearchBar from '@/components/navbar/searchBar.vue';

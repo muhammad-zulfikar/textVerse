@@ -69,7 +69,7 @@
         <PhSpinnerGap v-if="isSaving" :size="20" class="animate-spin" />
         <PhCalendarCheck v-else :size="20" />
         <span class="hidden md:flex md:ml-2">
-          {{ localeDate(note.value.last_edited || note.value.time_created) }}
+          {{ localeDate(note.value.last_edited) }}
         </span>
       </Button>
       <Dropdown
@@ -300,17 +300,16 @@
     PhX,
     PhCalendarCheck,
   } from '@phosphor-icons/vue';
-  import { uiStore, folderStore, authStore, notesStore } from '@/utils/stores';
+  import { uiStore, folderStore, authStore, notesStore } from '@/store';
   import Dropdown from '@/components/ui/dropdown.vue';
   import Button from '@/components/ui/button.vue';
-  import { DEFAULT_FOLDERS } from '@/utils/constants';
-  import { Note } from '@/utils/types';
-  import { localeDate } from '@/utils/helpers';
+  import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
+  import { Note } from '@/store/notesStore/types';
   import {
     copyNoteContentToClipboard,
     copyPublicLink,
   } from '@/store/notesStore/actions';
-  import { isContentEmpty } from '@/store/notesStore/helpers';
+  import { localeDate, isContentEmpty } from '@/store/notesStore/helpers';
 
   const props = defineProps<{
     note: Ref<Note>;

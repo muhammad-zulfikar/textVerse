@@ -108,7 +108,7 @@
 
 <script setup lang="ts">
   import { ref, computed } from 'vue';
-  import { notesStore, folderStore, uiStore } from '@/utils/stores';
+  import { notesStore, folderStore, uiStore } from '@/store';
   import {
     PhFolder,
     PhFolders,
@@ -121,7 +121,7 @@
   import Dropdown from '@/components/ui/dropdown.vue';
   import InputModal from '@/components/ui/modal/inputModal.vue';
   import alertModal from '@/components/ui/modal/alertModal.vue';
-  import { DEFAULT_FOLDERS } from '@/utils/constants';
+  import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
   import Button from '@/components/ui/button.vue';
 
   const selectedFolder = computed(() => folderStore.currentFolder);

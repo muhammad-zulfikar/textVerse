@@ -1,5 +1,6 @@
-import { Note, NotesState } from '@/utils/types';
-import { authStore, firebaseStore, localStore, uiStore } from '@/utils/stores';
+import { Note } from '../types';
+import { NotesState } from '../state';
+import { authStore, firebaseStore, localStore, uiStore } from '@/store';
 import { loadNotes, saveNoteToStore } from '.';
 
 export const moveNoteToTrash = async (

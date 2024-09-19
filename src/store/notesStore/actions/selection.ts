@@ -1,5 +1,5 @@
-import { NotesState } from '@/utils/types';
-import { uiStore } from '@/utils/stores';
+import { NotesState } from '../state';
+import { uiStore } from '@/store';
 
 export const openNote = (state: NotesState, noteId: string | null): void => {
   state.selectedNoteId = noteId;

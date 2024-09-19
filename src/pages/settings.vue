@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-  import { authStore } from '@/utils/stores';
+  import { authStore } from '@/store';
   import { PhInfo, PhGithubLogo } from '@phosphor-icons/vue';
   import SyncStatus from '@/components/settings/sync/syncStatus.vue';
   import ImportNotes from '@/components/settings/sync/importNotes.vue';

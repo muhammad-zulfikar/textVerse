@@ -42,7 +42,7 @@
   import { PhFunnel, PhTextAa, PhCalendarBlank } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
   import Button from '@/components/ui/button.vue';
-  import { notesStore, uiStore } from '@/utils/stores';
+  import { notesStore, uiStore } from '@/store';
 
   const setSortType = (sortType: 'date' | 'title') => {
     uiStore.setSortType(sortType);

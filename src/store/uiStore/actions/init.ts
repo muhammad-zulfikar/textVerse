@@ -1,4 +1,4 @@
-import { authStore } from '@/utils/stores';
+import { authStore } from '@/store';
 import { UIState } from '@/utils/types';
 import {
   loadFirebaseSettings,

@@ -48,7 +48,7 @@
 <script setup lang="ts">
   import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
   import { PhCaretDown, PhCardsThree, PhSidebar } from '@phosphor-icons/vue';
-  import { uiStore } from '@/utils/stores';
+  import { uiStore } from '@/store';
   import Dropdown from '@/components/ui/dropdown.vue';
 
   const isOpen = ref(false);

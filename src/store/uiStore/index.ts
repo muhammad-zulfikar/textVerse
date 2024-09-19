@@ -1,5 +1,3 @@
-// index.ts
-
 import { defineStore } from 'pinia';
 import stateFactory from './state';
 import * as actions from './actions';

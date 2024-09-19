@@ -74,7 +74,7 @@
   import { ref, computed } from 'vue';
   import { useRouter } from 'vue-router';
   import { PhSwap, PhTextbox, PhTrash } from '@phosphor-icons/vue';
-  import { authStore, uiStore } from '@/utils/stores';
+  import { authStore, uiStore } from '@/store';
   import AlertModal from '@/components/ui/modal/alertModal.vue';
   import AvatarModal from '@/components/ui/modal/avatarModal.vue';
   import ImageViewModal from '@/components/ui/modal/imageViewModal.vue';

@@ -152,7 +152,7 @@
 <script setup lang="ts">
   import { ref, computed, watch, defineAsyncComponent } from 'vue';
   import { useRouter } from 'vue-router';
-  import { authStore, notesStore, folderStore } from '@/utils/stores';
+  import { authStore, notesStore, folderStore } from '@/store';
   import {
     PhList,
     PhHouseLine,
@@ -204,8 +204,8 @@
     return notesStore.notes
       .filter((note) => !note.pinned)
       .sort((a, b) => {
-        const dateA = new Date(a.last_edited || a.time_created).getTime();
-        const dateB = new Date(b.last_edited || b.time_created).getTime();
+        const dateA = new Date(a.last_edited).getTime();
+        const dateB = new Date(b.last_edited).getTime();
         return dateB - dateA;
       })
       .slice(0, 5);

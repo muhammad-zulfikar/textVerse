@@ -1,11 +1,11 @@
 // localStore.ts
 
 import { defineStore } from 'pinia';
-import { Note } from '@/utils/types';
+import { Note } from '../types';
 import initialNotes from '@/assets/initialNotes.json';
-import { searchNotes } from '@/utils/helpers';
-import { DEFAULT_FOLDERS } from '@/utils/constants';
-import { notesStore } from '@/utils/stores';
+import { searchNotes } from '@/store/notesStore/helpers';
+import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
+import { notesStore } from '@/store';
 import { importFolders } from '../actions';
 
 export const useLocalStore = defineStore('local', {
@@ -18,8 +18,7 @@ export const useLocalStore = defineStore('local', {
       const importedNotes = initialNotes.map((note) => ({
         ...note,
         id: note.id,
-        time_created: note.time_created,
-        last_edited: note.time_created,
+        last_edited: note.last_edited,
         pinned: false,
         folder: note.folder || DEFAULT_FOLDERS.UNCATEGORIZED,
       }));

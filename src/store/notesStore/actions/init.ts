@@ -1,5 +1,6 @@
-import { authStore, firebaseStore } from '@/utils/stores';
-import { Note, NotesState } from '@/utils/types';
+import { authStore, firebaseStore } from '@/store';
+import { Note } from '../types';
+import { NotesState } from '../state';
 import { loadNotes } from '.';
 import { reorderNotes } from '../helpers';
 

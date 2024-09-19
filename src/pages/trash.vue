@@ -152,7 +152,7 @@
 
 <script lang="ts" setup>
   import { ref, computed, onMounted, onUnmounted } from 'vue';
-  import { notesStore, uiStore } from '@/utils/stores';
+  import { notesStore, uiStore } from '@/store';
   import LoadingSpinner from '@/components/ui/loading.vue';
   import AlertModal from '@/components/ui/modal/alertModal.vue';
   import {
@@ -164,8 +164,8 @@
   } from '@phosphor-icons/vue';
   import DOMPurify from 'dompurify';
   import Button from '@/components/ui/button.vue';
-  import { DEFAULT_FOLDERS } from '@/utils/constants';
-  import { localeDate } from '@/utils/helpers';
+  import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
+  import { localeDate } from '@/store/notesStore/helpers';
 
   const showMenu = ref(false);
   const selectedNotes = ref<string[]>([]);

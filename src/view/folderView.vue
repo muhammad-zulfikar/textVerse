@@ -67,7 +67,7 @@
             {{ note.title }}
           </h3>
           <span class="text-xs text-gray-500 mt-2">
-            {{ localeDate(note.last_edited || note.time_created) }}
+            {{ localeDate(note.last_edited) }}
           </span>
         </div>
       </TransitionGroup>
@@ -78,8 +78,8 @@
 <script setup lang="ts">
   import { ref, computed } from 'vue';
   import { PhFolder, PhFile, PhFolderDashed } from '@phosphor-icons/vue';
-  import { notesStore, folderStore } from '@/utils/stores';
-  import { localeDate } from '@/utils/helpers';
+  import { notesStore, folderStore } from '@/store';
+  import { localeDate } from '@/store/notesStore/helpers';
 
   const currentView = ref('folders');
   const currentFolder = ref('');

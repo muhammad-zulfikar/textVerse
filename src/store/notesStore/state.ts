@@ -1,4 +1,17 @@
-import { NotesState } from '@/utils/types';
+import { Note } from './types';
+
+export interface NotesState {
+  notes: Note[];
+  notesLoaded: boolean;
+  deletedNotes: Note[];
+  deletedNotesLoaded: boolean;
+  selectedNotes: string[];
+  selectedNoteId: string | null;
+  searchQuery: string;
+  publicNotes: Map<string, string>;
+  pinnedNotes: Set<string>;
+  notesListener: (() => void) | null;
+}
 
 export default (): NotesState => ({
   notes: [],

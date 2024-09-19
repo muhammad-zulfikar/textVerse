@@ -1,7 +1,7 @@
-import { DEFAULT_FOLDERS } from '@/utils/constants';
-import { generateUniqueId, sanitizeNoteContent } from '@/utils/helpers';
-import { authStore, firebaseStore, localStore, uiStore } from '@/utils/stores';
-import { Note, NotesState } from '@/utils/types';
+import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
+import { authStore, firebaseStore, localStore, uiStore } from '@/store';
+import { Note } from '../types';
+import { NotesState } from '../state';
 import {
   clearSelectedNotes,
   deleteNote,
@@ -9,7 +9,7 @@ import {
   permanentlyDeleteNote,
   saveNoteToStore,
 } from '.';
-import { getNoteById } from '../helpers';
+import { generateUniqueId, sanitizeNoteContent, getNoteById } from '../helpers';
 
 export const batchDeleteNotes = async (
   state: NotesState,
@@ -68,7 +68,6 @@ export const bulkImport = async (state: NotesState, notes: Note[]) => {
     ...note,
     content: sanitizeNoteContent(note.content),
     id: note.id || generateUniqueId(),
-    time_created: note.time_created || new Date().toISOString(),
     last_edited: note.last_edited || new Date().toISOString(),
     pinned: note.pinned || false,
     folder: note.folder || DEFAULT_FOLDERS.UNCATEGORIZED,
@@ -91,13 +90,11 @@ export const bulkImport = async (state: NotesState, notes: Note[]) => {
 
 export const bulkExport = function (state: NotesState): Note[] {
   return state.notes.map((note: Note) => {
-    const { id, title, content, time_created, last_edited, pinned, folder } =
-      note;
+    const { id, title, content, last_edited, pinned, folder } = note;
     return {
       id,
       title,
       content,
-      time_created,
       last_edited,
       pinned,
       folder,

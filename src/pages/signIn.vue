@@ -109,7 +109,7 @@
 <script setup lang="ts">
   import { computed, ref } from 'vue';
   import { useRouter } from 'vue-router';
-  import { authStore, uiStore } from '@/utils/stores';
+  import { authStore, uiStore } from '@/store';
 
   const router = useRouter();
 

@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
   import { PhUpload } from '@phosphor-icons/vue';
-  import { notesStore } from '@/utils/stores';
+  import { notesStore } from '@/store';
   import { ref } from 'vue';
 
   const fileInput = ref<HTMLInputElement | null>(null);

@@ -90,10 +90,10 @@
     PhFolder,
     PhFolderMinus,
   } from '@phosphor-icons/vue';
-  import { notesStore, uiStore, folderStore } from '@/utils/stores';
+  import { notesStore, uiStore, folderStore } from '@/store';
   import Button from '@/components/ui/button.vue';
   import Dropdown from '@/components/ui/dropdown.vue';
-  import { DEFAULT_FOLDERS } from '@/utils/constants';
+  import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
 
   const AlertModal = defineAsyncComponent(
     () => import('@/components/ui/modal/alertModal.vue')

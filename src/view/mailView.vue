@@ -65,7 +65,7 @@
               class="flex items-center px-2 py-1 cursor-pointer truncate card hover:text-black dark:hover:text-white hover:bg-cream-200 dark:hover:bg-gray-700 ml-auto"
             >
               <PhCalendarBlank :size="16" class="mr-2" />
-              {{ localeDate(note.last_edited || note.time_created) }}
+              {{ localeDate(note.last_edited) }}
             </div>
           </div>
         </div>
@@ -96,9 +96,7 @@
           <div class="hidden md:flex justify-end items-center text-sm mb-4">
             <span class="ml-4 text-gray-600 dark:text-gray-300">
               Last edited:
-              {{
-                localeDate(editedNote.last_edited || editedNote.time_created)
-              }}
+              {{ localeDate(editedNote.last_edited) }}
             </span>
           </div>
           <div
@@ -126,13 +124,12 @@
     PhFolder,
     PhCalendarBlank,
   } from '@phosphor-icons/vue';
-  import { notesStore, uiStore, folderStore } from '@/utils/stores';
-  import { Note } from '@/utils/types';
+  import { notesStore, uiStore, folderStore } from '@/store';
+  import { Note } from '@/store/notesStore/types';
   import TextEditor from '@/components/textEditor/textEditor.vue';
-  import { DEFAULT_FOLDERS } from '@/utils/constants';
+  import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
   import DOMPurify from 'dompurify';
-  import { localeDate } from '@/utils/helpers';
-  import { hasChanged } from '@/utils/helpers';
+  import { localeDate, hasChanged } from '@/store/notesStore/helpers';
 
   const props = defineProps<{ notes: Note[] }>();
 
@@ -202,8 +199,8 @@
     if (props.notes.length === 0) return;
 
     const newestNote = props.notes.reduce((newest, current) => {
-      const newestDate = new Date(newest.last_edited || newest.time_created);
-      const currentDate = new Date(current.last_edited || current.time_created);
+      const newestDate = new Date(newest.last_edited || newest.last_edited);
+      const currentDate = new Date(current.last_edited || current.last_edited);
       return currentDate > newestDate ? current : newest;
     });
 

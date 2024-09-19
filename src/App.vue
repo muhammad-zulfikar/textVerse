@@ -26,7 +26,7 @@
     uiStore,
     notesStore,
     folderStore,
-  } from './utils/stores';
+  } from './store';
   import Navbar from '@/components/navbar/navbar.vue';
   import Toast from '@/components/ui/toast.vue';
   import LoadingSpinner from '@/components/ui/loading.vue';

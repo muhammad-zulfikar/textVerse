@@ -3,56 +3,56 @@
     "id": "V1StGXR8_Z5jdHi6B-myT", 
     "title": "A Tale of Two Cities",
     "content": "<p>Set during the French Revolution, this novel contrasts the lives of two men who look alike but have very different fates.</p>",
-    "time_created": "2023-03-15T08:00:00.000Z",
+    "last_edited": "2023-03-15T08:00:00.000Z",
     "folder": "Historical"
   },
   {
     "id": "nJ3XpS1FQt9z7yW5IAdIX",
     "title": "All Quiet on the Western Front",
     "content": "<p>A harrowing account of a German soldier's experiences and disillusionment during World War I.</p>",
-    "time_created": "2022-07-23T09:00:00.000Z",
+    "last_edited": "2022-07-23T09:00:00.000Z",
     "folder": "Historical"
   },
   {
     "id": "2S9b1xOzQyqXyABPl3r5O",
     "title": "Pride and Prejudice",
     "content": "<p>It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.</p>",
-    "time_created": "2021-01-30T10:00:00.000Z",
+    "last_edited": "2021-01-30T10:00:00.000Z",
     "folder": "Literature"
   },
   {
     "id": "zG6B1Ukmz_mcdQnZaKp5S",
     "title": "1984",
     "content": "<p>War is peace.<em>Freedom is slavery.</em> <u>Ignorance is strength.</u> These paradoxes define the dystopian society in which the characters find themselves trapped.</p>",
-    "time_created": "2020-11-05T11:00:00.000Z",
+    "last_edited": "2020-11-05T11:00:00.000Z",
     "folder": "Literature"
   },
   {
     "id": "J7xY8eU-pskO5BqPxZ4xR",
     "title": "To Kill a Mockingbird",
     "content": "<p>You never really understand a person until you consider things from his point of view, until you climb into his skin and walk around in it.</p>",
-    "time_created": "2019-09-14T12:00:00.000Z",
+    "last_edited": "2019-09-14T12:00:00.000Z",
     "folder": "Classics"
   },
   {
     "id": "f9QiRek__2KdYm5CwSjHb",
     "title": "The Great Gatsby",
     "content": "<p><em>So we beat on, boats against the current</em>, borne back ceaselessly into the past. This line captures the essence of Gatsby's tragic pursuit.</p>",
-    "time_created": "2018-04-20T13:00:00.000Z",
+    "last_edited": "2018-04-20T13:00:00.000Z",
     "folder": "Classics"
   },
   {
     "id": "M8SdFyH5IjU7zZrB1cMbG",
     "title": "Brave New World",
     "content": "<p>Words can be like X-rays if you use them properly—<em>they’ll go through anything.</em> You read and you’re pierced by their meaning.</p>",
-    "time_created": "2017-12-10T14:00:00.000Z",
+    "last_edited": "2017-12-10T14:00:00.000Z",
     "folder": "SciFi"
   },
   {
     "id": "R4LQ-VuHn-ZTe5wbx8CfU",
     "title": "Jane Eyre",
     "content": "<p>I am no bird; and <u>no net ensnares me</u>: <em>I am a free human being with an independent will, which I now exert to leave you.</em></p>",
-    "time_created": "2016-08-25T15:00:00.000Z",
+    "last_edited": "2016-08-25T15:00:00.000Z",
     "folder": "SciFi"
   }
 ]
