@@ -1,33 +1,42 @@
 <template>
-  <Button
-    @click="handleClick"
-    :disabled="isSyncing || (!authStore.isLoggedIn && !isSignInMode)"
-  >
-    <component
-      :is="currentIcon"
-      :size="20"
-      :class="{ 'animate-spin': isSpinning }"
-    />
-  </Button>
+  <div>
+    <Button
+      @click="handleClick"
+      :disabled="isSyncing || (!authStore.isLoggedIn && !isSignInMode)"
+    >
+      <component
+        :is="currentIcon"
+        :size="20"
+        :class="{ 'animate-spin': isSpinning }"
+      />
+    </Button>
+  </div>
+  <SignInModal id="signInModal" />
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, watch } from 'vue';
+  import { ref, computed, watch, defineAsyncComponent } from 'vue';
   import {
     PhCloudCheck,
     PhSpinnerGap,
     PhCloudSlash,
     PhSignIn,
   } from '@phosphor-icons/vue';
-  import { useRouter } from 'vue-router';
   import { firebaseStore, authStore, uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
 
-  const router = useRouter();
+  const SignInModal = defineAsyncComponent(
+    () => import('@/components/composable/modal/signInModal.vue')
+  );
+
   const isSyncing = ref(false);
   const isSpinning = ref(false);
   const syncStatus = ref('idle');
   const isSignInMode = ref(!authStore.isLoggedIn);
+
+  const showSigninModal = () => {
+    uiStore.setActiveModal('signInModal');
+  };
 
   const currentIcon = computed(() => {
     if (isSignInMode.value) return PhSignIn;
@@ -38,7 +47,7 @@
 
   const handleClick = () => {
     if (isSignInMode.value) {
-      router.push('/sign-in');
+      showSigninModal();
     } else {
       syncNotes();
     }

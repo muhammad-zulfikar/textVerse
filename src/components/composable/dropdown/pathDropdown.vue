@@ -68,7 +68,7 @@
     router.options.routes.filter(
       (route) =>
         route.name &&
-        route.name !== 'NotFound' &&
+        route.name !== '404' &&
         route.name !== 'About' &&
         route.name !== 'Note' &&
         route.name !== 'Public' &&

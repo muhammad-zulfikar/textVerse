@@ -2,7 +2,7 @@
   <div
     class="max-w-xl md:max-w-2xl py-8 px-4 md:px-8 flex flex-col mx-auto gap-8 overflow-y-auto font-serif select-none"
   >
-    <div class="flex-grow flex flex-col gap-2 md:gap-8">
+    <div class="flex-grow flex flex-col gap-6 md:gap-8">
       <div class="p-4 card">
         <h2 class="text-2xl font-semibold mb-4">Sync your notes</h2>
         <div class="flex flex-col gap-4">

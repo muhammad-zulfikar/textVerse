@@ -7,10 +7,10 @@
     <PhLink :size="20" />
   </button>
   <InputModal
-    :is-open="isLinkModalOpen"
+    id="linkInput"
     mode="link"
     @update="insertLink"
-    @close="closeLinkModal"
+    @cancel="closeLinkModal"
   />
 </template>
 
@@ -18,24 +18,23 @@
   import { ref, onMounted, onUnmounted } from 'vue';
   import { PhLink } from '@phosphor-icons/vue';
   import { uiStore } from '@/store';
-  import InputModal from '@/components/ui/modal/inputModal.vue';
+  import InputModal from '@/components/composable/modal/inputModal.vue';
 
   const isActive = ref(false);
-  const isLinkModalOpen = ref(false);
   const selectedRange = ref<Range | null>(null);
 
   const openLinkModal = () => {
     const selection = window.getSelection();
     if (selection && !selection.isCollapsed) {
       selectedRange.value = selection.getRangeAt(0);
-      isLinkModalOpen.value = true;
+      uiStore.setActiveModal('linkInput');
     } else {
       uiStore.showToastMessage('Please select some text to create a link.');
     }
   };
 
   const closeLinkModal = () => {
-    isLinkModalOpen.value = false;
+    uiStore.setActiveModal(null);
     selectedRange.value = null;
   };
 

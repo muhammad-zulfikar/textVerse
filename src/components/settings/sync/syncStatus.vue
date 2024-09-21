@@ -19,26 +19,36 @@
         <span v-else>Your notes are being synced across devices.</span>
       </p>
     </div>
-    <button
+    <Button
       v-if="authStore.isLoggedIn"
-      @click="confirmSignout"
-      class="card flex items-center justify-center w-full md:w-auto text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
+      @click="openSignOutAlert"
+      class="w-full md:w-auto text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
     >
       <PhSignOut :size="20" class="mr-2" />
       Sign out
-    </button>
-    <router-link
+    </Button>
+    <Button
       v-else
-      to="/sign-in"
-      class="card flex items-center justify-center w-full md:w-auto text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
+      @click="openSignInModal"
+      class="w-full md:w-auto text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
     >
       <PhSignIn :size="20" class="mr-2" />
       Sign in
-    </router-link>
+    </Button>
   </div>
+
+  <SignInModal id="signInModal" />
+
+  <AlertModal
+    id="signOutAlert"
+    :message="signOutMessage"
+    @cancel="closeSignOutAlert"
+    @confirm="signout"
+  />
 </template>
 
 <script setup lang="ts">
+  import { defineAsyncComponent, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import {
     PhCloudSlash,
@@ -47,6 +57,36 @@
     PhSignOut,
   } from '@phosphor-icons/vue';
   import { authStore, uiStore } from '@/store';
+  import Button from '@/components/ui/button.vue';
+
+  const SignInModal = defineAsyncComponent(
+    () => import('@/components/composable/modal/signInModal.vue')
+  );
+
+  const AlertModal = defineAsyncComponent(
+    () => import('@/components/composable/modal/alertModal.vue')
+  );
+
+  const openSignInModal = () => {
+    uiStore.setActiveModal('signInModal');
+  };
+
+  const signOutMessage = ref('');
+
+  const openSignOutAlert = () => {
+    signOutMessage.value =
+      "Are you sure you want to sign out? You won't be able to sync your notes.";
+    uiStore.setActiveModal('signOutAlert');
+  };
+
+  const closeSignOutAlert = () => {
+    uiStore.setActiveModal(null);
+  };
+
+  const signout = () => {
+    uiStore.setActiveModal(null);
+    confirmSignout();
+  };
 
   const router = useRouter();
 

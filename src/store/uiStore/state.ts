@@ -1,7 +1,4 @@
-export type Theme = 'light' | 'dark' | 'system';
-export type ViewType = 'card' | 'table' | 'mail' | 'folder';
-export type NoteViewType = 'modal' | 'sidebar';
-export type SortType = 'date' | 'title';
+import { Theme, ViewType, NoteViewType, SortType } from './types';
 
 export interface UIState {
   theme: Theme;
@@ -10,6 +7,7 @@ export interface UIState {
   columns: number;
   sortType: SortType;
   activeDropdown: string | null;
+  activeModal: string | null;
   showToast: boolean;
   toastMessage: string;
   toastTimeout: number | null;
@@ -28,6 +26,7 @@ export default (): UIState => ({
   columns: 4,
   sortType: 'date',
   activeDropdown: null,
+  activeModal: null,
   showToast: false,
   toastMessage: '',
   toastTimeout: null,

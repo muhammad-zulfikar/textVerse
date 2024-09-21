@@ -203,6 +203,8 @@ export const loadNotes = async (state: NotesState): Promise<void> => {
       deletedNotes = localStore.getDeletedNotesFromLocalStorage();
     }
     state.deletedNotes = Object.values(deletedNotes) || [];
+
+    state.notesLoaded = true;
   } catch (error) {
     console.error('Error loading notes:', error);
     uiStore.showToastMessage('Failed to load notes. Please try again.');

@@ -1,4 +1,5 @@
-import { NoteViewType, SortType, UIState, ViewType } from '@/utils/types';
+import { UIState } from '../state';
+import { ViewType, NoteViewType, SortType } from '../types';
 import { saveSettings } from '.';
 
 export const setViewType = (state: UIState, newViewType: ViewType) => {

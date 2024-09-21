@@ -1,13 +1,13 @@
 <template>
   <div class="absolute inset-0 flex items-center bg-cream-50 dark:bg-gray-700">
-    <div class="flex items-center">
-      <Button @click="deselectAllNotes" class="mr-2 md:mr-4">
+    <div class="flex items-center space-x-2 md:space-x-4">
+      <Button @click="deselectAllNotes">
         <PhX :size="20" />
       </Button>
       <span>{{ selectedNotesCount }} selected</span>
     </div>
-    <div class="flex items-center ml-auto select-button">
-      <Button @click="selectAllNotes" class="mr-2 md:mr-4">
+    <div class="flex items-center space-x-2 md:space-x-4 ml-auto select-button">
+      <Button @click="selectAllNotes">
         <PhChecks :size="20" />
       </Button>
       <Dropdown
@@ -16,7 +16,6 @@
         contentWidth="12rem"
         direction="down"
         position="right"
-        class="mr-2 md:mr-4"
       >
         <template #label>
           <Button>
@@ -30,7 +29,7 @@
             class="w-full rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
           >
             <li
-              @click="openMoveConfirmation(folder)"
+              @click="openMoveAlert(folder)"
               class="text-sm cursor-pointer w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
             >
               <PhFolder
@@ -44,35 +43,31 @@
           </div>
         </div>
       </Dropdown>
-      <Button
-        v-if="isTrashRoute"
-        @click="restoreSelectedNotes"
-        class="mr-2 md:mr-4"
-      >
+      <Button v-if="isTrashRoute" @click="restoreSelectedNotes">
         <PhArrowCounterClockwise :size="20" />
       </Button>
-      <Button v-else @click="togglePinSelected" class="mr-2 md:mr-4">
+      <Button v-else @click="togglePinSelected">
         <component
           :is="allSelectedNotesPinned ? PhPushPinSlash : PhPushPin"
           :size="20"
         />
       </Button>
-      <Button @click="deleteSelectedNotes" variant="danger">
+      <Button @click="openDeleteAlert" variant="danger">
         <PhTrash :size="20" />
       </Button>
     </div>
     <AlertModal
       v-if="isTrashRoute"
-      :is-open="showDeleteConfirmation"
-      :message="'Are you sure you want to permanently delete the selected notes?'"
+      id="selectionDeleteAlert"
+      :message="deleteAlertMessage"
       @confirm="confirmDeleteSelected"
-      @cancel="showDeleteConfirmation = false"
+      @cancel="closeDeleteAlert"
     />
     <AlertModal
-      :is-open="showMoveConfirmation"
-      :message="moveConfirmationMessage"
+      id="selectionMoveAlert"
+      :message="moveAlertMessage"
       @confirm="confirmMoveSelected"
-      @cancel="showMoveConfirmation = false"
+      @cancel="closeMoveAlert"
     />
   </div>
 </template>
@@ -96,14 +91,13 @@
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
 
   const AlertModal = defineAsyncComponent(
-    () => import('@/components/ui/modal/alertModal.vue')
+    () => import('@/components/composable/modal/alertModal.vue')
   );
 
   const route = useRoute();
   const isTrashRoute = computed(() => route.path === '/trash');
-  const showDeleteConfirmation = ref(false);
-  const showMoveConfirmation = ref(false);
-  const moveConfirmationMessage = ref('');
+  const deleteAlertMessage = ref('');
+  const moveAlertMessage = ref('');
   const targetFolder = ref('');
 
   const selectedNotesCount = computed(() => notesStore.selectedNotes.length);
@@ -163,26 +157,36 @@
     uiStore.showToastMessage('Selected notes restored');
   };
 
-  const deleteSelectedNotes = async () => {
+  const openDeleteAlert = async () => {
     if (isTrashRoute.value) {
-      showDeleteConfirmation.value = true;
+      deleteAlertMessage.value =
+        'Are you sure you want to permanently delete the selected notes?';
+      uiStore.setActiveModal('selectionDeleteAlert');
     } else {
       const noteIds = notesStore.selectedNotes;
       await notesStore.batchDeleteNotes(noteIds, false);
     }
   };
 
+  const closeDeleteAlert = async () => {
+    uiStore.setActiveModal(null);
+  };
+
   const confirmDeleteSelected = async () => {
     const noteIds = notesStore.selectedNotes;
     await notesStore.batchDeleteNotes(noteIds, true);
-    showDeleteConfirmation.value = false;
+    uiStore.setActiveModal(null);
   };
 
-  const openMoveConfirmation = (folder: string) => {
+  const openMoveAlert = (folder: string) => {
     targetFolder.value = folder;
-    moveConfirmationMessage.value = `Are you sure you want to move the selected notes to "${folder}"?`;
-    showMoveConfirmation.value = true;
+    moveAlertMessage.value = `Are you sure you want to move the selected notes to "${folder}"?`;
+    uiStore.setActiveModal('selectionMoveAlert');
     uiStore.setActiveDropdown(null);
+  };
+
+  const closeMoveAlert = async () => {
+    uiStore.setActiveModal(null);
   };
 
   const confirmMoveSelected = async () => {
@@ -190,6 +194,6 @@
       notesStore.selectedNotes,
       targetFolder.value
     );
-    showMoveConfirmation.value = false;
+    uiStore.setActiveModal(null);
   };
 </script>

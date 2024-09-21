@@ -1,4 +1,5 @@
-import { Theme, UIState } from '@/utils/types';
+import { UIState } from '../state';
+import { Theme } from '../types';
 import { saveSettings } from '.';
 
 export const setTheme = (state: UIState, newTheme: Theme) => {

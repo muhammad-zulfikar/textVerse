@@ -1,4 +1,4 @@
-import { UIState } from '@/utils/types';
+import { UIState } from '../state';
 
 export const toggleExpand = (state: UIState) => {
   state.isExpanded = !state.isExpanded;
@@ -6,6 +6,10 @@ export const toggleExpand = (state: UIState) => {
 
 export const setActiveDropdown = (state: UIState, dropdown: string | null) => {
   state.activeDropdown = dropdown;
+};
+
+export const setActiveModal = (state: UIState, modal: string | null) => {
+  state.activeModal = modal;
 };
 
 export const showToastMessage = (state: UIState, message: string) => {

@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-  import Button from '../button.vue';
+  import Button from '@/components/ui/button.vue';
   import { PhCheckCircle, PhXCircle } from '@phosphor-icons/vue';
   import { notesStore, uiStore } from '@/store';
 

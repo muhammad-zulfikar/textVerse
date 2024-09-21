@@ -1,10 +1,5 @@
-import {
-  UIState,
-  Theme,
-  ViewType,
-  NoteViewType,
-  SortType,
-} from '@/utils/types';
+import { UIState } from '../state';
+import { Theme, ViewType, NoteViewType, SortType } from '../types';
 import { applyTheme, getValidColumns } from '.';
 import { authStore } from '@/store';
 import { ref, set, onValue, off, get } from 'firebase/database';

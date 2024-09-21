@@ -19,6 +19,7 @@ import {
   updateProfile,
   deleteUser,
   signInWithPopup,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { uiStore } from '@/store';
 
@@ -107,6 +108,20 @@ export const useAuthStore = defineStore('auth', {
       const userCredential = await signInWithPopup(auth, provider);
       this.user = userCredential.user;
       this.avatarUrl = this.user.photoURL || '';
+    },
+
+    async resetPassword(email: string) {
+      try {
+        await sendPasswordResetEmail(auth, email);
+        uiStore.showToastMessage(
+          'Password reset email sent. Please check your inbox.'
+        );
+      } catch (error) {
+        uiStore.showToastMessage(
+          'Failed to send password reset email. Please try again.'
+        );
+        throw error;
+      }
     },
 
     async updateAvatar(newAvatarUrl: string) {

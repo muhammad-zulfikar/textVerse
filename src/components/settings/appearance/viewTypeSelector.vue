@@ -8,30 +8,27 @@
     </div>
     <Dropdown
       label="ViewType"
-      dropdownId="viewtype"
+      dropdownId="viewType"
       contentWidth="8.8rem"
-      content-margin-left="-0.75rem"
-      showArrow="false"
       direction="down"
+      position="right"
     >
       <template #label>
-        <button
-          @click="toggleDropdown"
-          :class="[
-            'card flex items-center relative mt-2 md:mt-0 text-sm md:text-base px-4 py-2',
-          ]"
-        >
+        <Button :class="['text-sm md:text-base px-4 py-2']">
           <component :is="currentViewIcon" :size="20" class="mr-2" />
           {{ viewTypeText }}
           <div
             class="p-1 ml-2 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
-            :class="{ 'rotate-180 bg-cream-300 dark:bg-gray-600': isOpen }"
+            :class="{
+              'rotate-180 bg-cream-300 dark:bg-gray-600':
+                uiStore.activeDropdown === 'viewType',
+            }"
           >
             <PhCaretDown class="size-4" />
           </div>
-        </button>
+        </Button>
       </template>
-      <div class="px-1 text-sm">
+      <div class="px-1 text-sm md:text-base">
         <div
           class="w-full rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
           :class="{
@@ -66,14 +63,12 @@
                   'hover:bg-cream-300 dark:hover:bg-gray-600':
                     uiStore.columns > 1,
                 }"
-                class="text-center text-sm p-2 mb-1 rounded-md transition-colors duration-200"
+                class="text-center p-2 mb-1 rounded-md transition-colors duration-200"
                 :disabled="uiStore.columns <= 1"
               >
                 <PhMinusCircle :size="16" />
               </button>
-              <span
-                class="text-sm text-center mb-1 text-gray-750 dark:text-gray-300"
-              >
+              <span class="text-center mb-1 text-gray-750 dark:text-gray-300">
                 {{ uiStore.columns }}
               </span>
               <button
@@ -84,7 +79,7 @@
                   'hover:bg-cream-300 dark:hover:bg-gray-600':
                     uiStore.columns < (isMobile ? 2 : 4),
                 }"
-                class="text-center text-sm p-2 mb-1 rounded-md transition-colors duration-200"
+                class="p-2 mb-1 rounded-md transition-colors duration-200"
                 :disabled="uiStore.columns >= (isMobile ? 2 : 4)"
               >
                 <PhPlusCircle :size="16" />
@@ -125,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
+  import { computed, ref } from 'vue';
   import {
     PhSquaresFour,
     PhTable,
@@ -136,9 +131,9 @@
     PhPlusCircle,
   } from '@phosphor-icons/vue';
   import { uiStore } from '@/store';
+  import Button from '@/components/ui/button.vue';
   import Dropdown from '@/components/ui/dropdown.vue';
 
-  const isOpen = ref(false);
   const isMobile = ref(window.innerWidth < 640);
 
   const viewTypeText = computed(
@@ -160,10 +155,6 @@
     }
   });
 
-  const toggleDropdown = () => {
-    isOpen.value = !isOpen.value;
-  };
-
   const expandedOption = ref('');
 
   const toggleOptions = (option: string) => {
@@ -176,7 +167,7 @@
       uiStore.setColumns(isMobile.value ? 1 : 4);
     }
     uiStore.showToastMessage('View type updated');
-    isOpen.value = false;
+    uiStore.setActiveDropdown(null);
     expandedOption.value = '';
   };
 
@@ -193,35 +184,4 @@
     }
     uiStore.setViewType('card');
   };
-
-  const handleOutsideClick = (event: MouseEvent) => {
-    const target = event.target as Element;
-    if (!target.closest('[dropdown-id="viewtype"]')) {
-      isOpen.value = false;
-      expandedOption.value = '';
-    }
-  };
-
-  const handleResize = () => {
-    const newIsMobile = window.innerWidth < 640;
-    if (newIsMobile !== isMobile.value) {
-      isMobile.value = newIsMobile;
-      if (isMobile.value && uiStore.columns > 2) {
-        uiStore.setColumns(2);
-      } else if (!isMobile.value && uiStore.columns < 3) {
-        uiStore.setColumns(4);
-      }
-    }
-  };
-
-  onMounted(() => {
-    document.addEventListener('click', handleOutsideClick);
-    window.addEventListener('resize', handleResize);
-    handleResize();
-  });
-
-  onBeforeUnmount(() => {
-    document.removeEventListener('click', handleOutsideClick);
-    window.removeEventListener('resize', handleResize);
-  });
 </script>

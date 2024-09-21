@@ -1,14 +1,12 @@
 <template>
-  <Button @click="toggleSidebar">
-    <PhList :size="20" />
-  </Button>
-
-  <ModalBackdrop v-model="isOpen" @click="closeSidebar" />
-  <transition name="slide-left">
+  <Modal
+    :modelValue="isOpen"
+    :id="id"
+    transition="sidebar-left"
+    @close="closeSidebar"
+  >
     <div
-      v-if="isOpen"
       class="card fixed inset-y-0 left-0 z-50 w-64 shadow-lg overflow-y-auto rounded-lg font-serif text-sm"
-      @click.stop
     >
       <div
         class="flex justify-between items-center px-4 py-[6.5px] bg-cream-50 dark:bg-gray-700"
@@ -49,20 +47,20 @@
 
       <div class="p-2">
         <h2 class="font-bold mb-2 px-2 mt-2">Create</h2>
-        <button
+        <li
           @click="openNoteForm"
-          class="w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+          class="w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center cursor-pointer"
         >
           <PhFile class="size-5 mr-2" />
           Note
-        </button>
-        <button
+        </li>
+        <li
           @click="openFolderForm"
-          class="w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
+          class="w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center cursor-pointer"
         >
           <PhFolder class="size-5 mr-2" />
           Folder
-        </button>
+        </li>
       </div>
 
       <div class="p-2">
@@ -133,28 +131,27 @@
         </transition>
       </div>
     </div>
-  </transition>
+  </Modal>
   <AlertModal
-    :is-open="showSignoutConfirmation"
+    id="signOutAlert"
     :message="`Are you sure you want to sign out? You won't be able to sync your notes.`"
     @cancel="cancelSignout"
     @confirm="signout"
   />
   <InputModal
-    :is-open="isFolderFormOpen"
+    id="folderInput"
     mode="folder"
     :max-length="10"
+    @cancel="closeFolderForm"
     @update="handleFolderSubmit"
-    @close="closeFolderForm"
   />
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, watch, defineAsyncComponent } from 'vue';
+  import { computed, defineAsyncComponent, ref } from 'vue';
   import { useRouter } from 'vue-router';
-  import { authStore, notesStore, folderStore } from '@/store';
+  import { authStore, notesStore, folderStore, uiStore } from '@/store';
   import {
-    PhList,
     PhHouseLine,
     PhGear,
     PhTrash,
@@ -164,35 +161,25 @@
     PhFolder,
     PhCaretUp,
   } from '@phosphor-icons/vue';
-  import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
-  import Button from '@/components/ui/button.vue';
-  import Separator from '../ui/separator.vue';
+  import Modal from '@/components/ui/modal.vue';
+  import Separator from '@/components/ui/separator.vue';
 
   const AlertModal = defineAsyncComponent(
-    () => import('@/components/ui/modal/alertModal.vue')
+    () => import('@/components/composable/modal/alertModal.vue')
   );
 
   const InputModal = defineAsyncComponent(
-    () => import('@/components/ui/modal/inputModal.vue')
+    () => import('@/components/composable/modal/inputModal.vue')
   );
 
-  const isOpen = ref(false);
+  const props = defineProps<{
+    id: string;
+  }>();
+
+  const isOpen = computed(() => uiStore.activeModal === props.id);
+
   const router = useRouter();
   const isUserDropupOpen = ref(false);
-  const showSignoutConfirmation = ref(false);
-  const isFolderFormOpen = ref(false);
-
-  const toggleSidebar = () => {
-    isOpen.value = !isOpen.value;
-    if (!isOpen.value) {
-      isUserDropupOpen.value = false;
-    }
-  };
-
-  const closeSidebar = () => {
-    isOpen.value = false;
-    isUserDropupOpen.value = false;
-  };
 
   const menuItems = [
     { label: 'Home', path: '/', icon: PhHouseLine },
@@ -212,7 +199,7 @@
   });
 
   const signout = async () => {
-    showSignoutConfirmation.value = false;
+    uiStore.setActiveModal(null);
     router.push('/');
     await authStore.logout();
   };
@@ -225,69 +212,58 @@
   const openNote = (noteId: string) => {
     router.push('/');
     notesStore.openNote(noteId);
-    closeSidebar();
   };
 
   const navigateToSettings = () => {
     router.push('/settings');
-    closeSidebar();
+  };
+
+  const closeSidebar = () => {
+    if (
+      uiStore.activeModal === 'signOutAlert' ||
+      uiStore.activeModal === 'folderInput'
+    ) {
+    } else {
+      uiStore.setActiveModal(null);
+    }
   };
 
   const openSignoutAlert = () => {
-    showSignoutConfirmation.value = true;
-    closeSidebar();
+    uiStore.setActiveModal('signOutAlert');
   };
 
   const cancelSignout = () => {
-    showSignoutConfirmation.value = false;
+    uiStore.setActiveModal('sidebar');
   };
 
   const handleMenuItemClick = (item: any) => {
     if (item.action) {
       item.action();
     }
-    closeSidebar();
   };
 
   const openNoteForm = () => {
     router.push('/');
+    uiStore.setActiveModal(null);
     notesStore.openNote(null);
-    closeSidebar();
   };
 
   const openFolderForm = () => {
     router.push('/');
-    isFolderFormOpen.value = true;
-    closeSidebar();
+    uiStore.setActiveModal('folderInput');
   };
 
   const closeFolderForm = () => {
-    isFolderFormOpen.value = false;
+    uiStore.setActiveModal('sidebar');
   };
 
   const handleFolderSubmit = (folderName: string) => {
     folderStore.addFolder(folderName);
     closeFolderForm();
   };
-
-  watch(isOpen, (newValue) => {
-    if (!newValue) {
-      isUserDropupOpen.value = false;
-    }
-  });
 </script>
 
 <style scoped>
-  .slide-left-enter-active,
-  .slide-left-leave-active {
-    transition: transform 0.3s ease;
-  }
-
-  .slide-left-enter-from,
-  .slide-left-leave-to {
-    transform: translateX(-100%);
-  }
-
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.3s ease;

@@ -42,7 +42,13 @@
 
   const openNoteWithDelay = (noteId: string, delay: number = 600) => {
     setTimeout(() => {
-      notesStore.openNote(noteId);
+      const noteExists = notesStore.notes.some((note) => note.id === noteId);
+      if (noteExists) {
+        notesStore.openNote(noteId);
+      } else {
+        uiStore.showToastMessage('Note not found');
+        notesStore.closeNote();
+      }
     }, delay);
   };
 
@@ -87,7 +93,7 @@
     }
   };
 
-  const loadNotesAndSetLoading = async () => {
+  const loadNotes = async () => {
     try {
       await notesStore.loadNotes();
     } catch (error) {
@@ -106,13 +112,30 @@
     window.removeEventListener('popstate', handlePopState);
   };
 
-  onMounted(async () => {
-    await loadNotesAndSetLoading();
-
-    if (route.name === 'Note') {
-      const noteId = route.params.id as string;
-      openNoteWithDelay(noteId);
+  const loadNoteById = async (noteId: string) => {
+    if (!notesStore.notesLoaded) {
+      await loadNotes();
     }
+
+    const note = notesStore.notes.find((n) => n.id === noteId);
+    if (note) {
+      notesStore.openNote(noteId);
+    } else {
+      console.log('Note not found:', noteId);
+      uiStore.showToastMessage('Note not found');
+      notesStore.closeNote();
+    }
+  };
+
+  onMounted(async () => {
+    if (!notesStore.notesLoaded) {
+      await loadNotes();
+    }
+
+    if (route.name === 'Note' && route.params.id) {
+      await loadNoteById(route.params.id as string);
+    }
+
     setupEventListeners();
   });
 

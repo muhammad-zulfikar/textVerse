@@ -15,13 +15,13 @@
       @change="handleFileUpload"
       class="hidden"
     />
-    <button
+    <Button
       @click="triggerFileInput"
-      class="card flex items-center justify-center w-full md:w-auto text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
+      class="w-full md:w-auto text-sm md:text-base py-2 px-4 mt-4 md:mt-0"
     >
       <PhUpload :size="20" class="mr-2" />
       Import notes
-    </button>
+    </Button>
   </div>
 </template>
 
@@ -29,6 +29,7 @@
   import { PhUpload } from '@phosphor-icons/vue';
   import { notesStore } from '@/store';
   import { ref } from 'vue';
+  import Button from '@/components/ui/button.vue';
 
   const fileInput = ref<HTMLInputElement | null>(null);
 

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import stateFactory from './state';
 import * as actions from './actions';
-import { UIState } from '@/utils/types';
+import { UIState } from './state';
 
 type ActionType = typeof actions;
 

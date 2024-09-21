@@ -1,29 +1,22 @@
 <template>
-  <ModalBackdrop v-model="props.isOpen" />
-  <transition name="zoom">
-    <div
-      v-show="props.isOpen"
-      class="fixed inset-0 z-40 flex items-center justify-center font-serif"
-    >
-      <div @click="handleOutsideClick" class="absolute inset-0"></div>
-      <div ref="modalContainer" :class="modalClasses">
-        <div class="flex w-full pt-2 md:pt-4 select-none">
-          <NoteToolbar v-bind="toolbarProps" />
-        </div>
-        <div
-          class="w-full bg-transparent pt-2 md:pt-4 md:pb-2 flex-grow overflow-y-auto flex flex-col"
-        >
-          <TextEditor
-            v-model="editedNote.content"
-            @update:modelValue="updateNoteContent"
-            :showToolbar="true"
-            :editable="true"
-            class="h-full flex-grow overflow-y-auto"
-          />
-        </div>
+  <Modal :modelValue="props.isOpen" id="noteModal" @close="clickOutside">
+    <div ref="modalContainer" :class="modalClasses">
+      <div class="flex w-full pt-2 md:pt-4 select-none">
+        <NoteToolbar v-bind="toolbarProps" />
+      </div>
+      <div
+        class="w-full bg-transparent pt-2 md:pt-4 md:pb-2 flex-grow overflow-y-auto flex flex-col"
+      >
+        <TextEditor
+          v-model="editedNote.content"
+          @update:modelValue="updateNoteContent"
+          :showToolbar="true"
+          :editable="true"
+          class="h-full flex-grow overflow-y-auto"
+        />
       </div>
     </div>
-  </transition>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -37,7 +30,7 @@
     hasChanged,
     isContentEmpty,
   } from '@/store/notesStore/helpers';
-  import ModalBackdrop from '@/components/ui/modal/backdropModal.vue';
+  import Modal from '@/components/ui/modal.vue';
   import NoteToolbar from './noteToolbar.vue';
   import TextEditor from '@/components/textEditor/textEditor.vue';
 
@@ -128,7 +121,7 @@
     debouncedSaveNote();
   }
 
-  async function handleOutsideClick() {
+  async function clickOutside() {
     if (isContentEmpty(editedNote.value.content)) {
       if (editedNote.value.id) {
         await notesStore.deleteNote(editedNote.value.id);
@@ -180,7 +173,8 @@
           isEditing.value = false;
         }
       }
-    }
+    },
+    { immediate: true }
   );
 
   onMounted(() => {

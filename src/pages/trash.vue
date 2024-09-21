@@ -29,7 +29,7 @@
           </p>
           <Button
             variant="danger"
-            @click="emptyTrash"
+            @click="openEmptyTrashAlert"
             class="mt-3 md:mt-0 md:ml-4 text-sm"
           >
             <PhTrash :size="20" class="mr-2" />
@@ -56,7 +56,7 @@
           <li
             v-for="note in deletedNotes"
             :key="note.id"
-            class="notes bg-cream-300 dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 break-inside-avoid h-min mb-[9px] p-2 cursor-pointer relative group select-none"
+            class="notes bg-cream-100 dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 break-inside-avoid h-min mb-[9px] p-2 cursor-pointer relative group select-none"
             :class="{
               'z-50': showMenu && notesStore.selectedNote?.id === note.id,
               shadow: notesStore.selectedNotes.includes(note.id),
@@ -97,7 +97,7 @@
               >
                 <div class="flex items-center text-left text-[10px] md:text-xs">
                   <div
-                    @click.stop="permanentlyDeleteNote(note.id)"
+                    @click.stop="openDeleteNoteAlert(note.id)"
                     class="flex items-center px-2 py-1 mr-2 cursor-pointer truncate card text-red-500 hover:text-red-100 hover:bg-red-700/50 dark:hover:bg-red-800/60"
                   >
                     <PhTrash :size="16" />
@@ -118,15 +118,6 @@
                     {{ note.folder }}
                   </p>
                 </div>
-                <div class="text-left text-[10px] md:text-xs">
-                  <p
-                    v-if="!isMobile && uiStore.columns < 5"
-                    class="flex items-center px-2 py-1 cursor-pointer truncate card"
-                  >
-                    <PhCalendarBlank :size="16" class="mr-2" />
-                    {{ localeDate(note.last_edited) }}
-                  </p>
-                </div>
               </div>
             </div>
           </li>
@@ -134,17 +125,17 @@
       </div>
 
       <AlertModal
-        :is-open="isDeleteAlertOpen"
-        :message="deleteAlertMessage"
+        id="deleteNoteAlert"
+        :message="deleteNoteAlertMessage"
         @confirm="confirmPermanentlyDeleteNote"
-        @cancel="isDeleteAlertOpen = false"
+        @cancel="closeDeleteAlert"
       />
 
       <AlertModal
-        :is-open="isEmptyTrashAlertOpen"
+        id="emptyTrashAlert"
         :message="emptyTrashAlertMessage"
         @confirm="confirmEmptyTrash"
-        @cancel="isEmptyTrashAlertOpen = false"
+        @cancel="closeEmptyTrashAlert"
       />
     </div>
   </div>
@@ -154,22 +145,19 @@
   import { ref, computed, onMounted, onUnmounted } from 'vue';
   import { notesStore, uiStore } from '@/store';
   import LoadingSpinner from '@/components/ui/loading.vue';
-  import AlertModal from '@/components/ui/modal/alertModal.vue';
+  import AlertModal from '@/components/composable/modal/alertModal.vue';
   import {
     PhCheck,
     PhFolder,
     PhTrash,
     PhClockClockwise,
-    PhCalendarBlank,
   } from '@phosphor-icons/vue';
   import DOMPurify from 'dompurify';
   import Button from '@/components/ui/button.vue';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
-  import { localeDate } from '@/store/notesStore/helpers';
 
   const showMenu = ref(false);
   const selectedNotes = ref<string[]>([]);
-  const isMobile = window.innerWidth <= 768;
 
   const deletedNotes = computed(() => notesStore.deletedNotes);
 
@@ -211,16 +199,22 @@
     }
   };
 
-  const isDeleteAlertOpen = ref(false);
-  const isEmptyTrashAlertOpen = ref(false);
-  const deleteAlertMessage = ref('');
+  const deleteNoteAlertMessage = ref('');
   const emptyTrashAlertMessage = ref('');
   const noteToDelete = ref<string | null>(null);
 
-  const permanentlyDeleteNote = (noteId: string) => {
+  const closeDeleteAlert = () => {
+    uiStore.setActiveModal(null);
+  };
+
+  const closeEmptyTrashAlert = () => {
+    uiStore.setActiveModal(null);
+  };
+
+  const openDeleteNoteAlert = (noteId: string) => {
     noteToDelete.value = noteId;
-    isDeleteAlertOpen.value = true;
-    deleteAlertMessage.value =
+    uiStore.setActiveModal('deleteNoteAlert');
+    deleteNoteAlertMessage.value =
       'Are you sure you want to permanently delete this note? This action cannot be undone.';
   };
 
@@ -234,7 +228,7 @@
         uiStore.showToastMessage('Failed to delete note. Please try again.');
       }
     }
-    isDeleteAlertOpen.value = false;
+    uiStore.setActiveModal(null);
     noteToDelete.value = null;
   };
 
@@ -248,8 +242,8 @@
     }
   };
 
-  const emptyTrash = () => {
-    isEmptyTrashAlertOpen.value = true;
+  const openEmptyTrashAlert = () => {
+    uiStore.setActiveModal('emptyTrashAlert');
     emptyTrashAlertMessage.value =
       'Are you sure you want to empty the trash? This action cannot be undone.';
   };
@@ -262,7 +256,7 @@
       console.error('Error emptying trash:', error);
       uiStore.showToastMessage('Failed to empty trash. Please try again.');
     }
-    isEmptyTrashAlertOpen.value = false;
+    uiStore.setActiveModal(null);
   };
 
   const handleOutsideClick = (event: MouseEvent) => {

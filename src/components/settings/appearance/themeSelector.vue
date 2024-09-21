@@ -1,5 +1,3 @@
-<!--themeSelector-->
-
 <template>
   <div class="flex items-center justify-between relative md:mb-2">
     <div class="mr-6">
@@ -10,28 +8,25 @@
     </div>
     <Dropdown
       label="Theme"
-      dropdownId="theme"
+      dropdownId="themeDropdown"
       contentWidth="8rem"
-      content-margin-left="-0.75rem"
-      showArrow="false"
       direction="down"
+      position="right"
     >
       <template #label>
-        <button
-          @click="toggleDropdown"
-          :class="[
-            'card flex items-center relative mt-2 md:mt-0 text-sm md:text-base px-4 py-2',
-          ]"
-        >
+        <Button :class="['text-sm md:text-base px-4 py-2']">
           <component :is="currentThemeIcon" :size="20" class="mr-2" />
           {{ currentThemeText }}
           <div
             class="p-1 ml-2 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
-            :class="{ 'rotate-180 bg-cream-300 dark:bg-gray-600': isOpen }"
+            :class="{
+              'rotate-180 bg-cream-300 dark:bg-gray-600':
+                uiStore.activeDropdown === 'themeDropdown',
+            }"
           >
             <PhCaretDown class="size-4" />
           </div>
-        </button>
+        </Button>
       </template>
       <a
         v-for="theme in themes"
@@ -48,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
+  import { computed } from 'vue';
   import {
     PhDesktopTower,
     PhSun,
@@ -56,9 +51,9 @@
     PhCaretDown,
   } from '@phosphor-icons/vue';
   import { uiStore } from '@/store';
+  import Button from '@/components/ui/button.vue';
   import Dropdown from '@/components/ui/dropdown.vue';
 
-  const isOpen = ref(false);
   const themes = ['system', 'dark', 'light'];
 
   const currentThemeText = computed(
@@ -89,25 +84,6 @@
 
   const setTheme = (theme: 'light' | 'dark' | 'system') => {
     uiStore.setTheme(theme);
-    isOpen.value = false;
+    uiStore.setActiveDropdown(null);
   };
-
-  const toggleDropdown = () => {
-    isOpen.value = !isOpen.value;
-  };
-
-  const handleOutsideClick = (event: MouseEvent) => {
-    const target = event.target as Element;
-    if (!target.closest('[dropdown-id="theme"]')) {
-      isOpen.value = false;
-    }
-  };
-
-  onMounted(() => {
-    document.addEventListener('click', handleOutsideClick);
-  });
-
-  onBeforeUnmount(() => {
-    document.removeEventListener('click', handleOutsideClick);
-  });
 </script>

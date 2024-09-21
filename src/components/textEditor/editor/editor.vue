@@ -7,17 +7,14 @@
       @input="handleInput"
       @keydown="handleKeyDown"
     ></div>
-    <ImageViewModal
-      :is-open="isImageModalOpen"
-      :avatar-url="currentImageUrl"
-      @close="closeImageModal"
-    />
+    <ImageViewModal id="imageViewModal" :avatar-url="currentImageUrl" />
   </div>
 </template>
 
 <script setup lang="ts">
   import { ref, onMounted, watch, provide } from 'vue';
-  import ImageViewModal from '@/components/ui/modal/imageViewModal.vue';
+  import ImageViewModal from '@/components/composable/modal/imageViewModal.vue';
+  import { uiStore } from '@/store';
 
   const props = defineProps<{
     modelValue: string;
@@ -29,7 +26,6 @@
   }>();
 
   const editorRef = ref<HTMLElement | null>(null);
-  const isImageModalOpen = ref(false);
   const currentImageUrl = ref('');
 
   const handleInput = () => {
@@ -47,11 +43,7 @@
 
   const openImageModal = (imageUrl: string) => {
     currentImageUrl.value = imageUrl;
-    isImageModalOpen.value = true;
-  };
-
-  const closeImageModal = () => {
-    isImageModalOpen.value = false;
+    uiStore.setActiveModal('imageViewModal');
   };
 
   onMounted(() => {

@@ -4,7 +4,6 @@
     contentWidth="12rem"
     direction="down"
     position="left"
-    class="md:my-6 z-20"
   >
     <template #label>
       <Button>
@@ -90,19 +89,19 @@
   </Dropdown>
 
   <InputModal
-    :is-open="isModalOpen"
+    id="folderDropdownInput"
     mode="folder"
     :current-value="currentFolderName"
     :max-length="10"
+    @cancel="closeModal"
     @update="handleModalSubmit"
-    @close="closeModal"
   />
 
-  <alertModal
-    :is-open="isAlertOpen"
-    :message="AlertMessage"
-    @confirm="handleAlert"
+  <AlertModal
+    id="folderDropdownAlert"
+    :message="alertMessage"
     @cancel="closeAlert"
+    @confirm="handleAlert"
   />
 </template>
 
@@ -119,20 +118,18 @@
     PhTrash,
   } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
-  import InputModal from '@/components/ui/modal/inputModal.vue';
-  import alertModal from '@/components/ui/modal/alertModal.vue';
+  import InputModal from '@/components/composable/modal/inputModal.vue';
+  import AlertModal from '@/components/composable/modal/alertModal.vue';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
   import Button from '@/components/ui/button.vue';
 
   const selectedFolder = computed(() => folderStore.currentFolder);
   const notesCountByFolder = computed(() => folderStore.notesCountByFolder());
 
-  const isModalOpen = ref(false);
   const modalMode = ref<'create' | 'rename'>('create');
   const currentFolderName = ref('');
 
-  const isAlertOpen = ref(false);
-  const AlertMessage = ref('');
+  const alertMessage = ref('');
   const folderToDelete = ref('');
 
   const expandedFolder = ref('');
@@ -158,8 +155,8 @@
   const openRenameModal = (folder: string) => {
     modalMode.value = 'rename';
     currentFolderName.value = folder;
-    isModalOpen.value = true;
     uiStore.setActiveDropdown(null);
+    uiStore.setActiveModal('folderDropdownInput');
   };
 
   const sortedFolders = computed(() => {
@@ -183,7 +180,7 @@
   });
 
   const closeModal = () => {
-    isModalOpen.value = false;
+    uiStore.setActiveModal(null);
   };
 
   const handleModalSubmit = (folderName: string) => {
@@ -199,14 +196,14 @@
   };
 
   const openDeleteAlert = (folder: string) => {
-    isAlertOpen.value = true;
     uiStore.setActiveDropdown(null);
+    uiStore.setActiveModal('folderDropdownAlert');
     folderToDelete.value = folder;
-    AlertMessage.value = `Are you sure you want to delete the folder "${folder}"?`;
+    alertMessage.value = `Are you sure you want to delete the folder "${folder}"?`;
   };
 
   const closeAlert = () => {
-    isAlertOpen.value = false;
+    uiStore.setActiveModal(null);
   };
 
   const handleAlert = () => {

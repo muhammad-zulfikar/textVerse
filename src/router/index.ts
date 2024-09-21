@@ -39,8 +39,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/:catchAll(.*)',
-    name: 'NotFound',
-    component: () => import('@/pages/notFound.vue'),
+    name: '404',
+    component: () => import('@/pages/404.vue'),
   },
 ];
 

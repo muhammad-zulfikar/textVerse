@@ -6,12 +6,14 @@ export const openNote = (state: NotesState, noteId: string | null): void => {
   if (noteId) {
     window.history.pushState({}, '', `/${noteId}`);
   }
+  uiStore.setActiveDropdown(null);
   uiStore.openNoteView();
 };
 
 export const closeNote = (state: NotesState): void => {
   state.selectedNoteId = null;
   window.history.pushState({}, '', '/');
+  uiStore.setActiveDropdown(null);
   uiStore.closeNoteView();
 };
 

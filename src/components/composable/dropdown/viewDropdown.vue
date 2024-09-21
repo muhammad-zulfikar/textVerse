@@ -129,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted } from 'vue';
+  import { ref, onMounted } from 'vue';
   import { uiStore } from '@/store';
   import {
     PhSquaresFour,
@@ -178,24 +178,7 @@
     uiStore.setViewType('card');
   };
 
-  const handleResize = () => {
-    const newIsMobile = window.innerWidth < 640;
-    if (newIsMobile !== isMobile.value) {
-      isMobile.value = newIsMobile;
-      if (isMobile.value && uiStore.columns > 2) {
-        uiStore.setColumns(2);
-      } else if (!isMobile.value && uiStore.columns < 3) {
-        uiStore.setColumns(5);
-      }
-    }
-  };
-
   onMounted(() => {
-    window.addEventListener('resize', handleResize);
-    handleResize();
-  });
-
-  onUnmounted(() => {
-    window.removeEventListener('resize', handleResize);
+    uiStore.handleResize();
   });
 </script>

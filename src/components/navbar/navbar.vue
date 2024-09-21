@@ -10,7 +10,9 @@
             v-if="!isSelectModeActive && !isSearchExpanded"
             class="flex items-center"
           >
-            <Sidebar />
+            <Button @click="openSidebar">
+              <PhList :size="20" />
+            </Button>
             <div class="mr-2 md:mr-4"></div>
             <Path v-if="!isPublicPage" />
           </div>
@@ -66,37 +68,27 @@
       </div>
     </div>
     <Separator />
-    <AlertModal
-      :is-open="showSignoutConfirmation"
-      :message="`Are you sure you want to sign out? You won't be able to sync your notes.`"
-      @cancel="showSignoutConfirmation = false"
-      @confirm="signout"
-    />
   </div>
+
+  <Sidebar id="sidebar" />
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, defineAsyncComponent } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-  import { PhX } from '@phosphor-icons/vue';
-  import { authStore, notesStore } from '@/store';
+  import { ref, computed } from 'vue';
+  import { useRoute } from 'vue-router';
+  import { PhList, PhX } from '@phosphor-icons/vue';
+  import { notesStore, uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
   import Separator from '@/components/ui/separator.vue';
   import SearchBar from '@/components/navbar/searchBar.vue';
-  import Create from '@/components/ui/dropdown/createDropdown.vue';
-  import SyncButton from '@/components/ui/button/syncButton.vue';
-  import Path from '@/components/ui/dropdown/pathDropdown.vue';
-  import View from '@/components/ui/dropdown/viewDropdown.vue';
+  import Create from '@/components/composable/dropdown/createDropdown.vue';
+  import SyncButton from '@/components/composable/button/syncButton.vue';
+  import Path from '@/components/composable/dropdown/pathDropdown.vue';
+  import View from '@/components/composable/dropdown/viewDropdown.vue';
   import Sidebar from '@/components/navbar/sidebar.vue';
   import SelectionModeOverlay from '@/components/navbar/selectionModeOverlay.vue';
 
-  const AlertModal = defineAsyncComponent(
-    () => import('@/components/ui/modal/alertModal.vue')
-  );
-
-  const router = useRouter();
   const route = useRoute();
-  const showSignoutConfirmation = ref(false);
   const isSearchExpanded = ref(false);
 
   const setSearchExpanded = (expanded: boolean) => {
@@ -107,6 +99,10 @@
     if (notesStore && notesStore.setSearchQuery) {
       notesStore.setSearchQuery(query);
     }
+  };
+
+  const openSidebar = () => {
+    uiStore.setActiveModal('sidebar');
   };
 
   const isHomePage = computed(() => {
@@ -120,12 +116,6 @@
   const isSelectModeActive = computed(
     () => notesStore.selectedNotes.length > 0
   );
-
-  const signout = async () => {
-    await authStore.logout();
-    showSignoutConfirmation.value = false;
-    router.push('/');
-  };
 </script>
 
 <style scoped>
