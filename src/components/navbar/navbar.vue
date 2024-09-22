@@ -69,8 +69,6 @@
     </div>
     <Separator />
   </div>
-
-  <Sidebar id="sidebar" />
 </template>
 
 <script setup lang="ts">
@@ -85,7 +83,6 @@
   import SyncButton from '@/components/composable/button/syncButton.vue';
   import Path from '@/components/composable/dropdown/pathDropdown.vue';
   import View from '@/components/composable/dropdown/viewDropdown.vue';
-  import Sidebar from '@/components/navbar/sidebar.vue';
   import SelectionModeOverlay from '@/components/navbar/selectionModeOverlay.vue';
 
   const route = useRoute();

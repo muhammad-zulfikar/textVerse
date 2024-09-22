@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', {
       return new Promise<void>((resolve) => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           this.user = user;
-          this.avatarUrl = user?.photoURL || '/avatar.png';
+          this.avatarUrl = user?.photoURL || '/icons/avatar.png';
           this.isLoading = false;
           unsubscribe();
           resolve();

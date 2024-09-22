@@ -17,37 +17,28 @@
       Delete all data
     </Button>
   </div>
-
-  <AlertModal
-    id="deleteDataAlert"
-    :message="deleteDataMessage"
-    @cancel="cancelDeleteData"
-    @confirm="deleteData"
-  />
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
   import { PhTrash } from '@phosphor-icons/vue';
   import { notesStore, uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
-  import AlertModal from '@/components/composable/modal/alertModal.vue';
-
-  const deleteDataMessage = ref('');
 
   const showDeleteDataAlert = () => {
-    deleteDataMessage.value =
-      'Are you sure you want to delete all of your data? This action cannot be undone.';
-    uiStore.setActiveModal('deleteDataAlert');
-  };
-
-  const cancelDeleteData = () => {
-    uiStore.setActiveModal(null);
-  };
-
-  const deleteData = () => {
-    uiStore.setActiveModal(null);
-    notesStore.deleteAllNotes();
-    uiStore.showToastMessage('All data deleted successfully');
+    uiStore.openAlertModal({
+      message: `Are you sure you want to delete all of your data?`,
+      confirm: async () => {
+        try {
+          await notesStore.deleteAllNotes();
+          uiStore.setActiveModal(null);
+          uiStore.showToastMessage('All data deleted successfully');
+        } catch (error) {
+          uiStore.showToastMessage('Failed to delete your data');
+        }
+      },
+      cancel: () => {
+        uiStore.setActiveModal(null);
+      },
+    });
   };
 </script>

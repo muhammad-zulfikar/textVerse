@@ -226,7 +226,7 @@
             <div
               v-for="folder in availableFolders"
               :key="folder"
-              @click="updateFolder(folder)"
+              @click="moveNote(folder)"
               class="p-2 cursor-pointer rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
               :class="{
                 'bg-cream-200 dark:bg-gray-700': folder === folderValue,
@@ -333,8 +333,8 @@
   const copyNote = () => copyNoteContentToClipboard(props.note.value);
   const duplicateNote = () => notesStore.duplicateNote(props.note.value);
 
-  const updateFolder = (folder: string) =>
-    notesStore.updateNote(props.note.value.id, { ...props.note.value, folder });
+  const moveNote = (folder: string) =>
+    notesStore.moveNote(props.note.value.id, folder);
 
   const deleteNote = async () => {
     await notesStore.deleteNote(props.note.value.id);

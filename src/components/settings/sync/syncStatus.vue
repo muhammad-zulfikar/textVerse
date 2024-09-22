@@ -36,19 +36,9 @@
       Sign in
     </Button>
   </div>
-
-  <SignInModal id="signInModal" />
-
-  <AlertModal
-    id="signOutAlert"
-    :message="signOutMessage"
-    @cancel="closeSignOutAlert"
-    @confirm="signout"
-  />
 </template>
 
 <script setup lang="ts">
-  import { defineAsyncComponent, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import {
     PhCloudSlash,
@@ -59,43 +49,23 @@
   import { authStore, uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
 
-  const SignInModal = defineAsyncComponent(
-    () => import('@/components/composable/modal/signInModal.vue')
-  );
-
-  const AlertModal = defineAsyncComponent(
-    () => import('@/components/composable/modal/alertModal.vue')
-  );
-
   const openSignInModal = () => {
     uiStore.setActiveModal('signInModal');
   };
 
-  const signOutMessage = ref('');
-
-  const openSignOutAlert = () => {
-    signOutMessage.value =
-      "Are you sure you want to sign out? You won't be able to sync your notes.";
-    uiStore.setActiveModal('signOutAlert');
-  };
-
-  const closeSignOutAlert = () => {
-    uiStore.setActiveModal(null);
-  };
-
-  const signout = () => {
-    uiStore.setActiveModal(null);
-    confirmSignout();
-  };
-
   const router = useRouter();
 
-  const confirmSignout = async () => {
-    try {
-      await authStore.logout();
-      router.push('/');
-    } catch (error) {
-      uiStore.showToastMessage('Error logging out, please try again later');
-    }
+  const openSignOutAlert = () => {
+    uiStore.openAlertModal({
+      message: `Are you sure you want to sign out? You won't be able to sync your notes.`,
+      confirm: async () => {
+        await authStore.logout();
+        uiStore.setActiveModal(null);
+        router.push('/');
+      },
+      cancel: () => {
+        uiStore.setActiveModal(null);
+      },
+    });
   };
 </script>

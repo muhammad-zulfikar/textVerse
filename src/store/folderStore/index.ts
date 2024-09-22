@@ -15,7 +15,6 @@ export const useFolderStore = defineStore('folders', {
         this.folders.push(folderName);
         await this.saveFolders();
       }
-      uiStore.showToastMessage(`Folder ${folderName} successfully created`);
     },
 
     async renameFolder(oldName: string, newName: string) {
@@ -48,7 +47,6 @@ export const useFolderStore = defineStore('folders', {
           localStorage.setItem('notes', JSON.stringify(updatedNotes));
         }
       }
-      uiStore.showToastMessage(`Folder renamed to ${newName}`);
     },
 
     async deleteFolder(folderName: string) {

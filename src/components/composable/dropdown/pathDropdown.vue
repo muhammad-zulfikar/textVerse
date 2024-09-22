@@ -38,14 +38,8 @@
 <script setup lang="ts">
   import { computed } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { authStore, uiStore } from '@/store';
-  import {
-    PhTrash,
-    PhHouseLine,
-    PhInfo,
-    PhGear,
-    PhSignIn,
-  } from '@phosphor-icons/vue';
+  import { uiStore } from '@/store';
+  import { PhTrash, PhHouseLine, PhInfo, PhGear } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
   import Button from '@/components/ui/button.vue';
 
@@ -72,7 +66,7 @@
         route.name !== 'About' &&
         route.name !== 'Note' &&
         route.name !== 'Public' &&
-        !(route.name === 'Sign In' && authStore.isLoggedIn)
+        !(route.name === 'Sign In')
     )
   );
 
@@ -84,8 +78,6 @@
         return PhGear;
       case 'Trash':
         return PhTrash;
-      case 'Sign In':
-        return PhSignIn;
       default:
         return PhInfo;
     }

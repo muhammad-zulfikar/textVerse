@@ -5,6 +5,8 @@ export interface NotesState {
   notesLoaded: boolean;
   deletedNotes: Note[];
   deletedNotesLoaded: boolean;
+  noteToDelete: string;
+  notesToDelete: string[];
   selectedNotes: string[];
   selectedNoteId: string | null;
   searchQuery: string;
@@ -18,6 +20,8 @@ export default (): NotesState => ({
   notesLoaded: false,
   deletedNotes: [],
   deletedNotesLoaded: false,
+  noteToDelete: '',
+  notesToDelete: [],
   selectedNotes: [],
   selectedNoteId: null,
   searchQuery: '',

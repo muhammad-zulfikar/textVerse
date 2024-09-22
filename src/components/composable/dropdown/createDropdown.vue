@@ -27,26 +27,13 @@
       </li>
     </div>
   </Dropdown>
-
-  <InputModal
-    id="folderInput"
-    mode="folder"
-    :max-length="10"
-    @update="handleFolderSubmit"
-    @cancel="closeFolderForm"
-  />
 </template>
 
 <script setup lang="ts">
-  import { defineAsyncComponent } from 'vue';
   import { uiStore, notesStore, folderStore } from '@/store';
   import { PhPlus, PhFile, PhFolder } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
   import Button from '@/components/ui/button.vue';
-
-  const InputModal = defineAsyncComponent(
-    () => import('@/components/composable/modal/inputModal.vue')
-  );
 
   const openNoteForm = () => {
     notesStore.openNote(null);
@@ -54,16 +41,16 @@
   };
 
   const openFolderForm = () => {
-    uiStore.setActiveDropdown(null);
-    uiStore.setActiveModal('folderInput');
-  };
-
-  const closeFolderForm = () => {
-    uiStore.setActiveModal('folderInput');
-  };
-
-  const handleFolderSubmit = (folderName: string) => {
-    folderStore.addFolder(folderName);
-    closeFolderForm();
+    uiStore.openInputModal({
+      mode: 'folder',
+      maxLength: 10,
+      cancel: () => {
+        uiStore.setActiveModal(null);
+      },
+      confirm: (folderName: string) => {
+        folderStore.addFolder(folderName);
+        uiStore.showToastMessage(`Folder ${folderName} successfully created`);
+      },
+    });
   };
 </script>

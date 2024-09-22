@@ -1,5 +1,5 @@
 <template>
-  <Modal :modelValue="isOpen" :id="id">
+  <Modal :modelValue="isOpen" id="input">
     <div
       class="card flex flex-col font-serif p-5 relative w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3"
     >
@@ -8,7 +8,7 @@
         v-model="inputValue"
         @focus="handleFocus"
         @blur="handleBlur"
-        :placeholder="placeholder"
+        :placeholder="placeholderText"
         class="w-full p-1 bg-transparent border-0 border-b-[1px] border-black dark:border-white outline-none placeholder-black dark:placeholder-white placeholder-opacity-50"
       />
       <span
@@ -20,118 +20,124 @@
       >
         {{ inputValue.length }} / {{ maxLength }}
       </span>
-      <div class="flex justify-end mt-6">
-        <button
-          @click="closeModal"
-          class="flex items-center px-2 py-1 card hover:bg-cream-300 dark:hover:bg-gray-700 mr-4 cursor-pointer"
-        >
+      <div class="flex justify-end mt-6 space-x-4">
+        <Button @click="handleCancel">
           <PhProhibit :size="20" class="mr-2" />
           <span class="text-sm">Cancel</span>
-        </button>
-        <button
-          @click="handleSubmit"
-          :disabled="!isValid"
-          :class="[
-            'text-sm flex items-center px-2 py-1 card hover:bg-cream-300 dark:hover:bg-gray-700',
-            {
-              'text-blue-500 hover:text-blue-600 hover:bg-blue-700': isValid,
-              'text-gray-400 cursor-default': !isValid,
-            },
-          ]"
-        >
-          <PhCheckCircle :size="20" class="size-5 mr-2" />
-          <span>Save</span>
-        </button>
+        </Button>
+        <Button @click="handleConfirm" variant="confirm" :disabled="!isValid">
+          <div v-if="mode !== 'email'" class="flex items-center">
+            <PhCheckCircle :size="20" class="mr-2" />
+            <span>Save</span>
+          </div>
+          <div v-else class="flex items-center">
+            <PhPaperPlaneTilt :size="20" class="mr-2" />
+            <span>Send</span>
+          </div>
+        </Button>
       </div>
     </div>
   </Modal>
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, watch } from 'vue';
-  import { PhProhibit, PhCheckCircle } from '@phosphor-icons/vue';
+  import { ref, computed, watch, onMounted } from 'vue';
+  import {
+    PhProhibit,
+    PhCheckCircle,
+    PhPaperPlaneTilt,
+  } from '@phosphor-icons/vue';
   import { uiStore } from '@/store';
   import Modal from '@/components/ui/modal.vue';
+  import Button from '@/components/ui/button.vue';
 
-  const props = defineProps<{
-    id: string;
-    mode: 'username' | 'folder' | 'title' | 'link';
-    currentValue?: string;
-    maxLength?: number;
-  }>();
+  const isOpen = computed(() => uiStore.activeModal === 'input');
+  const mode = computed(() => uiStore.inputModalOptions?.mode || 'folder');
+  const currentValue = computed(
+    () => uiStore.inputModalOptions?.currentValue || ''
+  );
+  const maxLength = computed(() => uiStore.inputModalOptions?.maxLength || 100);
 
-  const emit = defineEmits<{
-    (e: 'cancel'): void;
-    (e: 'update', value: string): void;
-  }>();
-
-  const isOpen = computed(() => uiStore.activeModal === props.id);
-
-  const inputValue = ref(props.currentValue || '');
-  const placeholder = ref('Enter value');
+  const inputValue = ref(currentValue.value);
+  const placeholderText = ref('');
 
   const modalTitle = computed(() => {
-    switch (props.mode) {
-      case 'username':
-        return 'Rename';
-      case 'folder':
-        return props.currentValue ? 'Rename Folder' : 'Create New Folder';
-      case 'title':
-        return props.currentValue ? 'Edit Title' : 'Enter Title';
-      case 'link':
-        return 'Enter Link URL';
-      default:
-        return placeholder;
-    }
+    const titles = {
+      username: 'Rename',
+      email: 'Forgot Password',
+      folder: currentValue.value ? 'Rename Folder' : 'Create New Folder',
+      link: 'Enter Link URL',
+    };
+    return titles[mode.value] || placeholderText.value;
   });
 
-  const showCharCount = computed(() => props.mode === 'folder');
-  const maxLength = computed(() => props.maxLength || 500);
+  const showCharCount = computed(() => mode.value === 'folder');
 
   const isValid = computed(() => {
     const trimmedLength = inputValue.value.trim().length;
-    if (props.mode === 'link') {
+    if (mode.value === 'link') {
       return (
         trimmedLength > 0 &&
         trimmedLength <= maxLength.value &&
         inputValue.value.startsWith('http')
       );
     }
+    if (mode.value === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(inputValue.value);
+    }
     return trimmedLength > 0 && trimmedLength <= maxLength.value;
   });
 
-  const handleSubmit = () => {
-    if (isValid.value) {
-      emit('update', inputValue.value);
-      closeModal();
+  const handleConfirm = () => {
+    if (isValid.value && uiStore.inputModalOptions?.confirm) {
+      uiStore.inputModalOptions.confirm(inputValue.value);
+    }
+    uiStore.inputModalOptions = null;
+    uiStore.setActiveModal(null);
+  };
+
+  const handleCancel = () => {
+    if (uiStore.inputModalOptions?.cancel) {
+      uiStore.inputModalOptions.cancel();
+    }
+    uiStore.inputModalOptions = null;
+    if (uiStore.activeModal === 'signIn') {
+      uiStore.setActiveModal('signIn');
+    } else {
+      uiStore.setActiveModal(null);
     }
   };
 
-  const closeModal = () => {
-    emit('cancel');
-  };
-
   const handleFocus = () => {
-    placeholder.value = '';
+    placeholderText.value = '';
   };
 
   const handleBlur = () => {
     if (inputValue.value.trim() === '') {
-      placeholder.value =
-        props.mode === 'username'
-          ? 'Enter your username'
-          : props.mode === 'folder'
-            ? 'Enter folder name'
-            : props.mode === 'title'
-              ? 'Enter title'
-              : 'Enter Link URL';
+      setPlaceholder();
     }
   };
 
-  watch(
-    () => props.currentValue,
-    (newValue) => {
-      inputValue.value = newValue || '';
-    }
-  );
+  const setPlaceholder = () => {
+    const placeholders = {
+      username: 'Enter your username',
+      folder: 'Enter folder name',
+      link: 'Enter link URL',
+      email: 'Enter your email address',
+    };
+    placeholderText.value = placeholders[mode.value] || '';
+  };
+
+  watch(currentValue, (newValue) => {
+    inputValue.value = newValue;
+  });
+
+  watch(mode, () => {
+    setPlaceholder();
+  });
+
+  onMounted(() => {
+    setPlaceholder();
+  });
 </script>

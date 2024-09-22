@@ -246,7 +246,7 @@
 
   const showContextMenu = (event: MouseEvent, note: Note) => {
     event.stopPropagation();
-    uiStore.setActiveDropdown(showMenu.value ? 'create' : null);
+    uiStore.setActiveDropdown(null);
     menuPosition.value = { x: event.clientX, y: event.clientY };
     showMenu.value = true;
     selectedNote.value = note;

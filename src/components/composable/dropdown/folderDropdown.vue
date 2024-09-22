@@ -68,7 +68,7 @@
             class="flex justify-between px-2"
           >
             <Button
-              @click.stop="openRenameModal(folder)"
+              @click.stop="openRenameFolderInput(folder)"
               class="text-xs flex items-center mb-2"
             >
               <PhTextbox :size="16" class="mr-1" />
@@ -76,7 +76,7 @@
             </Button>
             <Button
               variant="danger"
-              @click.stop="openDeleteAlert(folder)"
+              @click.stop="openDeleteFolderAlert(folder)"
               class="text-xs flex items-center mb-2"
             >
               <PhTrash :size="16" class="mr-1" />
@@ -87,22 +87,6 @@
       </div>
     </div>
   </Dropdown>
-
-  <InputModal
-    id="folderDropdownInput"
-    mode="folder"
-    :current-value="currentFolderName"
-    :max-length="10"
-    @cancel="closeModal"
-    @update="handleModalSubmit"
-  />
-
-  <AlertModal
-    id="folderDropdownAlert"
-    :message="alertMessage"
-    @cancel="closeAlert"
-    @confirm="handleAlert"
-  />
 </template>
 
 <script setup lang="ts">
@@ -118,20 +102,11 @@
     PhTrash,
   } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
-  import InputModal from '@/components/composable/modal/inputModal.vue';
-  import AlertModal from '@/components/composable/modal/alertModal.vue';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
   import Button from '@/components/ui/button.vue';
 
   const selectedFolder = computed(() => folderStore.currentFolder);
   const notesCountByFolder = computed(() => folderStore.notesCountByFolder());
-
-  const modalMode = ref<'create' | 'rename'>('create');
-  const currentFolderName = ref('');
-
-  const alertMessage = ref('');
-  const folderToDelete = ref('');
-
   const expandedFolder = ref('');
 
   const selectFolder = (folder: string) => {
@@ -150,13 +125,6 @@
 
   const toggleOptions = (folder: string) => {
     expandedFolder.value = expandedFolder.value === folder ? '' : folder;
-  };
-
-  const openRenameModal = (folder: string) => {
-    modalMode.value = 'rename';
-    currentFolderName.value = folder;
-    uiStore.setActiveDropdown(null);
-    uiStore.setActiveModal('folderDropdownInput');
   };
 
   const sortedFolders = computed(() => {
@@ -179,35 +147,34 @@
     return finalFolders;
   });
 
-  const closeModal = () => {
-    uiStore.setActiveModal(null);
+  const openRenameFolderInput = (folderName: string) => {
+    folderStore.targetFolder = folderName;
+
+    uiStore.openInputModal({
+      mode: 'folder',
+      maxLength: 10,
+      currentValue: folderName,
+      cancel: () => {
+        uiStore.setActiveModal(null);
+        folderStore.targetFolder = '';
+      },
+      confirm: (newFolderName: string) => {
+        folderStore.renameFolder(folderStore.targetFolder, newFolderName);
+        uiStore.showToastMessage(`Folder renamed to ${newFolderName}`);
+      },
+    });
   };
 
-  const handleModalSubmit = (folderName: string) => {
-    if (modalMode.value === 'create') {
-      folderStore.addFolder(folderName);
-      selectFolder(folderName);
-    } else {
-      folderStore.renameFolder(currentFolderName.value, folderName);
-      if (selectedFolder.value === currentFolderName.value) {
-        selectFolder(folderName);
-      }
-    }
-  };
-
-  const openDeleteAlert = (folder: string) => {
-    uiStore.setActiveDropdown(null);
-    uiStore.setActiveModal('folderDropdownAlert');
-    folderToDelete.value = folder;
-    alertMessage.value = `Are you sure you want to delete the folder "${folder}"?`;
-  };
-
-  const closeAlert = () => {
-    uiStore.setActiveModal(null);
-  };
-
-  const handleAlert = () => {
-    folderStore.deleteFolder(folderToDelete.value);
-    closeAlert();
+  const openDeleteFolderAlert = (folder: string) => {
+    uiStore.openAlertModal({
+      message: `Are you sure you want to delete the folder "${folder}"?`,
+      confirm: () => {
+        folderStore.folderToDelete = folder;
+        folderStore.deleteFolder(folderStore.folderToDelete);
+      },
+      cancel: () => {
+        uiStore.setActiveModal(null);
+      },
+    });
   };
 </script>

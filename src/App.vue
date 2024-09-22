@@ -13,6 +13,7 @@
           <Toast v-if="uiStore.showToast" :message="uiStore.toastMessage" />
         </Transition>
       </div>
+      <ModalView />
     </template>
   </div>
 </template>
@@ -30,6 +31,7 @@
   import Navbar from '@/components/navbar/navbar.vue';
   import Toast from '@/components/ui/toast.vue';
   import LoadingSpinner from '@/components/ui/loading.vue';
+  import ModalView from '@/components/composable/modal/modalView.vue';
 
   const router = useRouter();
   const routeOrder = ['Home', 'Settings', 'Trash', 'Sign In', 'About'];

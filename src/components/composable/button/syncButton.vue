@@ -11,11 +11,10 @@
       />
     </Button>
   </div>
-  <SignInModal id="signInModal" />
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, watch, defineAsyncComponent } from 'vue';
+  import { ref, computed, watch } from 'vue';
   import {
     PhCloudCheck,
     PhSpinnerGap,
@@ -25,17 +24,13 @@
   import { firebaseStore, authStore, uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
 
-  const SignInModal = defineAsyncComponent(
-    () => import('@/components/composable/modal/signInModal.vue')
-  );
-
   const isSyncing = ref(false);
   const isSpinning = ref(false);
   const syncStatus = ref('idle');
   const isSignInMode = ref(!authStore.isLoggedIn);
 
-  const showSigninModal = () => {
-    uiStore.setActiveModal('signInModal');
+  const openSigninModal = () => {
+    uiStore.setActiveModal('signIn');
   };
 
   const currentIcon = computed(() => {
@@ -47,7 +42,7 @@
 
   const handleClick = () => {
     if (isSignInMode.value) {
-      showSigninModal();
+      openSigninModal();
     } else {
       syncNotes();
     }

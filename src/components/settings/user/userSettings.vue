@@ -1,3 +1,5 @@
+<!--userSettings-->
+
 <template>
   <div class="p-4 card mb-2">
     <h2 class="text-2xl font-semibold mb-4">User Settings</h2>
@@ -25,7 +27,7 @@
           </div>
           <div
             class="w-1/2 h-full flex justify-center items-center text-white cursor-pointer transition-colors duration-300 rounded-r-full hover:bg-black hover:bg-opacity-60"
-            @click="openAvatarPicker"
+            @click="openImagePicker"
           >
             <PhSwap :size="20" />
           </div>
@@ -36,7 +38,7 @@
         <PhPencilSimpleLine
           :size="20"
           class="text-gray-700 dark:text-gray-400 cursor-pointer"
-          @click="openNameEditor"
+          @click="openRenameUserInput"
         />
       </div>
       <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -47,7 +49,7 @@
       >
         <Button
           v-if="!isGoogleUser"
-          @click="openChangePasswordModal"
+          @click="openForgotPasswordInput"
           class="py-2 px-4 text-sm md:text-base w-full sm:w-auto"
         >
           <PhTextbox :size="20" class="mr-2" />
@@ -64,33 +66,6 @@
       </div>
     </div>
   </div>
-
-  <SignInModal id="forgotPasswordModal" :from-user-settings="true" />
-
-  <AlertModal
-    id="deleteAccountAlert"
-    :message="'Are you sure you want to delete your account? This action cannot be undone.'"
-    @cancel="closeDeleteAccountAlert"
-    @confirm="deleteAccount"
-  />
-
-  <AvatarModal
-    id="avatarModal"
-    :initial-avatar-url="userAvatar"
-    @update="updateAvatar"
-    @remove="removeAvatar"
-    @cancel="closeAvatarPicker"
-  />
-
-  <ImageViewModal id="imageViewModal" :avatar-url="userAvatar" />
-
-  <InputModal
-    id="renameUserInput"
-    mode="username"
-    :current-value="username"
-    @update="updateName"
-    @cancel="closeRenameUserInput"
-  />
 </template>
 
 <script setup lang="ts">
@@ -105,11 +80,6 @@
   } from '@phosphor-icons/vue';
   import { authStore, uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
-  import AlertModal from '@/components/composable/modal/alertModal.vue';
-  import AvatarModal from '@/components/composable/modal/avatarModal.vue';
-  import ImageViewModal from '@/components/composable/modal/imageViewModal.vue';
-  import InputModal from '@/components/composable/modal/inputModal.vue';
-  import SignInModal from '@/components/composable/modal/signInModal.vue';
 
   const router = useRouter();
 
@@ -120,76 +90,102 @@
     () => authStore.user?.providerData[0]?.providerId === 'google.com'
   );
 
-  const openChangePasswordModal = () => {
-    uiStore.setActiveModal('forgotPasswordModal');
+  const closeModal = () => {
+    uiStore.setActiveModal(null);
   };
 
   const openDeleteAccountAlert = () => {
-    uiStore.setActiveModal('deleteAccountAlert');
+    uiStore.openAlertModal({
+      message: `Are you sure you want to delete your account?`,
+      confirm: async () => {
+        try {
+          await authStore.deleteAccount();
+          uiStore.setActiveModal(null);
+          router.push('/');
+          uiStore.showToastMessage('Account successfully deleted');
+        } catch (error) {
+          uiStore.showToastMessage('Failed to delete account');
+        }
+      },
+      cancel: () => {
+        closeModal();
+      },
+    });
   };
 
-  const closeDeleteAccountAlert = () => {
-    uiStore.setActiveModal(null);
-  };
-
-  const deleteAccount = async () => {
-    try {
-      await authStore.deleteAccount();
-      uiStore.setActiveModal(null);
-      router.push('/');
-      uiStore.showToastMessage('Account successfully deleted');
-    } catch (error) {
-      uiStore.showToastMessage('Failed to delete account');
-    }
-  };
-
-  const openAvatarPicker = () => {
-    uiStore.setActiveModal('avatarModal');
-  };
-
-  const closeAvatarPicker = () => {
-    uiStore.setActiveModal('null');
+  const openImagePicker = () => {
+    uiStore.openImagePicker({
+      initialImageUrl: userAvatar.value,
+      cancel: () => {
+        closeModal();
+      },
+      update: async (newAvatarUrl: string) => {
+        try {
+          await authStore.updateAvatar(newAvatarUrl);
+          closeModal();
+          uiStore.showToastMessage('Avatar successfully updated');
+        } catch (error) {
+          uiStore.showToastMessage(
+            'Failed to update avatar. Please try again.'
+          );
+        }
+      },
+      remove: async () => {
+        try {
+          await authStore.updateAvatar('/icons/avatar.png');
+          closeModal();
+          uiStore.showToastMessage('Avatar removed successfully');
+        } catch (error) {
+          uiStore.showToastMessage(
+            'Failed to remove avatar. Please try again.'
+          );
+        }
+      },
+    });
   };
 
   const openImageViewer = () => {
-    uiStore.setActiveModal('imageViewModal');
+    uiStore.openImageViewer({
+      imageUrl: userAvatar.value,
+    });
   };
 
-  const updateAvatar = async (newAvatarUrl: string) => {
-    try {
-      await authStore.updateAvatar(newAvatarUrl);
-      closeAvatarPicker();
-      uiStore.showToastMessage('Avatar successfully updated');
-    } catch (error) {
-      uiStore.showToastMessage('Failed to update avatar. Please try again.');
-    }
+  const openRenameUserInput = () => {
+    uiStore.openInputModal({
+      mode: 'username',
+      currentValue: username.value,
+      maxLength: 20,
+      cancel: () => {
+        closeModal();
+      },
+      confirm: async (newUsername: string) => {
+        try {
+          await authStore.updateName(newUsername);
+          uiStore.showToastMessage('Username successfully updated');
+        } catch (error) {
+          uiStore.showToastMessage('Failed to update username');
+        }
+      },
+    });
   };
 
-  const removeAvatar = async () => {
-    try {
-      await authStore.updateAvatar('/icons/avatar.png');
-      closeAvatarPicker();
-      uiStore.showToastMessage('Avatar removed successfully');
-    } catch (error) {
-      uiStore.showToastMessage('Failed to remove avatar. Please try again.');
-    }
-  };
-
-  const openNameEditor = () => {
-    uiStore.setActiveModal('renameUserInput');
-  };
-
-  const closeRenameUserInput = () => {
-    uiStore.setActiveModal(null);
-  };
-
-  const updateName = async (newName: string) => {
-    try {
-      await authStore.updateName(newName);
-      closeRenameUserInput();
-      uiStore.showToastMessage('Username successfully updated');
-    } catch (error) {
-      uiStore.showToastMessage('Failed to update username');
-    }
+  const openForgotPasswordInput = () => {
+    uiStore.openInputModal({
+      mode: 'email',
+      currentValue: userEmail.value,
+      cancel: () => {
+        uiStore.setActiveModal(null);
+      },
+      confirm: async (email: string) => {
+        try {
+          await authStore.resetPassword(email);
+          uiStore.showToastMessage(
+            'Password reset email sent. Please check your inbox.'
+          );
+        } catch (error) {
+          uiStore.showToastMessage('Failed to send password reset email');
+        }
+      },
+    });
   };
 </script>

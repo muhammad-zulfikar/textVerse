@@ -11,6 +11,32 @@ export interface UIState {
   showToast: boolean;
   toastMessage: string;
   toastTimeout: number | null;
+
+  alertOptions: {
+    message: string;
+    cancel: () => void;
+    confirm: () => void;
+  } | null;
+
+  inputModalOptions: {
+    mode: 'username' | 'email' | 'folder' | 'link';
+    currentValue?: string;
+    maxLength?: number;
+    cancel: () => void;
+    confirm: (value: string) => void;
+  } | null;
+
+  imagePickerOptions: {
+    initialImageUrl?: string;
+    cancel: () => void;
+    update: (imageUrl: string) => void;
+    remove: () => void;
+  } | null;
+
+  imageViewerOptions: {
+    imageUrl: string;
+  } | null;
+
   isNoteModalOpen: boolean;
   isNoteSidebarOpen: boolean;
   isExpanded: boolean;
@@ -30,6 +56,15 @@ export default (): UIState => ({
   showToast: false,
   toastMessage: '',
   toastTimeout: null,
+
+  alertOptions: null,
+
+  inputModalOptions: null,
+
+  imagePickerOptions: null,
+
+  imageViewerOptions: null,
+
   isNoteModalOpen: false,
   isNoteSidebarOpen: false,
   isExpanded: false,

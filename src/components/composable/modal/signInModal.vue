@@ -1,43 +1,25 @@
 <template>
-  <Modal :modelValue="isOpen" :id="id">
+  <Modal :modelValue="isOpen" id="signIn">
     <div
       class="card w-11/12 md:w-[500px] h-[440px] md:h-[480px] font-serif px-10 py-8 relative flex flex-col mx-auto"
     >
       <transition :name="transitionName" mode="out-in">
-        <div
-          :key="currentView"
-          :class="{
-            'flex flex-col items-center justify-center':
-              currentView === 'forgotPassword',
-          }"
-        >
+        <div :key="currentView">
           <h2 class="text-2xl font-bold mb-6 md:mb-8 flex justify-center">
             {{ viewTitle }}
           </h2>
-          <form
-            @submit.prevent="handleSubmit"
-            :class="{ 'w-full': currentView === 'forgotPassword' }"
-          >
-            <div
-              :class="{
-                'flex justify-center mt-[5rem]':
-                  currentView === 'forgotPassword',
-              }"
-            >
-              <div
-                :class="{ 'w-full md:w-3/4': currentView === 'forgotPassword' }"
-              >
-                <label for="email" class="block">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  v-model="email"
-                  required
-                  class="flex w-full bg-transparent p-1 border-0 border-b-[1px] border-black dark:border-gray-400 outline-none mb-4"
-                />
-              </div>
+          <form @submit.prevent="handleSubmit">
+            <div>
+              <label for="email" class="block">Email</label>
+              <input
+                type="email"
+                id="email"
+                v-model="email"
+                required
+                class="flex w-full bg-transparent p-1 border-0 border-b-[1px] border-black dark:border-gray-400 outline-none mb-4"
+              />
             </div>
-            <div v-if="currentView !== 'forgotPassword'">
+            <div>
               <label for="password" class="block mb-1">Password</label>
               <input
                 type="password"
@@ -59,15 +41,7 @@
                 class="w-full mb-4 bg-transparent p-1 border-0 border-b-[1px] border-black dark:border-white outline-none"
               />
             </div>
-            <div class="flex justify-center space-x-4">
-              <button
-                v-if="currentView === 'forgotPassword' && !fromUserSettings"
-                type="button"
-                @click="goBack"
-                class="px-4 py-2 mt-4 card"
-              >
-                Back
-              </button>
+            <div class="flex justify-center">
               <button
                 type="submit"
                 class="flex w-fit items-center justify-center px-4 py-2 mt-4 card"
@@ -107,18 +81,15 @@
             </button>
           </div>
           <p v-if="error" class="text-red-500 mt-4 text-center">{{ error }}</p>
-          <p
-            v-if="!fromUserSettings"
-            class="text-center mt-6 text-gray-500 dark:text-gray-400 text-sm"
-          >
+          <p class="text-center mt-6 text-gray-500 dark:text-gray-400 text-sm">
             <button
               v-if="currentView === 'signin'"
               class="hover:underline font-bold text-[13px]"
-              @click="toggleView('forgotPassword')"
+              @click="openForgotPasswordInput"
             >
-              Forgot Password?
+              Forgot password?
             </button>
-            <br v-if="currentView !== 'forgotPassword'" />
+            <br />
             {{
               currentView === 'signin'
                 ? "Don't have an account?"
@@ -127,7 +98,6 @@
                   : ''
             }}
             <button
-              v-if="currentView !== 'forgotPassword'"
               class="hover:underline font-bold text-[13px]"
               @click="
                 toggleView(currentView === 'signin' ? 'signup' : 'signin')
@@ -148,18 +118,13 @@
   import { authStore, uiStore } from '@/store';
   import Modal from '@/components/ui/modal.vue';
 
-  const props = defineProps<{
-    id: string;
-    fromUserSettings?: boolean;
-  }>();
-
-  const isOpen = computed(() => uiStore.activeModal === props.id);
+  const isOpen = computed(() => uiStore.activeModal === 'signIn');
 
   const router = useRouter();
   const email = ref('');
   const password = ref('');
   const confirmPassword = ref('');
-  const currentView = ref(props.fromUserSettings ? 'forgotPassword' : 'signin');
+  const currentView = ref('signin');
   const slideDirection = ref('right');
   const transitionName = computed(() => `slide-${slideDirection.value}`);
   const error = ref('');
@@ -173,8 +138,6 @@
         return 'Sign in';
       case 'signup':
         return 'Sign up';
-      case 'forgotPassword':
-        return 'Reset Password';
       default:
         return '';
     }
@@ -186,8 +149,6 @@
         return 'Sign in';
       case 'signup':
         return 'Sign up';
-      case 'forgotPassword':
-        return 'Send Reset Email';
       default:
         return '';
     }
@@ -200,23 +161,19 @@
         case 'signin':
           await authStore.login(email.value, password.value);
           router.push('/');
+          uiStore.setActiveModal(null);
           break;
         case 'signup':
           if (password.value !== confirmPassword.value) {
             uiStore.showToastMessage('Passwords do not match');
             return;
+          } else if (password.value.length >= 8) {
+            uiStore.showToastMessage('Password must be at least 8 characters');
+            return;
           }
+          uiStore.showToastMessage('Signing up...');
           await authStore.signUp(email.value, password.value);
           router.push('/');
-          break;
-        case 'forgotPassword':
-          await authStore.resetPassword(email.value);
-          uiStore.showToastMessage(
-            'Password reset email sent. Please check your inbox.'
-          );
-          if (!props.fromUserSettings) {
-            toggleView('signin');
-          }
           break;
       }
     } catch (err) {
@@ -227,6 +184,7 @@
       }
     } finally {
       isLoading.value = false;
+      uiStore.setActiveModal(null);
     }
   };
 
@@ -253,8 +211,23 @@
     error.value = '';
   };
 
-  const goBack = () => {
-    toggleView('signin');
+  const openForgotPasswordInput = () => {
+    uiStore.openInputModal({
+      mode: 'email',
+      cancel: () => {
+        uiStore.setActiveModal('signIn');
+      },
+      confirm: async (email: string) => {
+        try {
+          await authStore.resetPassword(email);
+          uiStore.showToastMessage(
+            'Password reset email sent. Please check your inbox.'
+          );
+        } catch (error) {
+          uiStore.showToastMessage('Failed to send password reset email');
+        }
+      },
+    });
   };
 </script>
 

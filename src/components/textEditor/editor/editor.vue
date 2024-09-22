@@ -7,14 +7,12 @@
       @input="handleInput"
       @keydown="handleKeyDown"
     ></div>
-    <ImageViewModal id="imageViewModal" :avatar-url="currentImageUrl" />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, watch, provide } from 'vue';
-  import ImageViewModal from '@/components/composable/modal/imageViewModal.vue';
   import { uiStore } from '@/store';
+  import { ref, onMounted, watch, provide } from 'vue';
 
   const props = defineProps<{
     modelValue: string;
@@ -26,7 +24,6 @@
   }>();
 
   const editorRef = ref<HTMLElement | null>(null);
-  const currentImageUrl = ref('');
 
   const handleInput = () => {
     if (editorRef.value) {
@@ -42,8 +39,9 @@
   };
 
   const openImageModal = (imageUrl: string) => {
-    currentImageUrl.value = imageUrl;
-    uiStore.setActiveModal('imageViewModal');
+    uiStore.openImageViewer({
+      imageUrl: imageUrl,
+    });
   };
 
   onMounted(() => {
@@ -51,6 +49,13 @@
       editorRef.value.innerHTML = props.modelValue;
       editorRef.value.addEventListener('click', (e) => {
         const target = e.target as HTMLElement;
+        if (target.tagName.toLowerCase() === 'a') {
+          const anchor = target as HTMLAnchorElement;
+          anchor.target = '_blank';
+          anchor.rel = 'noopener noreferrer';
+          window.open(anchor.href, '_blank', 'noopener noreferrer');
+        }
+
         if (target.tagName === 'IMG') {
           openImageModal((target as HTMLImageElement).src);
         }

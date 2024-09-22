@@ -1,7 +1,7 @@
 <template>
   <Modal
     :modelValue="isOpen"
-    :id="id"
+    id="sidebar"
     transition="sidebar-left"
     @close="closeSidebar"
   >
@@ -35,14 +35,14 @@
           <component :is="item.icon" class="size-5 mr-2 inline-block" />
           {{ item.label }}
         </router-link>
-        <router-link v-if="!authStore.isLoggedIn" to="/sign-in" class="my-1">
+        <div v-if="!authStore.isLoggedIn" @click="openSigninModal" class="my-1">
           <div
             class="text-sm p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
           >
             <PhSignIn class="size-5 mr-2" />
             Sign in
           </div>
-        </router-link>
+        </div>
       </div>
 
       <div class="p-2">
@@ -120,7 +120,7 @@
                 Settings
               </button>
               <button
-                @click="openSignoutAlert"
+                @click="openSignOutAlert"
                 class="flex w-full text-left p-2 hover:bg-cream-200 dark:hover:bg-gray-700 rounded transition-colors duration-200"
               >
                 <PhSignOut class="size-5 mr-2" />
@@ -132,25 +132,12 @@
       </div>
     </div>
   </Modal>
-  <AlertModal
-    id="signOutAlert"
-    :message="`Are you sure you want to sign out? You won't be able to sync your notes.`"
-    @cancel="cancelSignout"
-    @confirm="signout"
-  />
-  <InputModal
-    id="folderInput"
-    mode="folder"
-    :max-length="10"
-    @cancel="closeFolderForm"
-    @update="handleFolderSubmit"
-  />
 </template>
 
 <script setup lang="ts">
-  import { computed, defineAsyncComponent, ref } from 'vue';
+  import { computed, ref } from 'vue';
   import { useRouter } from 'vue-router';
-  import { authStore, notesStore, folderStore, uiStore } from '@/store';
+  import { authStore, notesStore, uiStore } from '@/store';
   import {
     PhHouseLine,
     PhGear,
@@ -164,19 +151,7 @@
   import Modal from '@/components/ui/modal.vue';
   import Separator from '@/components/ui/separator.vue';
 
-  const AlertModal = defineAsyncComponent(
-    () => import('@/components/composable/modal/alertModal.vue')
-  );
-
-  const InputModal = defineAsyncComponent(
-    () => import('@/components/composable/modal/inputModal.vue')
-  );
-
-  const props = defineProps<{
-    id: string;
-  }>();
-
-  const isOpen = computed(() => uiStore.activeModal === props.id);
+  const isOpen = computed(() => uiStore.activeModal === 'sidebar');
 
   const router = useRouter();
   const isUserDropupOpen = ref(false);
@@ -198,12 +173,6 @@
       .slice(0, 5);
   });
 
-  const signout = async () => {
-    uiStore.setActiveModal(null);
-    router.push('/');
-    await authStore.logout();
-  };
-
   const toggleUserDropup = (event: Event) => {
     event.stopPropagation();
     isUserDropupOpen.value = !isUserDropupOpen.value;
@@ -211,11 +180,17 @@
 
   const openNote = (noteId: string) => {
     router.push('/');
+    uiStore.setActiveModal(null);
     notesStore.openNote(noteId);
   };
 
   const navigateToSettings = () => {
     router.push('/settings');
+    uiStore.setActiveModal(null);
+  };
+
+  const openSigninModal = () => {
+    uiStore.setActiveModal('signInModal');
   };
 
   const closeSidebar = () => {
@@ -228,18 +203,25 @@
     }
   };
 
-  const openSignoutAlert = () => {
-    uiStore.setActiveModal('signOutAlert');
-  };
-
-  const cancelSignout = () => {
-    uiStore.setActiveModal('sidebar');
+  const openSignOutAlert = () => {
+    uiStore.openAlertModal({
+      message: `Are you sure you want to sign out? You won't be able to sync your notes.`,
+      confirm: async () => {
+        await authStore.logout();
+        uiStore.setActiveModal(null);
+        router.push('/');
+      },
+      cancel: () => {
+        uiStore.setActiveModal(null);
+      },
+    });
   };
 
   const handleMenuItemClick = (item: any) => {
     if (item.action) {
       item.action();
     }
+    uiStore.setActiveModal(null);
   };
 
   const openNoteForm = () => {
@@ -250,16 +232,7 @@
 
   const openFolderForm = () => {
     router.push('/');
-    uiStore.setActiveModal('folderInput');
-  };
-
-  const closeFolderForm = () => {
-    uiStore.setActiveModal('sidebar');
-  };
-
-  const handleFolderSubmit = (folderName: string) => {
-    folderStore.addFolder(folderName);
-    closeFolderForm();
+    uiStore.setActiveModal('createFolder');
   };
 </script>
 

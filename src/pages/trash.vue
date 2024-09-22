@@ -123,20 +123,6 @@
           </li>
         </transition-group>
       </div>
-
-      <AlertModal
-        id="deleteNoteAlert"
-        :message="deleteNoteAlertMessage"
-        @confirm="confirmPermanentlyDeleteNote"
-        @cancel="closeDeleteAlert"
-      />
-
-      <AlertModal
-        id="emptyTrashAlert"
-        :message="emptyTrashAlertMessage"
-        @confirm="confirmEmptyTrash"
-        @cancel="closeEmptyTrashAlert"
-      />
     </div>
   </div>
 </template>
@@ -145,7 +131,6 @@
   import { ref, computed, onMounted, onUnmounted } from 'vue';
   import { notesStore, uiStore } from '@/store';
   import LoadingSpinner from '@/components/ui/loading.vue';
-  import AlertModal from '@/components/composable/modal/alertModal.vue';
   import {
     PhCheck,
     PhFolder,
@@ -158,7 +143,6 @@
 
   const showMenu = ref(false);
   const selectedNotes = ref<string[]>([]);
-
   const deletedNotes = computed(() => notesStore.deletedNotes);
 
   const computedMb = computed(() => {
@@ -199,37 +183,27 @@
     }
   };
 
-  const deleteNoteAlertMessage = ref('');
-  const emptyTrashAlertMessage = ref('');
-  const noteToDelete = ref<string | null>(null);
-
-  const closeDeleteAlert = () => {
-    uiStore.setActiveModal(null);
-  };
-
-  const closeEmptyTrashAlert = () => {
-    uiStore.setActiveModal(null);
-  };
-
   const openDeleteNoteAlert = (noteId: string) => {
-    noteToDelete.value = noteId;
-    uiStore.setActiveModal('deleteNoteAlert');
-    deleteNoteAlertMessage.value =
-      'Are you sure you want to permanently delete this note? This action cannot be undone.';
-  };
-
-  const confirmPermanentlyDeleteNote = async () => {
-    if (noteToDelete.value) {
-      try {
-        await notesStore.permanentlyDeleteNote(noteToDelete.value);
-        uiStore.showToastMessage('Note permanently deleted');
-      } catch (error) {
-        console.error('Error deleting note:', error);
-        uiStore.showToastMessage('Failed to delete note. Please try again.');
-      }
-    }
-    uiStore.setActiveModal(null);
-    noteToDelete.value = null;
+    notesStore.noteToDelete = noteId;
+    uiStore.openAlertModal({
+      message: `Are you sure you want to permanently delete this note?`,
+      confirm: async () => {
+        if (notesStore.noteToDelete) {
+          try {
+            await notesStore.permanentlyDeleteNote(notesStore.noteToDelete);
+            uiStore.showToastMessage('Note permanently deleted');
+          } catch (error) {
+            console.error('Error deleting note:', error);
+            uiStore.showToastMessage(
+              'Failed to delete note. Please try again.'
+            );
+          }
+        }
+      },
+      cancel: () => {
+        uiStore.setActiveModal(null);
+      },
+    });
   };
 
   const restoreNote = async (noteId: string) => {
@@ -243,20 +217,21 @@
   };
 
   const openEmptyTrashAlert = () => {
-    uiStore.setActiveModal('emptyTrashAlert');
-    emptyTrashAlertMessage.value =
-      'Are you sure you want to empty the trash? This action cannot be undone.';
-  };
-
-  const confirmEmptyTrash = async () => {
-    try {
-      await notesStore.emptyTrash();
-      uiStore.showToastMessage('Trash emptied successfully');
-    } catch (error) {
-      console.error('Error emptying trash:', error);
-      uiStore.showToastMessage('Failed to empty trash. Please try again.');
-    }
-    uiStore.setActiveModal(null);
+    uiStore.openAlertModal({
+      message: `Are you sure you want to empty the trash?`,
+      confirm: async () => {
+        try {
+          await notesStore.emptyTrash();
+          uiStore.showToastMessage('Trash emptied successfully');
+        } catch (error) {
+          console.error('Error emptying trash:', error);
+          uiStore.showToastMessage('Failed to empty trash. Please try again.');
+        }
+      },
+      cancel: () => {
+        uiStore.setActiveModal(null);
+      },
+    });
   };
 
   const handleOutsideClick = (event: MouseEvent) => {
