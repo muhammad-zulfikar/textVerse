@@ -23,7 +23,7 @@
   );
 
   const Sidebar = defineAsyncComponent(
-    () => import('@/components/navbar/sidebar.vue')
+    () => import('@/components/composable/modal/sidebar.vue')
   );
 
   const ImageViewerModal = defineAsyncComponent(

@@ -137,7 +137,7 @@
 <script setup lang="ts">
   import { computed, ref } from 'vue';
   import { useRouter } from 'vue-router';
-  import { authStore, notesStore, uiStore } from '@/store';
+  import { authStore, folderStore, notesStore, uiStore } from '@/store';
   import {
     PhHouseLine,
     PhGear,
@@ -180,27 +180,21 @@
 
   const openNote = (noteId: string) => {
     router.push('/');
-    uiStore.setActiveModal(null);
+    closeSidebar();
     notesStore.openNote(noteId);
   };
 
   const navigateToSettings = () => {
     router.push('/settings');
-    uiStore.setActiveModal(null);
+    closeSidebar();
   };
 
   const openSigninModal = () => {
-    uiStore.setActiveModal('signInModal');
+    uiStore.setActiveModal('signIn');
   };
 
   const closeSidebar = () => {
-    if (
-      uiStore.activeModal === 'signOutAlert' ||
-      uiStore.activeModal === 'folderInput'
-    ) {
-    } else {
-      uiStore.setActiveModal(null);
-    }
+    uiStore.setActiveModal(null);
   };
 
   const openSignOutAlert = () => {
@@ -208,11 +202,11 @@
       message: `Are you sure you want to sign out? You won't be able to sync your notes.`,
       confirm: async () => {
         await authStore.logout();
-        uiStore.setActiveModal(null);
+        closeSidebar();
         router.push('/');
       },
       cancel: () => {
-        uiStore.setActiveModal(null);
+        closeSidebar();
       },
     });
   };
@@ -221,18 +215,28 @@
     if (item.action) {
       item.action();
     }
-    uiStore.setActiveModal(null);
+    closeSidebar();
   };
 
   const openNoteForm = () => {
     router.push('/');
-    uiStore.setActiveModal(null);
+    closeSidebar();
     notesStore.openNote(null);
   };
 
   const openFolderForm = () => {
     router.push('/');
-    uiStore.setActiveModal('createFolder');
+    uiStore.openInputModal({
+      mode: 'folder',
+      maxLength: 10,
+      cancel: () => {
+        uiStore.setActiveModal(null);
+      },
+      confirm: (folderName: string) => {
+        folderStore.addFolder(folderName);
+        uiStore.showToastMessage(`Folder ${folderName} successfully created`);
+      },
+    });
   };
 </script>
 

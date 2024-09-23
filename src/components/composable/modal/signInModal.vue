@@ -1,7 +1,7 @@
 <template>
   <Modal :modelValue="isOpen" id="signIn">
     <div
-      class="card w-11/12 md:w-[500px] h-[440px] md:h-[480px] font-serif px-10 py-8 relative flex flex-col mx-auto"
+      class="card w-11/12 md:w-[500px] h-[500px] font-serif px-10 py-8 relative flex flex-col mx-auto"
     >
       <transition :name="transitionName" mode="out-in">
         <div :key="currentView">
@@ -9,38 +9,49 @@
             {{ viewTitle }}
           </h2>
           <form @submit.prevent="handleSubmit">
-            <div>
-              <label for="email" class="block">Email</label>
+            <label for="email" class="block">Email</label>
+            <div class="relative mb-4">
+              <PhEnvelope class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
               <input
                 type="email"
                 id="email"
+                placeholder="username@example.com"
                 v-model="email"
                 required
-                class="flex w-full bg-transparent p-1 border-0 border-b-[1px] border-black dark:border-gray-400 outline-none mb-4"
+                class="flex w-full bg-transparent p-1 pl-8 border-b-[1px] border-gray-600 dark:border-gray-400 placeholder:text-gray-500 outline-none"
               />
             </div>
-            <div>
-              <label for="password" class="block mb-1">Password</label>
+
+            <label for="password" class="block mb-1">Password</label>
+            <div class="relative mb-4">
+              <PhKey class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
               <input
                 type="password"
                 id="password"
+                placeholder="********"
                 v-model="password"
                 required
-                class="w-full bg-transparent p-1 border-0 border-b-[1px] border-black dark:border-gray-400 outline-none mb-4"
+                class="w-full bg-transparent p-1 pl-8 border-b-[1px] border-gray-600 dark:border-gray-400 placeholder:text-gray-500 outline-none"
               />
             </div>
+
             <div v-if="currentView === 'signup'">
               <label for="confirmPassword" class="block mb-1">
                 Confirm Password
               </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                v-model="confirmPassword"
-                required
-                class="w-full mb-4 bg-transparent p-1 border-0 border-b-[1px] border-black dark:border-white outline-none"
-              />
+              <div class="relative mb-4">
+                <PhKey class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  placeholder="********"
+                  v-model="confirmPassword"
+                  required
+                  class="w-full bg-transparent p-1 pl-8 border-b-[1px] border-gray-600 dark:border-gray-400 placeholder:text-gray-500 outline-none"
+                />border-black
+              </div>
             </div>
+
             <div class="flex justify-center">
               <button
                 type="submit"
@@ -48,6 +59,8 @@
                 :disabled="isLoading"
               >
                 <template v-if="!isLoading">
+                  <PhSignIn v-if="currentView === 'signin'" :size="20" class="mr-2" />
+                  <PhUserCirclePlus v-else :size="20" class="mr-2" />
                   {{ submitButtonText }}
                 </template>
                 <div v-else class="loading-dots py-2 px-4">
@@ -58,19 +71,17 @@
               </button>
             </div>
           </form>
+
           <p v-if="currentView === 'signin'" class="text-center my-2">or</p>
+          
           <div v-if="currentView === 'signin'">
             <button
               @click="signInWithGoogle"
-              class="w-fit card text-gray-700 dark:text-white py-2 px-4 rounded flex items-center justify-center mb-6 mx-auto"
+              class="w-fit card text-gray-700 dark:text-white py-2 px-4 rounded flex items-center justify-center mb-8 md:mb-6 mx-auto"
               :disabled="isGoogleLoading"
             >
               <template v-if="!isGoogleLoading">
-                <img
-                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                  alt="Google logo"
-                  class="w-5 h-5 mr-2"
-                />
+                <PhGoogleLogo :size="20" class="mr-2" />
                 Sign in with Google
               </template>
               <div v-else class="loading-dots py-2 px-4">
@@ -80,11 +91,13 @@
               </div>
             </button>
           </div>
+
           <p v-if="error" class="text-red-500 mt-4 text-center">{{ error }}</p>
+          
           <p class="text-center mt-6 text-gray-500 dark:text-gray-400 text-sm">
             <button
               v-if="currentView === 'signin'"
-              class="hover:underline font-bold text-[13px]"
+              class="hover:underline font-bold text-[13px] mb-1"
               @click="openForgotPasswordInput"
             >
               Forgot password?
@@ -116,6 +129,7 @@
   import { computed, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { authStore, uiStore } from '@/store';
+  import { PhEnvelope, PhKey, PhSignIn, PhUserCirclePlus, PhGoogleLogo } from '@phosphor-icons/vue';
   import Modal from '@/components/ui/modal.vue';
 
   const isOpen = computed(() => uiStore.activeModal === 'signIn');
