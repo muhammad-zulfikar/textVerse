@@ -78,12 +78,12 @@
   import { notesStore, uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
   import Separator from '@/components/ui/separator.vue';
-  import SearchBar from '@/components/navbar/searchBar.vue';
+  import SearchBar from '@/components/header/searchBar.vue';
   import Create from '@/components/composable/dropdown/createDropdown.vue';
   import SyncButton from '@/components/composable/button/syncButton.vue';
   import Path from '@/components/composable/dropdown/pathDropdown.vue';
   import View from '@/components/composable/dropdown/viewDropdown.vue';
-  import SelectionModeOverlay from '@/components/navbar/selectionModeOverlay.vue';
+  import SelectionModeOverlay from '@/components/header/selectionModeOverlay.vue';
 
   const route = useRoute();
   const isSearchExpanded = ref(false);

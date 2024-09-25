@@ -20,6 +20,7 @@
 
   const toggleSelectMode = (event: Event) => {
     event.stopPropagation();
+    uiStore.setActiveDropdown(null);
     uiStore.toggleSelectMode();
     if (!uiStore.isSelectMode) {
       notesStore.clearSelectedNotes();

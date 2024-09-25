@@ -6,6 +6,8 @@ import { initializeStores } from './store';
 import 'tailwindcss/tailwind.css';
 import './style/style.css';
 import './style/textEditor.css';
+import './style/card.css';
+import './style/transition.css';
 import './firebase';
 
 const app = createApp(App);

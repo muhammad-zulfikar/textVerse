@@ -31,7 +31,7 @@
       "
       v-model="openColumnSubmenu"
       @update:modelValue="updateColumnSubmenu"
-      @click="toggleOptions('card')"
+      :mainClick="() => setViewType('card')"
     >
       <DropdownItem @click.stop="decreaseColumns" :icon="PhMinusCircle">
         Decrease Columns
@@ -84,12 +84,9 @@
 
   const closeModal = () => {
     isOpen.value = false;
+    uiStore.activeDropdown = null;
     expandedOption.value = '';
     openColumnSubmenu.value = false;
-  };
-
-  const toggleOptions = (option: string) => {
-    expandedOption.value = expandedOption.value === option ? '' : option;
   };
 
   const updateColumnSubmenu = (isOpen: boolean) => {

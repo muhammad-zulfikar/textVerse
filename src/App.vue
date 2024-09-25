@@ -2,7 +2,7 @@
   <div class="app-container">
     <LoadingSpinner v-if="isLoading" />
     <template v-else>
-      <Navbar ref="navbarRef" />
+      <Navbar />
       <div class="scrollable-container">
         <router-view v-slot="{ Component, route }">
           <Transition :name="transitionName" mode="out-in">
@@ -26,7 +26,7 @@
     notesStore,
     folderStore,
   } from './store';
-  import Navbar from '@/components/navbar/navbar.vue';
+  import Navbar from '@/components/header/navbar.vue';
   import Toast from '@/components/ui/toast.vue';
   import LoadingSpinner from '@/components/ui/loading.vue';
   import ModalView from '@/components/composable/modal/modalView.vue';
@@ -46,22 +46,11 @@
     { immediate: true }
   );
 
-  watch(
-    () => authStore.user,
-    async (newUser, oldUser) => {
-      if (newUser !== oldUser) {
-        await uiStore.initializeUI();
-        await notesStore.initializeNotes();
-        await folderStore.initializeFolders();
-      }
-    }
-  );
-
-  onMounted(async () => {
+  const initializeApp = async () => {
+    isLoading.value = true;
     const startTime = Date.now();
 
     try {
-      await authStore.initializeAuth();
       await uiStore.initializeUI();
       await notesStore.initializeNotes();
       await folderStore.initializeFolders();
@@ -80,6 +69,20 @@
         isLoading.value = false;
       }, remainingTime);
     }
+  };
+
+  watch(
+    () => authStore.user,
+    async (newUser, oldUser) => {
+      if (newUser !== oldUser) {
+        await initializeApp();
+      }
+    }
+  );
+
+  onMounted(async () => {
+    await authStore.initializeAuth();
+    await initializeApp();
   });
 </script>
 

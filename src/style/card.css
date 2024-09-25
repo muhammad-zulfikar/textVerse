@@ -1,0 +1,23 @@
+.card {
+  @apply bg-cream-100 dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
+}
+
+.card-rounded {
+  @apply bg-cream-100 dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300;
+}
+
+.card-fullscreen {
+  @apply bg-cream-100 dark:bg-gray-750 shadow-lg hover:shadow-2xl transition-all duration-300;
+}
+
+.card-transparent {
+  @apply bg-transparent border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300;
+}
+
+.card-transparent-avatar {
+  @apply bg-transparent border-[1px] border-black dark:border-gray-400 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300;
+}
+
+.card-no-transition {
+  @apply bg-cream-100 dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl;
+}

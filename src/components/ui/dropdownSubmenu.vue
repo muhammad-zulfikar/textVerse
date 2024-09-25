@@ -9,7 +9,7 @@
         itemType === 'active' && 'bg-cream-200 dark:bg-gray-700',
       ]"
     >
-      <div @click="handleItemClick" class="flex items-center w-full">
+      <div @click="handleMainClick" class="flex items-center w-full">
         <component :is="icon" v-if="icon" :size="20" class="size-5 mr-2" />
         <slot name="label">
           {{ label }}
@@ -55,7 +55,7 @@
       type: String as PropType<'normal' | 'destructive' | 'active'>,
       default: 'normal',
     },
-    itemClick: {
+    mainClick: {
       type: Function as PropType<(event: MouseEvent) => void>,
       required: false,
     },
@@ -76,10 +76,10 @@
     emit('update:modelValue', !props.modelValue);
   };
 
-  const handleItemClick = (event: MouseEvent) => {
+  const handleMainClick = (event: MouseEvent) => {
     event.stopPropagation();
-    if (props.itemClick) {
-      props.itemClick(event);
+    if (props.mainClick) {
+      props.mainClick(event);
     } else {
       toggleSubmenu(event);
     }

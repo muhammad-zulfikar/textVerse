@@ -47,7 +47,7 @@
       :itemType="folder === selectedFolder ? 'active' : 'normal'"
       :modelValue="openSubmenu[folder]"
       @update:modelValue="updateOpenSubmenu(folder, $event)"
-      @itemClick="selectFolder(folder)"
+      :mainClick="() => selectFolder(folder)"
     >
       <DropdownItem @click="openRenameFolderInput(folder)" :icon="PhTextbox">
         Rename
@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
+  import { ref, computed, watch } from 'vue';
   import { folderStore, uiStore } from '@/store';
   import {
     PhFolder,
@@ -119,10 +119,12 @@
     folderStore.setCurrentFolder(DEFAULT_FOLDERS.ALL_NOTES);
   };
 
-  const userFolders = folderStore.folders.filter(
-    (folder: string) =>
-      folder !== DEFAULT_FOLDERS.ALL_NOTES &&
-      folder !== DEFAULT_FOLDERS.UNCATEGORIZED
+  const userFolders = computed(() =>
+    folderStore.folders.filter(
+      (folder: string) =>
+        folder !== DEFAULT_FOLDERS.ALL_NOTES &&
+        folder !== DEFAULT_FOLDERS.UNCATEGORIZED
+    )
   );
 
   const openRenameFolderInput = (folderName: string) => {
@@ -155,4 +157,12 @@
       },
     });
   };
+
+  watch(
+    () => folderStore.folders,
+    () => {
+      userFolders.value;
+    },
+    { deep: true }
+  );
 </script>

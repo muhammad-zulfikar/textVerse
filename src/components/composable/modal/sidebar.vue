@@ -87,7 +87,7 @@
             <img
               :src="authStore.avatarUrl"
               alt="User Avatar"
-              class="size-8 rounded-full mr-2"
+              class="size-8 rounded-full object-cover mr-3"
             />
             <span>{{ authStore.user?.displayName || 'User' }}</span>
           </div>

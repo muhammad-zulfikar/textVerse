@@ -53,7 +53,7 @@
               </label>
               <div class="relative mb-4">
                 <PhKey
-                  class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                  class="absolute left-2 top-1/2 transform -translate-y-1/2"
                 />
                 <input
                   :type="showConfirmPassword ? 'text' : 'password'"
@@ -66,7 +66,7 @@
                 <button
                   type="button"
                   @click="togglePasswordVisibility('confirmPassword')"
-                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2"
                 >
                   <PhEye v-if="showConfirmPassword" />
                   <PhEyeSlash v-else />

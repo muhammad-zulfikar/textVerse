@@ -297,8 +297,8 @@
     notesStore.moveNote(props.note.value.id, folder);
 
   const deleteNote = async () => {
-    await notesStore.deleteNote(props.note.value.id);
     notesStore.closeNote();
+    await notesStore.deleteNote(props.note.value.id);
   };
 
   const restoreNote = async () => {
