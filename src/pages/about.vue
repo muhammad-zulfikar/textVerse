@@ -70,5 +70,5 @@
 
 <script setup>
   import { PhGithubLogo } from '@phosphor-icons/vue';
-  import Navbar from '@/components/navbar/navbar.vue';
+  import Navbar from '@/components/header/navbar.vue';
 </script>
