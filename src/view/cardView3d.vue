@@ -6,7 +6,7 @@
       :class="['relative min-w-[300px] md:mx-auto', columnClass]"
     >
       <li
-        v-for="note in notes"
+        v-for="(note, index) in notes"
         :key="note.id"
         class="notes card break-inside-avoid h-min mb-[9px] p-2 cursor-pointer relative group select-none transform-gpu"
         :class="[
@@ -17,6 +17,9 @@
         ]"
         @contextmenu.prevent="(event) => showContextMenu(event, note)"
         @click.stop="handleNoteClick(note)"
+        @mousemove="(event) => handleMouseMove(event, index)"
+        @mouseleave="() => handleMouseLeave(index)"
+        :ref="(el) => setCardRef(el, index)"
       >
         <NoteSelectButton :note="note" />
         <NoteHeader :note="note" />
@@ -43,7 +46,14 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+  import {
+    ComponentPublicInstance,
+    computed,
+    onMounted,
+    onUnmounted,
+    ref,
+    watch,
+  } from 'vue';
   import { notesStore, uiStore } from '@/store';
   import { Note } from '@/store/notesStore/types';
   import ContextMenu from '@/components/contextMenu/contextMenu.vue';
@@ -53,13 +63,12 @@
   import NoteContent from './card/noteContent.vue';
   import NoteFooter from './card/noteFooter.vue';
 
-  const props = defineProps<{
-    notes: Note[];
-  }>();
+  const props = defineProps<{ notes: Note[] }>();
 
   const showMenu = ref(false);
   const menuPosition = ref({ x: 0, y: 0 });
   const selectedNote = ref<Note | null>(null);
+  const cardRefs = ref<(HTMLElement | null)[]>([]);
 
   const columnClass = computed(() => {
     const classes = {
@@ -125,10 +134,51 @@
   };
 
   const handleNoteClick = (note: Note) => {
-    if (uiStore.isSelectMode) {
-      notesStore.toggleNoteSelection(note.id);
+    uiStore.isSelectMode
+      ? notesStore.toggleNoteSelection(note.id)
+      : notesStore.openNote(note.id);
+  };
+
+  const setCardRef = (
+    el: Element | ComponentPublicInstance | null,
+    index: number
+  ) => {
+    if (el instanceof HTMLElement) {
+      cardRefs.value[index] = el;
+    } else if (el) {
+      const vnode = (el as any).$?.__vnode;
+      if (vnode && vnode.el instanceof HTMLElement) {
+        cardRefs.value[index] = vnode.el;
+      } else {
+        cardRefs.value[index] = null;
+      }
     } else {
-      notesStore.openNote(note.id);
+      cardRefs.value[index] = null;
+    }
+  };
+
+  const handleMouseMove = (event: MouseEvent, index: number) => {
+    const card = cardRefs.value[index];
+    if (!(card instanceof HTMLElement)) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const deltaX = (x - rect.width / 2) / (rect.width / 2);
+    const deltaY = (y - rect.height / 2) / (rect.height / 2);
+
+    card.style.transform = `
+    perspective(1000px)
+    rotateX(${deltaY * 10}deg)
+    rotateY(${-deltaX * 10}deg)
+  `;
+  };
+
+  const handleMouseLeave = (index: number) => {
+    const card = cardRefs.value[index];
+    if (card instanceof HTMLElement) {
+      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
     }
   };
 
@@ -217,21 +267,39 @@
     font-size: 2em;
     font-weight: bold;
     line-height: 1.1;
+    /* margin-bottom: 10px; */
     padding-bottom: 5px;
+    /* border-bottom: 1px solid black; */
   }
+
+  /* .dark .content :deep(h1) {
+    border-bottom: 1px solid white;
+  } */
 
   .content :deep(h2) {
     font-size: 1.5em;
     font-weight: bold;
     line-height: 1.05;
+    /* margin-bottom: 10px; */
     padding-bottom: 5px;
+    /* border-bottom: 1px solid black; */
   }
+
+  /* .dark .content :deep(h2) {
+    border-bottom: 1px solid white;
+  } */
 
   .content :deep(h3) {
     font-size: 1.17em;
     font-weight: bold;
+    /* margin-bottom: 6px; */
     padding-bottom: 3px;
+    /* border-bottom: 1px solid black; */
   }
+
+  /* .dark .content :deep(h3) {
+    border-bottom: 1px solid white;
+  } */
 
   .content :deep(blockquote) {
     border-left: 3px solid #d9c698;
@@ -279,7 +347,16 @@
     border-width: 2px;
   }
 
+  /* .notes:hover {
+    transform: perspective(1000px) rotateX(0) rotateY(0)
+      scale3d(1.05, 1.05, 1.05);
+  }
+
+  .notes:not(:hover) {
+    transform: perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1);
+  }
+
   .notes:active {
     transform: scale(0.98);
-  }
+  } */
 </style>

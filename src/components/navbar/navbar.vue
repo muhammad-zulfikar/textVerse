@@ -5,7 +5,7 @@
     >
       <div class="flex items-center w-full relative">
         <!-- Left: Menu (always) -->
-        <transition-group name="slide-fade">
+        <TransitionGroup name="slide-fade">
           <div
             v-if="!isSelectModeActive && !isSearchExpanded"
             class="flex items-center"
@@ -16,18 +16,18 @@
             <div class="mr-2 md:mr-4"></div>
             <Path v-if="!isPublicPage" />
           </div>
-        </transition-group>
+        </TransitionGroup>
 
-        <transition name="slide-fade">
+        <Transition name="slide-fade">
           <div v-if="isSearchExpanded" class="absolute top-0 left-0">
             <Button @click.stop="setSearchExpanded(false)">
               <PhX :size="20" />
             </Button>
           </div>
-        </transition>
+        </Transition>
 
         <!-- Center: Search bar (desktop only, only on home page) -->
-        <transition name="slide-fade">
+        <Transition name="slide-fade">
           <div
             v-if="isHomePage && !isSelectModeActive"
             class="hidden md:flex justify-center items-center w-full pointer-events-none"
@@ -36,10 +36,10 @@
               <SearchBar @update:modelValue="updateSearchQuery" />
             </div>
           </div>
-        </transition>
+        </Transition>
 
         <!-- Right: Search (mobile), Create, View, Sync -->
-        <transition name="slide-fade">
+        <Transition name="slide-fade">
           <div
             v-if="isHomePage && !isSelectModeActive"
             class="flex items-center ml-auto"
@@ -60,11 +60,11 @@
               />
             </div>
           </div>
-        </transition>
+        </Transition>
 
-        <transition name="slide-fade">
+        <Transition name="slide-fade">
           <SelectionModeOverlay v-if="isSelectModeActive" />
-        </transition>
+        </Transition>
       </div>
     </div>
     <Separator />

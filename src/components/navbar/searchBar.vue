@@ -11,7 +11,7 @@
         'w-[180px]': isExpanded && isMobile,
       }"
     >
-      <transition name="expand">
+      <Transition name="expand">
         <div
           v-show="isExpanded || !isMobile"
           class="overflow-hidden absolute right-0"
@@ -30,7 +30,7 @@
             }"
           />
         </div>
-      </transition>
+      </Transition>
       <div
         @click="toggleExpand"
         class="px-2 py-1.5 cursor-pointer md:hidden z-10"

@@ -5,7 +5,7 @@
     <div
       class="font-serif card px-10 py-8 md:p-8 relative flex flex-col mx-auto max-w-md w-full"
     >
-      <transition :name="transitionName" mode="out-in">
+      <Transition :name="transitionName" mode="out-in">
         <div :key="isSignUp ? 'signup' : 'signin'">
           <h2 class="text-2xl font-bold mb-4 flex justify-center">
             {{ isSignUp ? 'Sign up' : 'Sign in' }}
@@ -101,7 +101,7 @@
             </button>
           </p>
         </div>
-      </transition>
+      </Transition>
     </div>
   </div>
 </template>

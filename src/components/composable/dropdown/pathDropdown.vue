@@ -13,25 +13,16 @@
         </span>
       </Button>
     </template>
-    <div class="px-1 space-y-1">
-      <router-link
-        v-for="route in availableRoutes"
-        :key="route.path"
-        :to="route.path"
-        @click="closeDropdown"
-        class="block w-full text-left text-sm p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
-        :class="{
-          'bg-cream-200 dark:bg-gray-700': currentPath === route.name,
-        }"
-      >
-        <component
-          :is="getIconForRoute(route.name as string)"
-          :size="20"
-          class="mr-2 inline-block"
-        />
-        {{ route.name }}
-      </router-link>
-    </div>
+    <DropdownItem
+      v-for="route in availableRoutes"
+      :key="route.path"
+      :label="getRouteLabel(route.name)"
+      :icon="getRouteIcon(getRouteLabel(route.name))"
+      :itemType="
+        currentPath === getRouteLabel(route.name) ? 'active' : 'normal'
+      "
+      @click="handleRouteClick(route.path)"
+    />
   </Dropdown>
 </template>
 
@@ -39,8 +30,17 @@
   import { computed } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { uiStore } from '@/store';
-  import { PhTrash, PhHouseLine, PhInfo, PhGear } from '@phosphor-icons/vue';
+  import {
+    PhTrash,
+    PhHouseLine,
+    PhInfo,
+    PhGear,
+    PhSignIn,
+    PhKey,
+    PhWarning,
+  } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
+  import DropdownItem from '@/components/ui/dropdownItem.vue';
   import Button from '@/components/ui/button.vue';
 
   const route = useRoute();
@@ -55,7 +55,7 @@
   });
 
   const currentIcon = computed(() => {
-    return getIconForRoute(currentPathName.value);
+    return getRouteIcon(currentPathName.value);
   });
 
   const availableRoutes = computed(() =>
@@ -66,11 +66,20 @@
         route.name !== 'About' &&
         route.name !== 'Note' &&
         route.name !== 'Public' &&
-        !(route.name === 'Sign In')
+        !(route.name === 'Sign In') &&
+        !(route.name === 'Reset Password')
     )
   );
 
-  const getIconForRoute = (routeName: string) => {
+  const getRouteLabel = (routeName: string | symbol | undefined): string => {
+    if (typeof routeName === 'string') {
+      return routeName;
+    } else {
+      return 'Unknown';
+    }
+  };
+
+  const getRouteIcon = (routeName: string) => {
     switch (routeName) {
       case 'Home':
         return PhHouseLine;
@@ -78,9 +87,20 @@
         return PhGear;
       case 'Trash':
         return PhTrash;
-      default:
+      case 'Sign In':
+        return PhSignIn;
+      case 'Reset Password':
+        return PhKey;
+      case 'About':
         return PhInfo;
+      case '404':
+        return PhWarning;
     }
+  };
+
+  const handleRouteClick = (path: string) => {
+    router.push(path);
+    closeDropdown();
   };
 
   const closeDropdown = () => {

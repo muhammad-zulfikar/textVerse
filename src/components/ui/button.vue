@@ -33,7 +33,7 @@
     danger:
       'hover:bg-red-700/50 dark:hover:bg-red-800/60 text-red-500 hover:text-red-100',
     confirm:
-      'hover:bg-blue-600 dark:hover:bg-blue-900/60 text-blue-500 hover:text-blue-200',
+      'hover:bg-blue-400 dark:hover:bg-blue-900/60 text-blue-500 hover:text-blue-100',
   } as const;
 
   const handleClick = (event: MouseEvent) => {

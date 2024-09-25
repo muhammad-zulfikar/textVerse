@@ -17,7 +17,7 @@
         ]"
         :style="{ width: props.contentWidth || 'auto' }"
       >
-        <div class="py-1" role="menu" aria-orientation="vertical">
+        <div class="py-1 space-y-1" role="menu" aria-orientation="vertical">
           <slot></slot>
         </div>
       </div>

@@ -10,22 +10,12 @@
         <PhPlus :size="20" />
       </Button>
     </template>
-    <div class="w-full text-sm px-1 space-y-1">
-      <li
-        @click.stop="openNoteForm"
-        class="w-full text-left cursor-pointer p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
-      >
-        <PhFile :size="20" class="mr-2" />
-        Note
-      </li>
-      <li
-        @click.stop="openFolderForm"
-        class="w-full text-left cursor-pointer p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
-      >
-        <PhFolder :size="20" class="mr-2" />
-        Folder
-      </li>
-    </div>
+    <DropdownItem @click.stop="openNoteForm" :icon="PhFile" label="Note" />
+    <DropdownItem
+      @click.stop="openFolderForm"
+      :icon="PhFolder"
+      label="Folder"
+    />
   </Dropdown>
 </template>
 
@@ -33,6 +23,7 @@
   import { uiStore, notesStore, folderStore } from '@/store';
   import { PhPlus, PhFile, PhFolder } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
+  import DropdownItem from '@/components/ui/dropdownItem.vue';
   import Button from '@/components/ui/button.vue';
 
   const openNoteForm = () => {

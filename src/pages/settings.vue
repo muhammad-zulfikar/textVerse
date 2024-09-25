@@ -34,21 +34,15 @@
         class="flex justify-between items-center mt-4 text-sm text-gray-600 dark:text-gray-400"
       >
         <span>Created by Zulfikar</span>
-        <div class="flex gap-4">
-          <div class="flex items-center">
-            <PhInfo :size="16" class="mr-2" />
-            <router-link to="/about" class="hover:underline">About</router-link>
-          </div>
-          <div class="flex items-center">
-            <PhGithubLogo :size="16" class="mr-2" />
-            <a
-              href="https://github.com/muhammad-zulfikar/textverse"
-              target="_blank"
-              class="hover:underline"
-            >
-              GitHub
-            </a>
-          </div>
+        <div class="flex items-center">
+          <PhGithubLogo :size="16" class="mr-2" />
+          <a
+            href="https://github.com/muhammad-zulfikar/textverse"
+            target="_blank"
+            class="hover:underline"
+          >
+            GitHub
+          </a>
         </div>
       </footer>
     </div>

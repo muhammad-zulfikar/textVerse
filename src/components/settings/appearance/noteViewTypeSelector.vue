@@ -11,14 +11,14 @@
     <Dropdown
       label="Note View Type"
       dropdownId="noteViewType"
-      contentWidth="9rem"
+      contentWidth="8.7rem"
       direction="down"
       position="right"
     >
       <template #label>
-        <Button :class="['text-sm md:text-base px-4 py-2']">
-          <component :is="currentPreferenceIcon" :size="20" class="mr-2" />
-          {{ currentPreferenceText }}
+        <Button class="text-sm md:text-base px-4 py-2">
+          <component :is="currentNoteViewTypeIcon" :size="20" class="mr-2" />
+          {{ currentNoteViewTypeText }}
           <div
             class="p-1 ml-2 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
             :class="{
@@ -30,16 +30,16 @@
           </div>
         </Button>
       </template>
-      <a
-        v-for="preference in preferences"
-        :key="preference"
-        @click="setPreference(preference)"
-        class="flex items-center flex-grow flex-shrink mx-1 p-2 hover:bg-cream-200 dark:hover:bg-gray-700 text-sm md:text-base rounded-md cursor-pointer"
-        role="menuitem"
-      >
-        <component :is="preferenceIcon(preference)" :size="20" class="mr-2" />
-        {{ preference.charAt(0).toUpperCase() + preference.slice(1) }}
-      </a>
+
+      <DropdownItem
+        v-for="(option, index) in noteViewOptions"
+        :key="index"
+        @click="setNoteViewType(option.type)"
+        :icon="option.icon"
+        :label="option.label"
+        :itemType="uiStore.noteViewType === option.type ? 'active' : 'normal'"
+        class="text-sm md:text-base"
+      />
     </Dropdown>
   </div>
 </template>
@@ -50,24 +50,39 @@
   import { uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
   import Dropdown from '@/components/ui/dropdown.vue';
+  import DropdownItem from '@/components/ui/dropdownItem.vue';
+  import type { NoteViewType } from '@/store/uiStore/types';
 
-  const preferences = ['modal', 'sidebar'] as const;
+  interface NoteViewOption {
+    label: string;
+    icon: any;
+    type: NoteViewType;
+  }
 
-  const currentPreferenceText = computed(
+  const noteViewOptions: NoteViewOption[] = [
+    {
+      label: 'Modal',
+      icon: PhCardsThree,
+      type: 'modal',
+    },
+    {
+      label: 'Sidebar',
+      icon: PhSidebar,
+      type: 'sidebar',
+    },
+  ];
+
+  const currentNoteViewTypeText = computed(
     () =>
       uiStore.noteViewType.charAt(0).toUpperCase() +
       uiStore.noteViewType.slice(1)
   );
 
-  const currentPreferenceIcon = computed(() => {
+  const currentNoteViewTypeIcon = computed(() => {
     return uiStore.noteViewType === 'modal' ? PhCardsThree : PhSidebar;
   });
 
-  const preferenceIcon = (preference: string) => {
-    return preference === 'modal' ? PhCardsThree : PhSidebar;
-  };
-
-  const setPreference = (preference: 'modal' | 'sidebar') => {
+  const setNoteViewType = (preference: NoteViewType) => {
     uiStore.setNoteViewType(preference);
     uiStore.showToastMessage('Note view type updated');
     uiStore.setActiveDropdown(null);

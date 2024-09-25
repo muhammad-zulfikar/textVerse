@@ -24,90 +24,86 @@
         </div>
       </Button>
     </template>
-    <div class="px-1 space-y-1">
-      <div
-        v-for="folder in sortedFolders"
-        :key="folder"
-        class="w-full rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
-        :class="{
-          'bg-cream-200 dark:bg-gray-700':
-            expandedFolder === folder || folder === selectedFolder,
-        }"
+
+    <DropdownItem
+      @click="selectFolder(DEFAULT_FOLDERS.ALL_NOTES)"
+      :itemType="
+        selectedFolder === DEFAULT_FOLDERS.ALL_NOTES ? 'active' : 'normal'
+      "
+      :icon="PhFolders"
+    >
+      {{ DEFAULT_FOLDERS.ALL_NOTES }} ({{
+        notesCountByFolder[DEFAULT_FOLDERS.ALL_NOTES] || 0
+      }})
+    </DropdownItem>
+
+    <DropdownSubmenu
+      v-for="folder in userFolders"
+      :key="folder"
+      :label="`${folder} (${notesCountByFolder[folder] || 0})`"
+      :icon="
+        folder !== DEFAULT_FOLDERS.UNCATEGORIZED ? PhFolder : PhFolderMinus
+      "
+      :itemType="folder === selectedFolder ? 'active' : 'normal'"
+      :modelValue="openSubmenu[folder]"
+      @update:modelValue="updateOpenSubmenu(folder, $event)"
+      @itemClick="selectFolder(folder)"
+    >
+      <DropdownItem @click="openRenameFolderInput(folder)" :icon="PhTextbox">
+        Rename
+      </DropdownItem>
+      <DropdownItem
+        @click="openDeleteFolderAlert(folder)"
+        itemType="destructive"
+        :icon="PhTrash"
       >
-        <div class="flex items-center justify-between">
-          <li
-            @click.stop="selectFolder(folder)"
-            class="text-sm cursor-pointer w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
-          >
-            <PhFolder
-              v-if="folder !== DEFAULT_FOLDERS.UNCATEGORIZED"
-              :size="20"
-              class="mr-2"
-            />
-            <PhFolderMinus v-else :size="20" class="mr-2" />
-            {{ folder }} ({{ notesCountByFolder[folder] || 0 }})
-          </li>
-          <button
-            v-if="
-              folder !== DEFAULT_FOLDERS.ALL_NOTES &&
-              folder !== DEFAULT_FOLDERS.UNCATEGORIZED
-            "
-            @click.stop="toggleOptions(folder)"
-            class="mr-2 p-1 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
-            :class="{
-              'rotate-180 bg-cream-300 dark:bg-gray-600':
-                expandedFolder === folder,
-            }"
-          >
-            <PhCaretDown :size="16" />
-          </button>
-        </div>
-        <Transition name="expand">
-          <div
-            v-if="expandedFolder === folder"
-            class="flex justify-between px-2"
-          >
-            <Button
-              @click.stop="openRenameFolderInput(folder)"
-              class="text-xs flex items-center mb-2"
-            >
-              <PhTextbox :size="16" class="mr-1" />
-              Rename
-            </Button>
-            <Button
-              variant="danger"
-              @click.stop="openDeleteFolderAlert(folder)"
-              class="text-xs flex items-center mb-2"
-            >
-              <PhTrash :size="16" class="mr-1" />
-              Delete
-            </Button>
-          </div>
-        </Transition>
-      </div>
-    </div>
+        Delete
+      </DropdownItem>
+    </DropdownSubmenu>
+
+    <DropdownItem
+      @click="selectFolder(DEFAULT_FOLDERS.UNCATEGORIZED)"
+      :itemType="
+        selectedFolder === DEFAULT_FOLDERS.UNCATEGORIZED ? 'active' : 'normal'
+      "
+      :icon="PhFolderMinus"
+    >
+      {{ DEFAULT_FOLDERS.UNCATEGORIZED }} ({{
+        notesCountByFolder[DEFAULT_FOLDERS.UNCATEGORIZED] || 0
+      }})
+    </DropdownItem>
   </Dropdown>
 </template>
 
 <script setup lang="ts">
   import { ref, computed } from 'vue';
-  import { notesStore, folderStore, uiStore } from '@/store';
+  import { folderStore, uiStore } from '@/store';
   import {
     PhFolder,
     PhFolders,
     PhFolderMinus,
     PhArrowCounterClockwise,
-    PhCaretDown,
     PhTextbox,
     PhTrash,
   } from '@phosphor-icons/vue';
   import Dropdown from '@/components/ui/dropdown.vue';
+  import DropdownItem from '@/components/ui/dropdownItem.vue';
+  import DropdownSubmenu from '@/components/ui/dropdownSubmenu.vue';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
   import Button from '@/components/ui/button.vue';
 
   const selectedFolder = computed(() => folderStore.currentFolder);
   const notesCountByFolder = computed(() => folderStore.notesCountByFolder());
-  const expandedFolder = ref('');
+  const openSubmenu = ref<{ [key: string]: boolean }>({});
+
+  const updateOpenSubmenu = (folder: string, isOpen: boolean) => {
+    Object.keys(openSubmenu.value).forEach((key) => {
+      if (key !== folder) {
+        openSubmenu.value[key] = false;
+      }
+    });
+    openSubmenu.value[folder] = isOpen;
+  };
 
   const selectFolder = (folder: string) => {
     folderStore.setCurrentFolder(folder);
@@ -123,29 +119,11 @@
     folderStore.setCurrentFolder(DEFAULT_FOLDERS.ALL_NOTES);
   };
 
-  const toggleOptions = (folder: string) => {
-    expandedFolder.value = expandedFolder.value === folder ? '' : folder;
-  };
-
-  const sortedFolders = computed(() => {
-    const userFolders = folderStore.folders.filter(
-      (folder: string) =>
-        folder !== DEFAULT_FOLDERS.ALL_NOTES &&
-        folder !== DEFAULT_FOLDERS.UNCATEGORIZED
-    );
-
-    const uncategorizedNotes = notesStore.notes.filter(
-      (note) => note.folder === DEFAULT_FOLDERS.UNCATEGORIZED
-    );
-    const showUncategorized = uncategorizedNotes.length > 0;
-
-    const finalFolders = [DEFAULT_FOLDERS.ALL_NOTES, ...userFolders.sort()];
-    if (showUncategorized) {
-      finalFolders.push(DEFAULT_FOLDERS.UNCATEGORIZED);
-    }
-
-    return finalFolders;
-  });
+  const userFolders = folderStore.folders.filter(
+    (folder: string) =>
+      folder !== DEFAULT_FOLDERS.ALL_NOTES &&
+      folder !== DEFAULT_FOLDERS.UNCATEGORIZED
+  );
 
   const openRenameFolderInput = (folderName: string) => {
     folderStore.targetFolder = folderName;

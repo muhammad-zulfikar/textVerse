@@ -38,7 +38,7 @@
             </th>
           </tr>
         </thead>
-        <transition-group name="list" tag="tbody">
+        <TransitionGroup name="list" tag="tbody">
           <tr
             v-for="note in notes"
             :key="note.id"
@@ -108,7 +108,7 @@
               {{ localeDate(note.last_edited) }}
             </td>
           </tr>
-        </transition-group>
+        </TransitionGroup>
       </table>
     </div>
   </div>

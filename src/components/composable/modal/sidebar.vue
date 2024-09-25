@@ -63,7 +63,7 @@
         </li>
       </div>
 
-      <div class="p-2">
+      <div v-if="recentNotes.length > 0" class="p-2">
         <h2 class="font-bold mb-2 px-2 mt-2">Recent Notes</h2>
         <div
           v-for="note in recentNotes"
@@ -89,7 +89,7 @@
               alt="User Avatar"
               class="size-8 rounded-full mr-2"
             />
-            <span>{{ authStore.user?.displayName }}</span>
+            <span>{{ authStore.user?.displayName || 'User' }}</span>
           </div>
           <div
             class="p-1 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
@@ -101,7 +101,7 @@
           </div>
         </button>
 
-        <transition name="fade">
+        <Transition name="fade">
           <div
             v-if="isUserDropupOpen"
             class="dropup card mt-2 p-2 mx-2 rounded shadow-lg z-60"
@@ -128,14 +128,14 @@
               </button>
             </div>
           </div>
-        </transition>
+        </Transition>
       </div>
     </div>
   </Modal>
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue';
+  import { computed, ref, watch } from 'vue';
   import { useRouter } from 'vue-router';
   import { authStore, folderStore, notesStore, uiStore } from '@/store';
   import {
@@ -238,17 +238,34 @@
       },
     });
   };
+
+  const activeModal = computed(() => uiStore.activeModal);
+
+  watch(activeModal, (newVal) => {
+    if (newVal === null) {
+      isUserDropupOpen.value = false;
+    }
+  });
 </script>
 
 <style scoped>
   .fade-enter-active,
   .fade-leave-active {
-    transition: opacity 0.3s ease;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
   }
 
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;
+    transform: translateY(50%);
+  }
+
+  .fade-enter-to,
+  .fade-leave-from {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .dropup {

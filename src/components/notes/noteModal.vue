@@ -1,3 +1,5 @@
+<!--noteModal-->
+
 <template>
   <Modal :modelValue="props.isOpen" id="noteModal" @close="clickOutside">
     <div ref="modalContainer" :class="modalClasses">
@@ -10,8 +12,8 @@
         <TextEditor
           v-model="editedNote.content"
           @update:modelValue="updateNoteContent"
-          :showToolbar="true"
-          :editable="true"
+          :showToolbar="!props.isTrash"
+          :editable="!props.isTrash"
           class="h-full flex-grow overflow-y-auto"
         />
       </div>
@@ -37,6 +39,7 @@
   const props = defineProps<{
     noteId: string | null;
     isOpen: boolean;
+    isTrash?: boolean;
   }>();
 
   const isMobile = ref(window.innerWidth <= 768);
@@ -55,12 +58,16 @@
       'card w-11/12 md:w-3/4 lg:w-1/2 xl:w-3/5': !uiStore.isExpanded,
     },
   ]);
+  const noteArray = computed(() =>
+    props.isTrash ? notesStore.deletedNotes : notesStore.notes
+  );
 
   const toolbarProps = computed(() => ({
     note: editedNote,
     isEditing: isEditing.value,
     hasChanges: hasChanges.value,
     isSaving: isSaving.value,
+    isTrash: props.isTrash,
   }));
 
   const hasChanges = computed(() =>
@@ -122,6 +129,11 @@
   }
 
   async function clickOutside() {
+    if (props.isTrash) {
+      notesStore.closeNote(true);
+      return;
+    }
+
     if (isContentEmpty(editedNote.value.content)) {
       if (editedNote.value.id) {
         await notesStore.deleteNote(editedNote.value.id);
@@ -152,20 +164,20 @@
   }
 
   watch(
-    [() => props.isOpen, () => props.noteId],
-    async ([isOpen, newNoteId]) => {
+    [() => props.isOpen, () => props.noteId, () => props.isTrash],
+    async ([isOpen, newNoteId, isTrash]) => {
       if (isOpen) {
         if (isMobile.value) {
           uiStore.isExpanded = true;
         }
         await nextTick();
         if (newNoteId !== null) {
-          const note = notesStore.notes.find((n) => n.id === newNoteId);
+          const note = noteArray.value.find((n) => n.id === newNoteId);
           if (note) {
             editedNote.value = { ...note };
             initialNote.value = { ...note };
             setupNoteListener(newNoteId);
-            isEditing.value = true;
+            isEditing.value = !isTrash;
           }
         } else {
           editedNote.value = createEmptyNote();

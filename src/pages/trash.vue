@@ -1,3 +1,5 @@
+<!-- trash.vue -->
+
 <template>
   <div class="trashContainer">
     <div
@@ -36,114 +38,64 @@
             Empty Trash
           </Button>
         </div>
-        <transition-group
+        <TransitionGroup
           name="list"
           tag="ul"
-          :class="[
-            'relative min-w-[300px] md:mx-auto',
-            {
-              'columns-1 md:max-w-xl': uiStore.columns === 1,
-              'columns-2 gap-2 md:gap-7 md:max-w-4xl': uiStore.columns === 2,
-              'columns-3 sm:columns-2 md:columns-3 gap-8 md:max-w-6xl':
-                uiStore.columns === 3,
-              'columns-4 sm:columns-2 md:columns-3 lg:columns-4 gap-4':
-                uiStore.columns === 4,
-              'columns-5 sm:columns-2 md:columns-3 lg:columns-5 gap-2':
-                uiStore.columns === 5,
-            },
-          ]"
+          :class="['relative min-w-[300px] md:mx-auto', columnClass]"
         >
           <li
             v-for="note in deletedNotes"
             :key="note.id"
-            class="notes bg-cream-100 dark:bg-gray-750 border-[1px] border-black dark:border-gray-400 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 break-inside-avoid h-min mb-[9px] p-2 cursor-pointer relative group select-none"
-            :class="{
-              'z-50': showMenu && notesStore.selectedNote?.id === note.id,
-              shadow: notesStore.selectedNotes.includes(note.id),
-              'border-[2px] dark:border-white':
-                notesStore.selectedNotes.includes(note.id),
-              [computedMb]: true,
-            }"
-            @click="(event) => toggleNoteSelection(event, note.id)"
+            class="notes card break-inside-avoid h-min mb-[9px] p-2 cursor-pointer relative group select-none transform-gpu"
+            :class="[
+              { 'z-50': showMenu && notesStore.selectedNote?.id === note.id },
+              { shadow: note.pinned },
+              { selected: notesStore.selectedNotes.includes(note.id) },
+              computedMb,
+            ]"
+            @click.stop="handleNoteClick(note)"
           >
-            <div
-              class="absolute top-0 -left-3 card-rounded hover:bg-cream-200 dark:hover:bg-gray-700 transition-opacity duration-200"
-              :class="{
-                'opacity-100': notesStore.selectedNotes.includes(note.id),
-                'opacity-0 group-hover:opacity-100':
-                  !notesStore.selectedNotes.includes(note.id),
-              }"
-              @click="(event) => toggleNoteSelection(event, note.id)"
-              style="transform: translateY(-50%)"
-            >
-              <div class="p-1 rounded-full flex items-center justify-center">
-                <PhCheck :size="16" />
-              </div>
-            </div>
-            <div class="flex justify-between items-start">
-              <h1
-                class="font-bold text-sl font-serif cursor-pointer dark:text-white"
-              >
-                {{ note.title }}
-              </h1>
-            </div>
-            <div>
-              <div
-                class="font-serif text-sm mt-2 dark:text-white truncate-text"
-                v-html="sanitizeHtml(truncatedContent(note.content))"
-              ></div>
-              <div
-                class="flex justify-between items-center pt-3 mt-auto font-serif text-gray-700 dark:text-gray-400 text-xs"
-              >
-                <div class="flex items-center text-left text-[10px] md:text-xs">
-                  <div
-                    @click.stop="openDeleteNoteAlert(note.id)"
-                    class="flex items-center px-2 py-1 mr-2 cursor-pointer truncate card text-red-500 hover:text-red-100 hover:bg-red-700/50 dark:hover:bg-red-800/60"
-                  >
-                    <PhTrash :size="16" />
-                  </div>
-                  <div
-                    @click.stop="restoreNote(note.id)"
-                    class="flex items-center px-2 py-1 cursor-pointer truncate card hover:text-black dark:hover:text-white hover:bg-cream-200 dark:hover:bg-gray-700"
-                  >
-                    <PhClockClockwise :size="16" />
-                  </div>
-                </div>
-                <div class="text-left text-[10px] md:text-xs">
-                  <p
-                    v-if="note.folder !== DEFAULT_FOLDERS.UNCATEGORIZED"
-                    class="flex items-center px-2 py-1 cursor-pointer truncate card"
-                  >
-                    <PhFolder :size="16" class="mr-2" />
-                    {{ note.folder }}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <NoteSelectButton :note="note" />
+            <NoteHeader :note="note" />
+            <Separator />
+            <NoteContent :note="note" />
+            <DeletedNoteFooter :note="note" />
           </li>
-        </transition-group>
+        </TransitionGroup>
       </div>
     </div>
+    <NoteView :isTrash="true" />
   </div>
 </template>
 
 <script lang="ts" setup>
   import { ref, computed, onMounted, onUnmounted } from 'vue';
   import { notesStore, uiStore } from '@/store';
+  import { Note } from '@/store/notesStore/types';
+  import { PhTrash } from '@phosphor-icons/vue';
+  import NoteView from '@/components/notes/noteView.vue';
   import LoadingSpinner from '@/components/ui/loading.vue';
-  import {
-    PhCheck,
-    PhFolder,
-    PhTrash,
-    PhClockClockwise,
-  } from '@phosphor-icons/vue';
-  import DOMPurify from 'dompurify';
   import Button from '@/components/ui/button.vue';
-  import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
+  import Separator from '@/components/ui/separator.vue';
+  import NoteSelectButton from '@/view/card/noteSelectButton.vue';
+  import NoteHeader from '@/view/card/noteHeader.vue';
+  import NoteContent from '@/view/card/noteContent.vue';
+  import DeletedNoteFooter from '@/view/card/deletedNoteFooter.vue';
 
   const showMenu = ref(false);
   const selectedNotes = ref<string[]>([]);
   const deletedNotes = computed(() => notesStore.deletedNotes);
+
+  const columnClass = computed(() => {
+    const classes = {
+      1: 'columns-1 md:max-w-xl',
+      2: 'columns-2 gap-2 md:gap-7 md:max-w-4xl',
+      3: 'columns-3 sm:columns-2 md:columns-3 gap-8 md:max-w-6xl',
+      4: 'columns-4 sm:columns-2 md:columns-3 lg:columns-4 gap-4',
+      5: 'columns-5 sm:columns-2 md:columns-3 lg:columns-5 gap-2',
+    };
+    return classes[uiStore.columns as keyof typeof classes];
+  });
 
   const computedMb = computed(() => {
     if (uiStore.columns === 4) {
@@ -155,64 +107,11 @@
     }
   });
 
-  const sanitizeHtml = (content: string) => {
-    return DOMPurify.sanitize(content);
-  };
-
-  const truncatedContent = (content: string) => {
-    const div = document.createElement('div');
-    div.innerHTML = content;
-    return div.innerHTML;
-  };
-
-  const isSelectMode = ref(false);
-
-  const toggleNoteSelection = (event: Event, noteId: string) => {
-    event.stopPropagation();
-    notesStore.toggleNoteSelection(noteId);
-
-    const index = selectedNotes.value.indexOf(noteId);
-    if (index === -1) {
-      selectedNotes.value.push(noteId);
+  const handleNoteClick = (note: Note) => {
+    if (uiStore.isSelectMode) {
+      notesStore.toggleNoteSelection(note.id);
     } else {
-      selectedNotes.value.splice(index, 1);
-    }
-
-    if (!isSelectMode.value) {
-      isSelectMode.value = true;
-    }
-  };
-
-  const openDeleteNoteAlert = (noteId: string) => {
-    notesStore.noteToDelete = noteId;
-    uiStore.openAlertModal({
-      message: `Are you sure you want to permanently delete this note?`,
-      confirm: async () => {
-        if (notesStore.noteToDelete) {
-          try {
-            await notesStore.permanentlyDeleteNote(notesStore.noteToDelete);
-            uiStore.showToastMessage('Note permanently deleted');
-          } catch (error) {
-            console.error('Error deleting note:', error);
-            uiStore.showToastMessage(
-              'Failed to delete note. Please try again.'
-            );
-          }
-        }
-      },
-      cancel: () => {
-        uiStore.setActiveModal(null);
-      },
-    });
-  };
-
-  const restoreNote = async (noteId: string) => {
-    try {
-      await notesStore.restoreNote(noteId);
-      uiStore.showToastMessage('Note restored');
-    } catch (error) {
-      console.error('Error restoring note:', error);
-      uiStore.showToastMessage('Failed to restore note. Please try again.');
+      notesStore.openNote(note.id, true);
     }
   };
 
@@ -236,14 +135,14 @@
 
   const handleOutsideClick = (event: MouseEvent) => {
     if (!(event.target as HTMLElement).closest('li')) {
-      isSelectMode.value = false;
+      uiStore.isSelectMode = false;
       selectedNotes.value = [];
       notesStore.clearSelectedNotes();
     }
   };
 
   const closeSelectMode = () => {
-    isSelectMode.value = false;
+    uiStore.isSelectMode = false;
     selectedNotes.value = [];
     notesStore.clearSelectedNotes();
   };

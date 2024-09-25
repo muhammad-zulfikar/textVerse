@@ -52,8 +52,8 @@
           @click="openForgotPasswordInput"
           class="py-2 px-4 text-sm md:text-base w-full sm:w-auto"
         >
-          <PhTextbox :size="20" class="mr-2" />
-          Change Password
+          <PhKey :size="20" class="mr-2" />
+          Reset Password
         </Button>
         <Button
           @click="openDeleteAccountAlert"
@@ -75,8 +75,8 @@
     PhPencilSimpleLine,
     PhEye,
     PhSwap,
-    PhTextbox,
     PhTrash,
+    PhKey,
   } from '@phosphor-icons/vue';
   import { authStore, uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';

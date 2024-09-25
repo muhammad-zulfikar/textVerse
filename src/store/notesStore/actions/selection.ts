@@ -1,18 +1,26 @@
 import { NotesState } from '../state';
 import { uiStore } from '@/store';
 
-export const openNote = (state: NotesState, noteId: string | null): void => {
+export const openNote = (
+  state: NotesState,
+  noteId: string | null,
+  isTrashNote: boolean = false
+): void => {
   state.selectedNoteId = noteId;
   if (noteId) {
-    window.history.pushState({}, '', `/${noteId}`);
+    const baseUrl = isTrashNote ? '/trash' : '';
+    window.history.pushState({}, '', `${baseUrl}/${noteId}`);
   }
   uiStore.setActiveDropdown(null);
   uiStore.openNoteView();
 };
 
-export const closeNote = (state: NotesState): void => {
+export const closeNote = (
+  state: NotesState,
+  isTrashNote: boolean = false
+): void => {
   state.selectedNoteId = null;
-  window.history.pushState({}, '', '/');
+  window.history.pushState({}, '', isTrashNote ? '/trash' : '/');
   uiStore.setActiveDropdown(null);
   uiStore.closeNoteView();
 };

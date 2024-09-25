@@ -96,7 +96,7 @@
       <Dropdown
         ref="dropdownRef"
         dropdownId="noteOptionsDropdown"
-        contentWidth="9.5rem"
+        contentWidth="9rem"
         position="right"
         direction="down"
       >
@@ -108,115 +108,222 @@
           </div>
         </template>
 
-        <DropdownItem @click="closeNote" :icon="PhX" label="Close" />
+        <div
+          @click="closeNote"
+          class="block px-1 text-sm cursor-pointer"
+          role="menuitem"
+        >
+          <span
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhX :size="20" class="size-5 mr-2" />
+            Close
+          </span>
+        </div>
 
-        <DropdownItem
+        <div
           v-if="!isMobile"
           @click="toggleExpand"
-          :icon="isExpanded ? PhArrowsIn : PhArrowsOut"
-          :label="isExpanded ? 'Collapse' : 'Expand'"
-        />
+          class="block px-1 text-sm cursor-pointer"
+          role="menuitem"
+        >
+          <span
+            class="p-2 w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhArrowsIn v-if="isExpanded" :size="20" class="size-5 mr-2" />
+            <PhArrowsOut v-else :size="20" class="size-5 mr-2" />
+            {{ isExpanded ? 'Collapse' : 'Expand' }}
+          </span>
+        </div>
 
-        <DropdownItem
+        <div
           v-if="!isTrash"
           @click="copyNote"
-          :icon="PhClipboardText"
-          label="Copy"
-        />
+          class="block px-1 text-sm cursor-pointer"
+          role="menuitem"
+        >
+          <span
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhClipboardText :size="20" class="mr-2" />
+            Copy
+          </span>
+        </div>
 
-        <DropdownItem
+        <div
           v-if="!isTrash"
           @click="duplicateNote"
-          :icon="PhCopy"
-          label="Duplicate"
-        />
+          class="block px-1 text-sm cursor-pointer"
+          role="menuitem"
+        >
+          <span
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhCopy :size="20" class="mr-2" />
+            Duplicate
+          </span>
+        </div>
 
-        <DropdownItem
+        <div
           v-if="!isNotePinned && !isTrash"
           @click="togglePin"
-          :icon="PhPushPin"
-          label="Pin"
-        />
+          class="block px-1 text-sm cursor-pointer"
+          role="menuitem"
+        >
+          <span
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhPushPin :size="20" class="size-5 mr-2" />
+            Pin
+          </span>
+        </div>
 
-        <DropdownItem
+        <div
           v-if="isNotePinned && !isTrash"
           @click="togglePin"
-          :icon="PhPushPinSlash"
-          label="Unpin"
-        />
+          class="block px-1 text-sm cursor-pointer"
+          role="menuitem"
+        >
+          <span
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhPushPinSlash :size="20" class="size-5 mr-2" />
+            Unpin
+          </span>
+        </div>
 
-        <DropdownSubmenu
+        <div
           v-if="authStore.isLoggedIn && !isTrash"
-          :icon="isNotePublic ? PhGlobe : PhLock"
-          :label="isNotePublic ? 'Public' : 'Private'"
-          :modelValue="activeSubmenu === 'public'"
-          @update:modelValue="toggleSubmenu('public', $event)"
+          @click.stop="toggleSubmenu('visibility', $event)"
+          class="block px-1 text-sm cursor-pointer relative"
+          role="menuitem"
         >
-          <DropdownItem
-            @click="togglePublic"
-            :icon="PhLock"
-            label="Private"
-            :itemType="!isNotePublic ? 'active' : 'normal'"
-          />
-          <DropdownItem
-            @click="togglePublic"
-            :icon="PhGlobe"
-            label="Public"
-            :itemType="isNotePublic ? 'active' : 'normal'"
-          />
-          <DropdownItem
-            v-if="isNotePublic"
-            @click="copyLink"
-            :icon="PhCopy"
-            label="Copy link"
-          />
-        </DropdownSubmenu>
+          <span
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhGlobe v-if="isNotePublic" :size="20" class="size-5 mr-2" />
+            <PhLock v-else :size="20" class="size-5 mr-2" />
+            {{ isNotePublic ? 'Public' : 'Private' }}
+            <PhCaretRight :size="14" class="absolute right-2" />
+          </span>
+          <div
+            v-if="activeSubmenu.visibility"
+            :class="[
+              'absolute top-0 card p-1 space-y-1 min-w-36 whitespace-nowrap',
+              submenuPosition === 'right'
+                ? 'left-full -ml-1'
+                : 'right-full -mr-1',
+            ]"
+          >
+            <div
+              @click="togglePublic"
+              class="p-2 cursor-pointer rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+              :class="{
+                'bg-cream-200 dark:bg-gray-700': !isNotePublic,
+              }"
+            >
+              <PhLock :size="20" class="size-5 mr-2" />
+              Private
+            </div>
+            <div
+              @click="togglePublic"
+              class="p-2 cursor-pointer rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+              :class="{
+                'bg-cream-200 dark:bg-gray-700': isNotePublic,
+              }"
+            >
+              <PhGlobe :size="20" class="size-5 mr-2" />
+              Public
+            </div>
+            <div
+              v-if="isNotePublic"
+              @click="copyLink"
+              class="p-2 cursor-pointer rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+            >
+              <PhCopy :size="20" class="size-5 mr-2" />
+              Copy link
+            </div>
+          </div>
+        </div>
 
-        <DropdownSubmenu
+        <div
           v-if="!isTrash"
-          :icon="
-            folder !== DEFAULT_FOLDERS.UNCATEGORIZED ? PhFolder : PhFolderMinus
-          "
-          :label="folderValue"
-          :modelValue="activeSubmenu === 'folder'"
-          @update:modelValue="toggleSubmenu('folder', $event)"
+          @click.stop="toggleSubmenu('folder', $event)"
+          class="block px-1 text-sm cursor-pointer relative"
+          role="menuitem"
         >
-          <DropdownItem
-            v-for="folder in availableFolders"
-            :key="folder"
-            :icon="
-              folder !== DEFAULT_FOLDERS.UNCATEGORIZED
-                ? PhFolder
-                : PhFolderMinus
-            "
-            :label="folder"
-            :itemType="folder === folderValue ? 'active' : 'normal'"
-            @click="moveNote(folder)"
-          />
-        </DropdownSubmenu>
+          <span
+            class="p-2 cursor-pointer w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhFolder :size="20" class="size-5 mr-2" />
+            {{ folderValue }}
+            <PhCaretRight :size="14" class="absolute right-2" />
+          </span>
+          <div
+            v-if="activeSubmenu.folder"
+            :class="[
+              'absolute top-0 card p-1 space-y-1 min-w-36 whitespace-nowrap',
+              submenuPosition === 'right'
+                ? 'left-full -ml-1'
+                : 'right-full -mr-1',
+            ]"
+          >
+            <div
+              v-for="folder in availableFolders"
+              :key="folder"
+              @click="moveNote(folder)"
+              class="p-2 cursor-pointer rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+              :class="{
+                'bg-cream-200 dark:bg-gray-700': folder === folderValue,
+              }"
+            >
+              <PhFolder :size="20" class="size-5 mr-2" />
+              {{ folder }}
+            </div>
+          </div>
+        </div>
 
-        <DropdownItem
+        <div
           v-if="isEditing"
           @click="deleteNote"
-          :icon="PhTrash"
-          label="Delete"
-          itemType="destructive"
-        />
+          class="block px-1 text-sm cursor-pointer text-red-500 hover:text-red-100"
+          role="menuitem"
+        >
+          <span
+            class="p-2 w-full text-left rounded-md hover:bg-red-700/50 dark:hover:bg-red-800/60 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhTrash :size="20" class="size-5 mr-2" />
+            Delete
+          </span>
+        </div>
 
-        <DropdownItem
+        <div
           v-if="isTrash"
           @click="restoreNote"
-          :icon="PhClockClockwise"
-          label="Restore"
-        />
+          class="block px-1 text-sm cursor-pointer"
+          role="menuitem"
+        >
+          <span
+            class="p-2 w-full text-left rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhClockClockwise size="20" class="size-5 mr-2" />
+            Restore
+          </span>
+        </div>
 
-        <DropdownItem
+        <div
           v-if="isTrash"
           @click="deleteNotePermanently"
-          :icon="PhTrash"
-          label="Delete"
-          itemType="destructive"
-        />
+          class="block px-1 text-sm cursor-pointer text-red-500 hover:text-red-100"
+          role="menuitem"
+        >
+          <span
+            class="p-2 w-full text-left rounded-md hover:bg-red-700/50 dark:hover:bg-red-800/60 transition-colors duration-200 flex items-center whitespace-nowrap"
+          >
+            <PhTrash :size="20" class="size-5 mr-2" />
+            Delete
+          </span>
+        </div>
       </Dropdown>
     </div>
   </div>
@@ -239,11 +346,11 @@
     PhGlobe,
     PhGlobeX,
     PhFolder,
-    PhFolderMinus,
     PhArrowsIn,
     PhArrowsOut,
     PhTrash,
     PhClockClockwise,
+    PhCaretRight,
     PhPushPin,
     PhPushPinSlash,
     PhLock,
@@ -254,8 +361,6 @@
   } from '@phosphor-icons/vue';
   import { uiStore, folderStore, authStore, notesStore } from '@/store';
   import Dropdown from '@/components/ui/dropdown.vue';
-  import DropdownItem from '@/components/ui/dropdownItem.vue';
-  import DropdownSubmenu from '@/components/ui/dropdownSubmenu.vue';
   import Button from '@/components/ui/button.vue';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
   import { Note } from '@/store/notesStore/types';
@@ -273,11 +378,6 @@
     isTrash: boolean;
   }>();
 
-  const activeSubmenu = ref<'public' | 'folder' | null>(null);
-
-  const toggleSubmenu = (submenu: 'public' | 'folder', isOpen: boolean) => {
-    activeSubmenu.value = isOpen ? submenu : null;
-  };
   const title = computed(() => props.note.value.title);
   const folder = computed(() => props.note.value.folder);
   const isNotePublic = computed(() =>
@@ -407,6 +507,40 @@
   const isMobile = computed(() => window.innerWidth <= 768);
   const toggleExpand = () => uiStore.toggleExpand();
 
+  const activeSubmenu = ref({
+    visibility: false,
+    folder: false,
+  });
+
+  const submenuPosition = ref('right');
+
+  const checkSubmenuPosition = (event: MouseEvent) => {
+    const targetElement = event.currentTarget as HTMLElement;
+    const rect = targetElement.getBoundingClientRect();
+    const spaceOnRight = window.innerWidth - rect.right;
+    const requiredSpace = 200;
+
+    submenuPosition.value = spaceOnRight >= requiredSpace ? 'right' : 'left';
+  };
+
+  const toggleSubmenu = (
+    submenu: 'visibility' | 'folder',
+    event: MouseEvent
+  ) => {
+    checkSubmenuPosition(event);
+
+    if (submenu === 'visibility') {
+      activeSubmenu.value.visibility = !activeSubmenu.value.visibility;
+      activeSubmenu.value.folder = false;
+    } else {
+      if (activeSubmenu.value.visibility && submenu === 'folder') {
+        activeSubmenu.value.visibility = false;
+      }
+
+      activeSubmenu.value[submenu] = !activeSubmenu.value[submenu];
+    }
+  };
+
   watch(
     () => props.note.value.title,
     (newTitle) => {
@@ -428,9 +562,10 @@
 
   watch(
     () => uiStore.activeDropdown,
-    (newActiveDropdown) => {
-      if (newActiveDropdown === null) {
-        activeSubmenu.value = null;
+    (newDropdown) => {
+      if (newDropdown === null) {
+        activeSubmenu.value.visibility = false;
+        activeSubmenu.value.folder = false;
       }
     }
   );

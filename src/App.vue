@@ -5,14 +5,12 @@
       <Navbar ref="navbarRef" />
       <div class="scrollable-container">
         <router-view v-slot="{ Component, route }">
-          <transition :name="transitionName" mode="out-in">
+          <Transition :name="transitionName" mode="out-in">
             <component :is="Component" :key="route.path"></component>
-          </transition>
+          </Transition>
         </router-view>
-        <Transition name="toast-slide">
-          <Toast v-if="uiStore.showToast" :message="uiStore.toastMessage" />
-        </Transition>
       </div>
+      <Toast />
       <ModalView />
     </template>
   </div>

@@ -22,60 +22,16 @@ export const useFolderStore = defineStore('folders', {
       if (index !== -1) {
         this.folders[index] = newName;
         await this.saveFolders();
-
-        if (authStore.isLoggedIn) {
-          const notes = await firebaseStore.getAllNotesFromFirebase(
-            authStore.user!.uid
-          );
-          for (const note of Object.values(notes)) {
-            if (note.folder === oldName) {
-              await firebaseStore.updateNoteInFirebase(
-                authStore.user!.uid,
-                note.id,
-                { folder: newName }
-              );
-            }
-          }
-        } else {
-          const updatedNotes = notesStore.notes.map((note: Note) => {
-            if (note.folder === oldName) {
-              return { ...note, folder: newName };
-            }
-            return note;
-          });
-          notesStore.notes = updatedNotes;
-          localStorage.setItem('notes', JSON.stringify(updatedNotes));
-        }
+        await this.updateNoteFolders(oldName, newName);
       }
+      this.currentFolder = newName;
+      uiStore.showToastMessage(`Folder ${oldName} renamed to ${newName}`);
     },
 
     async deleteFolder(folderName: string) {
       this.folders = this.folders.filter((f) => f !== folderName);
       await this.saveFolders();
-
-      if (authStore.isLoggedIn) {
-        const notes = await firebaseStore.getAllNotesFromFirebase(
-          authStore.user!.uid
-        );
-        for (const note of Object.values(notes)) {
-          if (note.folder === folderName) {
-            await firebaseStore.updateNoteInFirebase(
-              authStore.user!.uid,
-              note.id,
-              { folder: DEFAULT_FOLDERS.UNCATEGORIZED }
-            );
-          }
-        }
-      } else {
-        const updatedNotes = notesStore.notes.map((note: Note) => {
-          if (note.folder === folderName) {
-            return { ...note, folder: DEFAULT_FOLDERS.UNCATEGORIZED };
-          }
-          return note;
-        });
-        notesStore.notes = updatedNotes;
-        localStorage.setItem('notes', JSON.stringify(updatedNotes));
-      }
+      await this.updateNoteFolders(folderName, DEFAULT_FOLDERS.UNCATEGORIZED);
 
       if (this.currentFolder === folderName) {
         this.currentFolder = DEFAULT_FOLDERS.ALL_NOTES;
@@ -85,13 +41,6 @@ export const useFolderStore = defineStore('folders', {
 
     setCurrentFolder(folderName: string) {
       this.currentFolder = folderName;
-    },
-
-    clearFolderListener() {
-      if (this.folderListener) {
-        off(ref(db, `users/${authStore.user!.uid}/folders`));
-        this.folderListener = null;
-      }
     },
 
     loadLocalFolders() {
@@ -121,7 +70,7 @@ export const useFolderStore = defineStore('folders', {
           ])
         );
       } else {
-        this.loadLocalFolders();
+        this.folders = [];
         await this.saveFolders();
       }
     },
@@ -143,13 +92,22 @@ export const useFolderStore = defineStore('folders', {
       });
     },
 
+    clearFolderListener() {
+      if (this.folderListener) {
+        off(ref(db, `users/${authStore.user!.uid}/folders`));
+        this.folderListener = null;
+      }
+    },
+
     async saveFolders() {
+      const foldersToSave = this.folders.filter(
+        (f) =>
+          ![DEFAULT_FOLDERS.ALL_NOTES, DEFAULT_FOLDERS.UNCATEGORIZED].includes(
+            f
+          )
+      );
+
       if (authStore.isLoggedIn) {
-        const foldersToSave = this.folders.filter(
-          (f) =>
-            f !== DEFAULT_FOLDERS.ALL_NOTES &&
-            f !== DEFAULT_FOLDERS.UNCATEGORIZED
-        );
         const foldersObj = Object.fromEntries(
           foldersToSave.map((f) => [f, true])
         );
@@ -159,23 +117,55 @@ export const useFolderStore = defineStore('folders', {
       }
     },
 
+    async updateNoteFolders(oldFolder: string, newFolder: string) {
+      if (authStore.isLoggedIn) {
+        const notes = await firebaseStore.getAllNotesFromFirebase(
+          authStore.user!.uid
+        );
+        for (const note of Object.values(notes)) {
+          if (note.folder === oldFolder) {
+            await firebaseStore.updateNoteInFirebase(
+              authStore.user!.uid,
+              note.id,
+              { folder: newFolder }
+            );
+          }
+        }
+      } else {
+        const updatedNotes = notesStore.notes.map((note: Note) =>
+          note.folder === oldFolder ? { ...note, folder: newFolder } : note
+        );
+        notesStore.notes = updatedNotes;
+        localStorage.setItem('notes', JSON.stringify(updatedNotes));
+      }
+    },
+
     notesCountByFolder(): Record<string, number> {
-      const counts: Record<string, number> = {};
-      this.folders.forEach((folder) => {
-        counts[folder] =
-          folder === DEFAULT_FOLDERS.ALL_NOTES
-            ? notesStore.notes.length
-            : notesStore.notes.filter((note) => note.folder === folder).length;
-      });
-      return counts;
+      return this.folders.reduce(
+        (counts, folder) => {
+          counts[folder] =
+            folder === DEFAULT_FOLDERS.ALL_NOTES
+              ? notesStore.notes.length
+              : notesStore.notes.filter((note) => note.folder === folder)
+                  .length;
+          return counts;
+        },
+        {} as Record<string, number>
+      );
+    },
+
+    async loadFolders() {
+      if (authStore.isLoggedIn) {
+        await this.loadFirebaseFolders();
+      } else {
+        this.loadLocalFolders();
+      }
     },
 
     async initializeFolders() {
+      await this.loadFolders();
       if (authStore.isLoggedIn) {
-        await this.loadFirebaseFolders();
         this.setupFirebaseListener();
-      } else {
-        this.loadLocalFolders();
       }
     },
   },

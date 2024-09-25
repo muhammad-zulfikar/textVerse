@@ -1,6 +1,6 @@
 <template>
   <div class="mb-[28px] md:mb-[46px]">
-    <transition name="slide-fade" mode="out-in">
+    <Transition name="slide-fade" mode="out-in">
       <component
         v-if="currentView && notesStore.notesLoaded && filteredNotes.length > 0"
         :key="uiStore.viewType"
@@ -16,7 +16,7 @@
           No notes found
         </p>
       </div>
-    </transition>
+    </Transition>
   </div>
 </template>
 

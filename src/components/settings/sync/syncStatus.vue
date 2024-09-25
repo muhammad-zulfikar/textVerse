@@ -50,7 +50,7 @@
   import Button from '@/components/ui/button.vue';
 
   const openSignInModal = () => {
-    uiStore.setActiveModal('signInModal');
+    uiStore.setActiveModal('signIn');
   };
 
   const router = useRouter();

@@ -14,7 +14,7 @@
       position="right"
     >
       <template #label>
-        <Button :class="['text-sm md:text-base px-4 py-2']">
+        <Button class="text-sm md:text-base px-4 py-2">
           <component :is="currentThemeIcon" :size="20" class="mr-2" />
           {{ currentThemeText }}
           <div
@@ -28,16 +28,15 @@
           </div>
         </Button>
       </template>
-      <a
-        v-for="theme in themes"
-        :key="theme"
-        @click="setTheme(theme as 'light' | 'dark' | 'system')"
-        class="flex items-center flex-grow flex-shrink mx-1 p-2 hover:bg-cream-200 dark:hover:bg-gray-700 text-sm md:text-base rounded-md cursor-pointer"
-        role="menuitem"
-      >
-        <component :is="themeIcon(theme)" :size="20" class="mr-2" />
-        {{ theme.charAt(0).toUpperCase() + theme.slice(1) }}
-      </a>
+      <DropdownItem
+        v-for="(theme, index) in themeOptions"
+        :key="index"
+        :icon="theme.icon"
+        :label="theme.label"
+        :itemType="uiStore.theme === theme.type ? 'active' : 'normal'"
+        @click="setTheme(theme.type)"
+        class="text-sm md:text-base"
+      />
     </Dropdown>
   </div>
 </template>
@@ -53,36 +52,31 @@
   import { uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
   import Dropdown from '@/components/ui/dropdown.vue';
+  import DropdownItem from '@/components/ui/dropdownItem.vue';
+  import { Theme } from '@/store/uiStore/types';
 
-  const themes = ['system', 'dark', 'light'];
+  interface ThemeOption {
+    label: string;
+    icon: any;
+    type: Theme;
+  }
 
-  const currentThemeText = computed(
-    () => uiStore.theme.charAt(0).toUpperCase() + uiStore.theme.slice(1)
-  );
+  const themeOptions: ThemeOption[] = [
+    { label: 'Light', icon: PhSun, type: 'light' },
+    { label: 'Dark', icon: PhMoon, type: 'dark' },
+    { label: 'System', icon: PhDesktopTower, type: 'system' },
+  ];
 
-  const currentThemeIcon = computed(() => {
-    switch (uiStore.theme) {
-      case 'light':
-        return PhSun;
-      case 'dark':
-        return PhMoon;
-      default:
-        return PhDesktopTower;
-    }
+  const currentThemeText = computed(() => {
+    return uiStore.theme.charAt(0).toUpperCase() + uiStore.theme.slice(1);
   });
 
-  const themeIcon = (theme: string) => {
-    switch (theme) {
-      case 'light':
-        return PhSun;
-      case 'dark':
-        return PhMoon;
-      default:
-        return PhDesktopTower;
-    }
-  };
+  const currentThemeIcon = computed(() => {
+    const theme = themeOptions.find((option) => option.type === uiStore.theme);
+    return theme ? theme.icon : PhDesktopTower;
+  });
 
-  const setTheme = (theme: 'light' | 'dark' | 'system') => {
+  const setTheme = (theme: Theme) => {
     uiStore.setTheme(theme);
     uiStore.setActiveDropdown(null);
   };

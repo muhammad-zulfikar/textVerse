@@ -38,6 +38,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/pages/home.vue'),
   },
   {
+    path: '/reset-password',
+    name: 'Reset Password',
+    component: () => import('@/pages/resetPassword.vue'),
+  },
+  {
     path: '/:catchAll(.*)',
     name: '404',
     component: () => import('@/pages/404.vue'),
