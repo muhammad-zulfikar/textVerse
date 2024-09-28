@@ -192,8 +192,6 @@ export const loadNotes = async (state: NotesState): Promise<void> => {
     }
     state.notes = Object.values(notes) || [];
 
-    reorderNotes(state);
-
     let deletedNotes;
     if (authStore.isLoggedIn) {
       deletedNotes = await firebaseStore.getDeletedNotesFromFirebase(

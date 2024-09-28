@@ -18,19 +18,8 @@ export const setNoteViewType = (state: UIState, preference: NoteViewType) => {
 };
 
 export const setColumns = (state: UIState, newColumns: number) => {
-  state.columns = getValidColumns(state, newColumns);
+  state.columns = newColumns;
   localStorage.setItem('columns', JSON.stringify(state.columns));
-};
-
-export const getValidColumns = (
-  _state: UIState,
-  columnsInput: number
-): number => {
-  const isMobile = window.innerWidth < 640;
-  if (isMobile) {
-    return Math.min(columnsInput, 2);
-  }
-  return columnsInput || 4;
 };
 
 export const openNoteView = (state: UIState) => {
@@ -52,8 +41,16 @@ export const closeNoteView = (state: UIState) => {
 };
 
 export const handleResize = (state: UIState) => {
-  const newColumns = getValidColumns(state, state.columns);
+  const width = window.innerWidth;
+  const newColumns = calculateColumns(width);
   if (newColumns !== state.columns) {
     setColumns(state, newColumns);
   }
+};
+
+export const calculateColumns = (width: number) => {
+  const minColumnWidth = 250;
+  const maxColumns = 5;
+  const availableColumns = Math.floor(width / minColumnWidth);
+  return Math.max(2, Math.min(availableColumns, maxColumns));
 };

@@ -29,8 +29,11 @@
       <div
         v-if="modelValue"
         :class="[
-          'absolute top-0 card py-1 space-y-1 min-w-36 whitespace-nowrap',
-          submenuPosition === 'right' ? 'left-full -ml-1' : 'right-full -mr-1',
+          'absolute py-1 space-y-1 min-w-36 whitespace-nowrap card',
+          submenuPosition.horizontal === 'right'
+            ? 'left-full -ml-1'
+            : 'right-full -mr-1',
+          submenuPosition.vertical === 'top' ? 'bottom-0 mb-2' : 'top-0 mt-2',
         ]"
       >
         <slot></slot>
@@ -63,16 +66,25 @@
 
   const emit = defineEmits(['update:modelValue']);
 
-  const submenuPosition = ref(props.initialPosition);
+  const submenuPosition = ref({
+    horizontal: props.initialPosition,
+    vertical: 'bottom',
+  });
 
   const toggleSubmenu = (event: MouseEvent) => {
     event.stopPropagation();
     const targetElement = event.currentTarget as HTMLElement;
     const rect = targetElement.getBoundingClientRect();
     const spaceOnRight = window.innerWidth - rect.right;
+    const spaceBelow = window.innerHeight - rect.bottom;
     const requiredSpace = 200;
 
-    submenuPosition.value = spaceOnRight >= requiredSpace ? 'right' : 'left';
+    submenuPosition.value.horizontal =
+      spaceOnRight >= requiredSpace ? 'right' : 'left';
+
+    submenuPosition.value.vertical =
+      spaceBelow >= requiredSpace ? 'bottom' : 'top';
+
     emit('update:modelValue', !props.modelValue);
   };
 

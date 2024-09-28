@@ -6,7 +6,7 @@
     @close="closeSidebar"
   >
     <div
-      class="card fixed inset-y-0 left-0 z-50 w-64 shadow-lg overflow-y-auto rounded-lg font-serif text-sm"
+      class="card fixed inset-y-0 left-0 z-50 w-64 shadow-lg overflow-y-auto rounded-lg font-serif text-sm select-none"
     >
       <div
         class="flex justify-between items-center px-4 py-[6.5px] bg-cream-50 dark:bg-gray-700"

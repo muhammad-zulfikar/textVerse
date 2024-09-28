@@ -4,17 +4,15 @@
       class="flex justify-between items-center p-2 md:p-4 h-[52px] md:h-[62px] bg-cream-50 dark:bg-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 font-serif text-sm md:text-base select-none"
     >
       <div class="flex items-center w-full relative">
-        <!-- Left: Menu (always) -->
         <TransitionGroup name="slide-fade">
           <div
-            v-if="!isSelectModeActive && !isSearchExpanded"
-            class="flex items-center"
+            v-if="!isSelectMode && !isSearchExpanded"
+            class="flex items-center space-x-2 md:space-x-4"
           >
             <Button @click="openSidebar">
               <PhList :size="20" />
             </Button>
-            <div class="mr-2 md:mr-4"></div>
-            <Path v-if="!isPublicPage" />
+            <Path v-if="!isPublicRoute" />
           </div>
         </TransitionGroup>
 
@@ -26,44 +24,43 @@
           </div>
         </Transition>
 
-        <!-- Center: Search bar (desktop only, only on home page) -->
         <Transition name="slide-fade">
           <div
-            v-if="isHomePage && !isSelectModeActive"
+            v-if="!isSelectMode"
             class="hidden md:flex justify-center items-center w-full pointer-events-none"
           >
             <div class="w-1/3 pointer-events-auto">
-              <SearchBar @update:modelValue="updateSearchQuery" />
+              <SearchBar @expanded="setSearchExpanded" />
             </div>
           </div>
         </Transition>
 
-        <!-- Right: Search (mobile), Create, View, Sync -->
         <Transition name="slide-fade">
           <div
-            v-if="isHomePage && !isSelectModeActive"
+            v-if="!isSettingsRoute && !isSelectMode"
             class="flex items-center ml-auto"
           >
-            <div class="mr-2 md:mr-4" v-if="!isSearchExpanded">
-              <Create />
-            </div>
-            <div class="mr-2 md:mr-4">
-              <View v-if="!isSearchExpanded" />
-            </div>
-            <div>
-              <SyncButton v-if="!isSearchExpanded" />
-            </div>
+            <Transition name="slide-fade">
+              <div
+                v-if="!isSearchExpanded"
+                class="flex items-center space-x-2 md:space-x-4"
+              >
+                <Transition name="slide-fade">
+                  <Create v-if="isHomeRoute" />
+                </Transition>
+                <View />
+                <SyncButton />
+              </div>
+            </Transition>
+
             <div class="md:hidden ml-2">
-              <SearchBar
-                @update:modelValue="updateSearchQuery"
-                @expanded="setSearchExpanded"
-              />
+              <SearchBar @expanded="setSearchExpanded" />
             </div>
           </div>
         </Transition>
 
         <Transition name="slide-fade">
-          <SelectionModeOverlay v-if="isSelectModeActive" />
+          <SelectionModeOverlay v-if="isSelectMode" />
         </Transition>
       </div>
     </div>
@@ -75,7 +72,7 @@
   import { ref, computed } from 'vue';
   import { useRoute } from 'vue-router';
   import { PhList, PhX } from '@phosphor-icons/vue';
-  import { notesStore, uiStore } from '@/store';
+  import { uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
   import Separator from '@/components/ui/separator.vue';
   import SearchBar from '@/components/header/searchBar.vue';
@@ -92,27 +89,25 @@
     isSearchExpanded.value = expanded;
   };
 
-  const updateSearchQuery = (query: string) => {
-    if (notesStore && notesStore.setSearchQuery) {
-      notesStore.setSearchQuery(query);
-    }
-  };
-
   const openSidebar = () => {
     uiStore.setActiveModal('sidebar');
   };
 
-  const isHomePage = computed(() => {
+  const isHomeRoute = computed(() => {
     return route.path === '/' || route.name === 'Note';
   });
 
-  const isPublicPage = computed(() => {
+  const isPublicRoute = computed(() => {
     return route.path.startsWith('/public');
   });
 
-  const isSelectModeActive = computed(
-    () => notesStore.selectedNotes.length > 0
-  );
+  const isSettingsRoute = computed(() => {
+    return route.path.startsWith('/settings');
+  });
+
+  const isSelectMode = computed(() => {
+    return uiStore.isSelectMode;
+  });
 </script>
 
 <style scoped>

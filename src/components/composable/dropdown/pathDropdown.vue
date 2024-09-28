@@ -21,15 +21,15 @@
       :itemType="
         currentPath === getRouteLabel(route.name) ? 'active' : 'normal'
       "
-      @click="handleRouteClick(route.path)"
+      @click="handleRouteClick(route)"
     />
   </Dropdown>
 </template>
 
 <script setup lang="ts">
   import { computed } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-  import { uiStore } from '@/store';
+  import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
+  import { uiStore, notesStore } from '@/store';
   import {
     PhTrash,
     PhHouseLine,
@@ -65,9 +65,10 @@
         route.name !== '404' &&
         route.name !== 'About' &&
         route.name !== 'Note' &&
+        route.name !== 'Deleted Note' &&
         route.name !== 'Public' &&
-        !(route.name === 'Sign In') &&
-        !(route.name === 'Reset Password')
+        route.name !== 'Sign In' &&
+        route.name !== 'Reset Password'
     )
   );
 
@@ -98,12 +99,22 @@
     }
   };
 
-  const handleRouteClick = (path: string) => {
-    router.push(path);
-    closeDropdown();
-  };
+  const handleRouteClick = async (route: RouteRecordRaw) => {
+    if (route && route.path) {
+      try {
+        notesStore.closeNote();
+        const path = route.path.startsWith('/') ? route.path : `/${route.path}`;
+        await router.replace(path);
 
-  const closeDropdown = () => {
-    uiStore.setActiveDropdown(null);
+        uiStore.isSelectMode = false;
+        uiStore.setActiveDropdown(null);
+      } catch (error) {
+        console.error('Navigation error:', error);
+        uiStore.showToastMessage('Failed to navigate. Please try again.');
+      }
+    } else {
+      console.error('Invalid route:', route);
+      uiStore.showToastMessage('Invalid route. Please try again.');
+    }
   };
 </script>

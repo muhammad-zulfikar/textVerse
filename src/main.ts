@@ -5,6 +5,7 @@ import router from './router';
 import { initializeStores } from './store';
 import 'tailwindcss/tailwind.css';
 import './style/style.css';
+import './style/syntaxHighlight.css';
 import './style/textEditor.css';
 import './style/card.css';
 import './style/transition.css';

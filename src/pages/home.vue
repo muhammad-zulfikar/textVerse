@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, onUnmounted, watch, computed } from 'vue';
+  import { onMounted, onUnmounted, computed } from 'vue';
   import { notesStore, folderStore, uiStore } from '@/store';
   import Toolbar from '@/components/ui/toolbar.vue';
   import NoteList from '@/components/notes/noteList.vue';
@@ -39,29 +39,6 @@
       notesStore.closeNote();
     }
   };
-
-  const openNoteWithDelay = (noteId: string, delay: number = 600) => {
-    setTimeout(() => {
-      const noteExists = notesStore.notes.some((note) => note.id === noteId);
-      if (noteExists) {
-        notesStore.openNote(noteId);
-      } else {
-        uiStore.showToastMessage('Note not found');
-        notesStore.closeNote();
-      }
-    }, delay);
-  };
-
-  watch(
-    () => route.params.id,
-    (newId) => {
-      if (newId) {
-        openNoteWithDelay(newId as string);
-      } else {
-        notesStore.closeNote();
-      }
-    }
-  );
 
   const handlePaste = async () => {
     try {
@@ -102,6 +79,17 @@
     }
   };
 
+  const loadNoteById = async (noteId: string, delay: number = 1200) => {
+    const note = notesStore.notes.find((n) => n.id === noteId);
+    if (note) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      notesStore.openNote(noteId);
+    } else {
+      uiStore.showToastMessage('Note not found');
+      notesStore.closeNote();
+    }
+  };
+
   const setupEventListeners = () => {
     document.addEventListener('keydown', handleKeyDown);
     window.addEventListener('popstate', handlePopState);
@@ -110,21 +98,6 @@
   const removeEventListeners = () => {
     document.removeEventListener('keydown', handleKeyDown);
     window.removeEventListener('popstate', handlePopState);
-  };
-
-  const loadNoteById = async (noteId: string) => {
-    if (!notesStore.notesLoaded) {
-      await loadNotes();
-    }
-
-    const note = notesStore.notes.find((n) => n.id === noteId);
-    if (note) {
-      notesStore.openNote(noteId);
-    } else {
-      console.log('Note not found:', noteId);
-      uiStore.showToastMessage('Note not found');
-      notesStore.closeNote();
-    }
   };
 
   onMounted(async () => {

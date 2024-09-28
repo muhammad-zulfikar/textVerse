@@ -16,6 +16,11 @@
       <List />
     </div>
 
+    <div class="flex space-x-1 mr-6">
+      <Code />
+      <Blockquote />
+    </div>
+
     <div class="flex space-x-1">
       <Link />
       <Image @imageUploaded="handleImageUploaded" />
@@ -31,6 +36,8 @@
   import List from './list/list.vue';
   import Link from './link/link.vue';
   import Image from './image/image.vue';
+  import Code from './code/code.vue';
+  import Blockquote from './blockquote/blockquote.vue';
 
   const isImageModalOpen = ref(false);
   const currentImageUrl = ref('');

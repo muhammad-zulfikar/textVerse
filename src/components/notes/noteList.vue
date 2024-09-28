@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-[28px] md:mb-[46px]">
+  <div class="mb-2 md:mb-4">
     <Transition name="slide-fade" mode="out-in">
       <component
         v-if="currentView && notesStore.notesLoaded && filteredNotes.length > 0"
@@ -11,9 +11,13 @@
         v-else-if="notesStore.notesLoaded && filteredNotes.length === 0"
         class="flex flex-col items-center justify-center h-[60vh]"
       >
-        <PhEmpty :size="100" class="text-gray-400 dark:text-gray-600 mb-4" />
+        <component
+          :is="isTrash ? PhTrash : PhEmpty"
+          :size="100"
+          class="text-gray-400 dark:text-gray-600 mb-4"
+        />
         <p class="text-gray-600 dark:text-gray-400 text-lg font-serif">
-          No notes found
+          {{ noNotesMessage }}
         </p>
       </div>
     </Transition>
@@ -23,13 +27,21 @@
 <script lang="ts" setup>
   import { computed, defineAsyncComponent } from 'vue';
   import { notesStore, uiStore } from '@/store';
-  import { PhEmpty } from '@phosphor-icons/vue';
+  import { PhEmpty, PhTrash } from '@phosphor-icons/vue';
 
   const props = defineProps<{
     notes: ReturnType<typeof notesStore.filteredNotes>;
+    isTrash?: boolean;
   }>();
 
   const filteredNotes = computed(() => props.notes);
+
+  const noNotesMessage = computed(() => {
+    if (props.isTrash) {
+      return notesStore.searchQuery ? 'No notes found' : 'Trash empty';
+    }
+    return 'No notes found';
+  });
 
   const currentView = computed(() => {
     switch (uiStore.viewType) {

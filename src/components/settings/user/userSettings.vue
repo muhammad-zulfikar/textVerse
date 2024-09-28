@@ -17,7 +17,7 @@
           class="absolute bottom-0 left-0 w-6 h-6 bg-white rounded-full p-1"
         />
         <div
-          class="absolute inset-0 bg-black bg-opacity-80 md:bg-opacity-40 rounded-full opacity-60 md:opacity-0 md:group-hover:opacity-90 flex justify-between items-center transition-opacity duration-300"
+          class="absolute inset-0 bg-black bg-opacity-50 md:bg-opacity-40 rounded-full opacity-60 md:opacity-0 md:group-hover:opacity-90 flex justify-between items-center transition-opacity duration-300"
         >
           <div
             class="w-1/2 h-full flex justify-center items-center text-white cursor-pointer transition-colors duration-300 rounded-l-full hover:bg-black hover:bg-opacity-80"

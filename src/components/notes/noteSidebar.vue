@@ -5,7 +5,7 @@
     @close="clickOutside"
     transition="sidebar-right"
   >
-    <div ref="sidebarContainer" :class="sidebarClasses">
+    <div :class="sidebarClasses">
       <div class="flex w-full pt-2 md:pt-4 select-none">
         <NoteToolbar v-bind="toolbarProps" />
       </div>
@@ -15,8 +15,8 @@
         <TextEditor
           v-model="editedNote.content"
           @update:modelValue="updateNoteContent"
-          :showToolbar="true"
-          :editable="true"
+          :showToolbar="!props.isTrash"
+          :editable="!props.isTrash"
           class="h-full flex-grow overflow-y-auto"
         />
       </div>
@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+  import { ref, computed, watch, onUnmounted, nextTick, onMounted } from 'vue';
   import { onValue, ref as dbRef } from 'firebase/database';
   import { db } from '@/firebase';
   import { Note } from '@/store/notesStore/types';
@@ -42,6 +42,7 @@
   const props = defineProps<{
     noteId: string | null;
     isOpen: boolean;
+    isTrash?: boolean;
   }>();
 
   const isMobile = ref(window.innerWidth <= 768);
@@ -49,7 +50,6 @@
   const isSaving = ref(false);
   const editedNote = ref<Note>(createEmptyNote());
   const initialNote = ref<Note | null>(null);
-  const sidebarContainer = ref<HTMLElement | null>(null);
 
   let saveNoteTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -57,15 +57,20 @@
     'flex flex-col fixed inset-y-0 right-0 px-2 md:px-4 overflow-y-auto',
     {
       'card-fullscreen w-full': uiStore.isExpanded,
-      'card w-3/4 md:w-2/5': !uiStore.isExpanded,
+      'card w-3/4 md:w-3/5': !uiStore.isExpanded,
     },
   ]);
+
+  const noteArray = computed(() =>
+    props.isTrash ? notesStore.deletedNotes : notesStore.notes
+  );
 
   const toolbarProps = computed(() => ({
     note: editedNote,
     isEditing: isEditing.value,
     hasChanges: hasChanges.value,
     isSaving: isSaving.value,
+    isTrash: props.isTrash,
   }));
 
   const hasChanges = computed(() =>
@@ -127,11 +132,15 @@
   }
 
   async function clickOutside() {
+    if (props.isTrash) {
+      notesStore.closeNote(true);
+      return;
+    }
+
     if (isContentEmpty(editedNote.value.content)) {
       if (editedNote.value.id) {
         await notesStore.deleteNote(editedNote.value.id);
       }
-      console.log('outside clicked');
       notesStore.closeNote();
       uiStore.showToastMessage('Empty note discarded');
       return;
@@ -158,20 +167,20 @@
   }
 
   watch(
-    [() => props.isOpen, () => props.noteId],
-    async ([isOpen, newNoteId]) => {
+    [() => props.isOpen, () => props.noteId, () => props.isTrash],
+    async ([isOpen, newNoteId, isTrash]) => {
       if (isOpen) {
         if (isMobile.value) {
           uiStore.isExpanded = true;
         }
         await nextTick();
         if (newNoteId !== null) {
-          const note = notesStore.notes.find((n) => n.id === newNoteId);
+          const note = noteArray.value.find((n) => n.id === newNoteId);
           if (note) {
             editedNote.value = { ...note };
             initialNote.value = { ...note };
             setupNoteListener(newNoteId);
-            isEditing.value = true;
+            isEditing.value = !isTrash;
           }
         } else {
           editedNote.value = createEmptyNote();
@@ -183,18 +192,21 @@
     { immediate: true }
   );
 
+  const handleResize = () => {
+    isMobile.value = window.innerWidth <= 768;
+    if (isMobile.value && props.isOpen) {
+      uiStore.isExpanded = true;
+    }
+  };
+
   onMounted(() => {
-    window.addEventListener('resize', () => {
-      isMobile.value = window.innerWidth <= 768;
-    });
+    window.addEventListener('resize', handleResize);
   });
 
   onUnmounted(() => {
-    window.removeEventListener('resize', () => {
-      isMobile.value = window.innerWidth <= 768;
-    });
     if (saveNoteTimeout) {
       clearTimeout(saveNoteTimeout);
     }
+    window.removeEventListener('resize', handleResize);
   });
 </script>

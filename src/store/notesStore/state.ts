@@ -13,6 +13,7 @@ export interface NotesState {
   publicNotes: Map<string, string>;
   pinnedNotes: Set<string>;
   notesListener: (() => void) | null;
+  currentHistoryIndex: number | null;
 }
 
 export default (): NotesState => ({
@@ -28,4 +29,5 @@ export default (): NotesState => ({
   publicNotes: new Map(),
   pinnedNotes: new Set(),
   notesListener: null,
+  currentHistoryIndex: null,
 });

@@ -1,6 +1,6 @@
 import { UIState } from '../state';
 import { Theme, ViewType, NoteViewType, SortType } from '../types';
-import { applyTheme, getValidColumns } from '.';
+import { applyTheme } from '.';
 import { authStore } from '@/store';
 import { ref, set, onValue, off, get } from 'firebase/database';
 import { db } from '@/firebase';
@@ -18,10 +18,7 @@ export const loadLocalSettings = (state: UIState) => {
   state.sortType = JSON.parse(
     localStorage.getItem('sortType') || '"date"'
   ) as SortType;
-  state.columns = getValidColumns(
-    state,
-    JSON.parse(localStorage.getItem('columns') || '4')
-  );
+  state.columns = JSON.parse(localStorage.getItem('columns') || '5');
 };
 
 export const loadFirebaseSettings = async (state: UIState) => {

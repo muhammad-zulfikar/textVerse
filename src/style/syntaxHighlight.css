@@ -1,0 +1,107 @@
+.syntax {
+  color: #000;
+}
+
+.dark .syntax {
+  color: #fff;
+}
+
+.syntax a {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dark .syntax a {
+  color: #3b82f6;
+}
+
+.syntax img {
+  margin: 10px auto;
+  display: block;
+  cursor: pointer;
+  max-height: 400px;
+}
+
+.syntax ul,
+.syntax ol {
+  padding-left: 30px;
+  margin: 10px 0;
+}
+
+.syntax ul {
+  list-style-type: disc;
+}
+
+.syntax ol {
+  list-style-type: decimal;
+}
+
+.syntax li {
+  margin-bottom: 5px;
+}
+
+.syntax h1 {
+  font-size: 2em;
+  font-weight: bold;
+  line-height: 1.1;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid black;
+}
+
+.dark .syntax h1 {
+  border-bottom: 1px solid white;
+}
+
+.syntax h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 1.05;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid black;
+}
+
+.dark .syntax h2 {
+  border-bottom: 1px solid white;
+}
+
+.syntax h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin-bottom: 6px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid black;
+}
+
+.dark .syntax h3 {
+  border-bottom: 1px solid white;
+}
+
+.syntax blockquote {
+  border-left: 3px solid #d9c698;
+  margin: 1em 0;
+  padding-left: 1em;
+  font-style: italic;
+  color: #666;
+}
+
+.dark .syntax blockquote {
+  border-left: 3px solid #ccc;
+  color: #b1b1b1;
+}
+
+.syntax code,
+.syntax pre {
+  background-color: #d9c698;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: serif;
+}
+
+.dark .syntax code,
+.dark .syntax pre {
+  background-color: #424242;
+  color: #fff;
+}

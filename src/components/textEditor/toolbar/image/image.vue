@@ -6,7 +6,7 @@
     type="file"
     ref="imageInputRef"
     @change="handleImageUpload"
-    accept="image/*,video/*"
+    accept="image/*"
     style="display: none"
   />
 </template>

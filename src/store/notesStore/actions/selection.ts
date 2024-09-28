@@ -45,6 +45,13 @@ export const clearSelectedNotes = (state: NotesState) => {
   state.selectedNotes = [];
 };
 
-export const selectAllNotes = (state: NotesState) => {
-  state.selectedNotes = state.notes.map((note) => note.id);
+export const selectAllNotes = (
+  state: NotesState,
+  isTrashRoute: boolean = false
+) => {
+  if (isTrashRoute) {
+    state.selectedNotes = state.deletedNotes.map((note) => note.id);
+  } else {
+    state.selectedNotes = state.notes.map((note) => note.id);
+  }
 };

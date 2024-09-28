@@ -42,7 +42,11 @@
       :key="folder"
       :label="`${folder} (${notesCountByFolder[folder] || 0})`"
       :icon="
-        folder !== DEFAULT_FOLDERS.UNCATEGORIZED ? PhFolder : PhFolderMinus
+        folder !== DEFAULT_FOLDERS.UNCATEGORIZED
+          ? notesCountByFolder[folder] === 0
+            ? PhFolderDashed
+            : PhFolder
+          : PhFolderMinus
       "
       :itemType="folder === selectedFolder ? 'active' : 'normal'"
       :modelValue="openSubmenu[folder]"
@@ -82,6 +86,7 @@
     PhFolder,
     PhFolders,
     PhFolderMinus,
+    PhFolderDashed,
     PhArrowCounterClockwise,
     PhTextbox,
     PhTrash,

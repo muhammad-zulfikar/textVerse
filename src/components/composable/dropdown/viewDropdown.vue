@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue';
+  import { ref } from 'vue';
   import { uiStore } from '@/store';
   import {
     PhSquaresFour,
@@ -96,7 +96,7 @@
   const setViewType = (viewType: 'card' | 'table' | 'mail' | 'folder') => {
     uiStore.setViewType(viewType);
     if (viewType !== 'card') {
-      uiStore.setColumns(isMobile.value ? 2 : 4);
+      uiStore.setColumns(isMobile.value ? 2 : 5);
     }
     closeModal();
   };
@@ -114,8 +114,4 @@
     }
     uiStore.setViewType('card');
   };
-
-  onMounted(() => {
-    uiStore.handleResize();
-  });
 </script>

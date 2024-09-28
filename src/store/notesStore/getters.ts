@@ -10,4 +10,7 @@ export default {
     (folderId: string): Note[] => {
       return filterNotes(state.notes, state.searchQuery, folderId);
     },
+  filteredDeletedNotes: (state: NotesState): Note[] => {
+    return filterNotes(state.deletedNotes, state.searchQuery, '', true);
+  },
 };

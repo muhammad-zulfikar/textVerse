@@ -162,12 +162,15 @@ export function sortNotes(notes: Note[], sortType: 'date' | 'title'): Note[] {
 export function filterNotes(
   notes: Note[],
   query: string,
-  folderId: string
+  folderId: string,
+  isTrash: boolean = false
 ): Note[] {
   const lowercaseQuery = query.toLowerCase();
   return notes.filter(
     (note) =>
-      (folderId === DEFAULT_FOLDERS.ALL_NOTES || note.folder === folderId) &&
+      (isTrash ||
+        folderId === DEFAULT_FOLDERS.ALL_NOTES ||
+        note.folder === folderId) &&
       (note.title.toLowerCase().includes(lowercaseQuery) ||
         note.content.toLowerCase().includes(lowercaseQuery))
   );

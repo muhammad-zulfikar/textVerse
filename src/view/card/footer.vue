@@ -17,16 +17,29 @@
       </div>
     </div>
     <div class="ml-auto text-left text-[10px] md:text-xs">
-      <p class="flex items-center px-2 py-1 cursor-pointer truncate card">
-        <PhCalendarBlank class="mr-1 md:mr-[6px] size-[14px] md:size-[16px]" />
-        {{ localeDate(props.note.last_edited) }}
-      </p>
+      <div class="px-2 py-1 cursor-pointer truncate card">
+        <span v-if="!isTrashRoute" class="flex items-center">
+          <PhCalendarBlank
+            class="mr-1 md:mr-[6px] size-[14px] md:size-[16px]"
+          />
+          {{ localeDate(props.note.last_edited) }}
+        </span>
+        <span
+          v-else-if="isTrashRoute && props.note.time_deleted"
+          class="flex items-center"
+        >
+          <PhTrash class="mr-1 md:mr-[6px] size-[14px] md:size-[16px]" />
+          {{ localeDate(props.note.time_deleted) }}
+        </span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { PhFolder, PhCalendarBlank } from '@phosphor-icons/vue';
+  import { computed } from 'vue';
+  import { useRoute } from 'vue-router';
+  import { PhFolder, PhCalendarBlank, PhTrash } from '@phosphor-icons/vue';
   import { folderStore } from '@/store';
   import { Note } from '@/store/notesStore/types';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
@@ -35,4 +48,7 @@
   const props = defineProps<{
     note: Note;
   }>();
+
+  const route = useRoute();
+  const isTrashRoute = computed(() => route.path === '/trash');
 </script>

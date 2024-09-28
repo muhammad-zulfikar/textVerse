@@ -1,5 +1,3 @@
-<!--selectionModeOverlay-->
-
 <template>
   <div class="absolute inset-0 flex items-center bg-cream-50 dark:bg-gray-700">
     <div class="flex items-center space-x-2 md:space-x-4">
@@ -21,29 +19,19 @@
       >
         <template #label>
           <Button>
-            <PhFolder :size="20" />
+            <PhFolderPlus :size="20" />
           </Button>
         </template>
-        <div class="px-1 space-y-1">
-          <div
-            v-for="folder in sortedFolders"
-            :key="folder"
-            class="w-full rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200"
-          >
-            <li
-              @click="openMoveSelectedNotesAlert(folder)"
-              class="text-sm cursor-pointer w-full text-left p-2 rounded-md hover:bg-cream-200 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center"
-            >
-              <PhFolder
-                v-if="folder !== DEFAULT_FOLDERS.UNCATEGORIZED"
-                :size="20"
-                class="mr-2"
-              />
-              <PhFolderMinus v-else :size="20" class="mr-2" />
-              {{ folder }}
-            </li>
-          </div>
-        </div>
+        <DropdownItem
+          v-for="folder in sortedFolders"
+          :key="folder"
+          @click="openMoveSelectedNotesAlert(folder)"
+          :icon="
+            folder !== DEFAULT_FOLDERS.UNCATEGORIZED ? PhFolder : PhFolderMinus
+          "
+        >
+          {{ folder }}
+        </DropdownItem>
       </Dropdown>
       <Button v-if="isTrashRoute" @click="restoreSelectedNotes">
         <PhArrowCounterClockwise :size="20" />
@@ -54,9 +42,16 @@
           :size="20"
         />
       </Button>
-      <Button @click="openDeleteSelectedNotesAlert" variant="danger">
-        <PhTrash :size="20" />
-      </Button>
+      <div v-if="isTrashRoute">
+        <Button @click="openDeleteSelectedNotesAlert" variant="danger">
+          <PhTrash :size="20" />
+        </Button>
+      </div>
+      <div v-else>
+        <Button @click="openTrashSelectedNotesAlert" variant="danger">
+          <PhTrash :size="20" />
+        </Button>
+      </div>
     </div>
   </div>
 </template>
@@ -72,16 +67,18 @@
     PhPushPinSlash,
     PhTrash,
     PhFolder,
+    PhFolderPlus,
     PhFolderMinus,
   } from '@phosphor-icons/vue';
   import { notesStore, uiStore, folderStore } from '@/store';
   import Button from '@/components/ui/button.vue';
   import Dropdown from '@/components/ui/dropdown.vue';
+  import DropdownItem from '@/components/ui/dropdownItem.vue';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
 
   const route = useRoute();
-  const isTrashRoute = computed(() => route.path === '/trash');
 
+  const isTrashRoute = computed(() => route.path === '/trash');
   const selectedNotesCount = computed(() => notesStore.selectedNotes.length);
 
   const allSelectedNotesPinned = computed(() => {
@@ -115,7 +112,7 @@
   });
 
   const selectAllNotes = () => {
-    notesStore.selectAllNotes();
+    notesStore.selectAllNotes(isTrashRoute.value);
   };
 
   const deselectAllNotes = () => {
@@ -145,21 +142,30 @@
     folderStore.targetFolder = '';
   };
 
+  const openTrashSelectedNotesAlert = async () => {
+    notesStore.notesToDelete = notesStore.selectedNotes;
+    uiStore.openAlertModal({
+      message: `Are you sure you want to move selected notes to trash?`,
+      confirm: async () => {
+        await notesStore.batchDeleteNotes(notesStore.notesToDelete, false);
+      },
+      cancel: () => {
+        closeModal();
+      },
+    });
+  };
+
   const openDeleteSelectedNotesAlert = async () => {
     notesStore.notesToDelete = notesStore.selectedNotes;
-    if (isTrashRoute) {
-      uiStore.openAlertModal({
-        message: `Are you sure you want to delete the selected notes?`,
-        confirm: async () => {
-          await notesStore.batchDeleteNotes(notesStore.notesToDelete, true);
-        },
-        cancel: () => {
-          closeModal();
-        },
-      });
-    } else {
-      await notesStore.batchDeleteNotes(notesStore.notesToDelete, false);
-    }
+    uiStore.openAlertModal({
+      message: `Are you sure you want to permanently delete the selected notes?`,
+      confirm: async () => {
+        await notesStore.batchDeleteNotes(notesStore.notesToDelete, true);
+      },
+      cancel: () => {
+        closeModal();
+      },
+    });
   };
 
   const openMoveSelectedNotesAlert = (folder: string) => {

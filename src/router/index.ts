@@ -22,6 +22,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/pages/trash.vue'),
   },
   {
+    path: '/trash/:id',
+    name: 'Deleted Note',
+    component: () => import('@/pages/trash.vue'),
+  },
+  {
     path: '/sign-in',
     name: 'Sign In',
     component: () => import('@/pages/signIn.vue'),

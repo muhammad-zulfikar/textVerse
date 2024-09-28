@@ -15,6 +15,7 @@ export const moveNoteToTrash = async (
     localStore.moveNoteToTrashInLocalStorage(note);
   }
   await loadNotes(state);
+  uiStore.showToastMessage(`${note.title} moved to trash`);
 };
 
 export const restoreNote = async (

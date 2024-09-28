@@ -37,6 +37,5 @@
 
   const setSortType = (sortType: 'date' | 'title') => {
     uiStore.setSortType(sortType);
-    notesStore.reorderNotes();
   };
 </script>

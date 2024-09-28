@@ -21,7 +21,6 @@ export const setupRealTimeSync = (state: NotesState) => {
       state.pinnedNotes = new Set(
         notes.filter((note) => note.pinned).map((note) => note.id)
       );
-      reorderNotes(state);
     }
   );
 };

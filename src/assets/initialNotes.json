@@ -4,55 +4,215 @@
     "title": "A Tale of Two Cities",
     "content": "<p>Set during the French Revolution, this novel contrasts the lives of two men who look alike but have very different fates.</p>",
     "last_edited": "2023-03-15T08:00:00.000Z",
-    "folder": "Historical"
+    "folder": "Historical",
+    "history": [
+      {
+        "timestamp": "2023-01-10T07:45:00.000Z",
+        "title": "A Tale of Two Cities",
+        "content": "<p>It was the best of times, it was the worst of times...</p>"
+      },
+      {
+        "timestamp": "2023-02-20T08:15:00.000Z",
+        "title": "A Tale of Two Cities",
+        "content": "<p>A far, far better thing that I do, than I have ever done...</p>"
+      },
+      {
+        "timestamp": "2023-03-15T08:00:00.000Z",
+        "title": "A Tale of Two Cities",
+        "content": "<p>Set during the French Revolution, this novel contrasts the lives of two men who look alike but have very different fates.</p>"
+      }
+    ]
   },
   {
     "id": "nJ3XpS1FQt9z7yW5IAdIX",
     "title": "All Quiet on the Western Front",
     "content": "<p>A harrowing account of a German soldier's experiences and disillusionment during World War I.</p>",
     "last_edited": "2022-07-23T09:00:00.000Z",
-    "folder": "Historical"
+    "folder": "Historical",
+    "history": [
+      {
+        "timestamp": "2022-05-01T07:00:00.000Z",
+        "title": "All Quiet on the Western Front",
+        "content": "<p>We are forlorn like children, and experienced like old men...</p>"
+      },
+      {
+        "timestamp": "2022-06-15T08:30:00.000Z",
+        "title": "All Quiet on the Western Front",
+        "content": "<p>I am young, I am twenty years old; yet I know nothing of life but despair...</p>"
+      },
+      {
+        "timestamp": "2022-07-23T09:00:00.000Z",
+        "title": "All Quiet on the Western Front",
+        "content": "<p>A harrowing account of a German soldier's experiences and disillusionment during World War I.</p>"
+      }
+    ]
   },
   {
     "id": "2S9b1xOzQyqXyABPl3r5O",
     "title": "Pride and Prejudice",
     "content": "<p>It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.</p>",
     "last_edited": "2021-01-30T10:00:00.000Z",
-    "folder": "Literature"
+    "folder": "Literature",
+    "history": [
+      {
+        "timestamp": "2020-10-15T10:15:00.000Z",
+        "title": "Pride and Prejudice",
+        "content": "<p>It is a truth universally acknowledged, that a single man in possession of a good fortune...</p>"
+      },
+      {
+        "timestamp": "2020-12-01T11:00:00.000Z",
+        "title": "Pride and Prejudice",
+        "content": "<p>I could easily forgive his pride, if he had not mortified mine...</p>"
+      },
+      {
+        "timestamp": "2021-01-30T10:00:00.000Z",
+        "title": "Pride and Prejudice",
+        "content": "<p>It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.</p>"
+      }
+    ]
   },
   {
     "id": "zG6B1Ukmz_mcdQnZaKp5S",
     "title": "1984",
-    "content": "<p>War is peace.<em>Freedom is slavery.</em> <u>Ignorance is strength.</u> These paradoxes define the dystopian society in which the characters find themselves trapped.</p>",
+    "content": "<p>War is peace.<em> Freedom is slavery.</em> <u>Ignorance is strength.</u> These paradoxes define the dystopian society in which the characters find themselves trapped.</p>",
     "last_edited": "2020-11-05T11:00:00.000Z",
-    "folder": "Literature"
+    "folder": "Literature",
+    "history": [
+      {
+        "timestamp": "2020-06-20T10:30:00.000Z",
+        "title": "1984",
+        "content": "<p>Big Brother is watching you...</p>"
+      },
+      {
+        "timestamp": "2020-08-15T11:45:00.000Z",
+        "title": "1984",
+        "content": "<p>In the end, the Party would announce that two and two made five...</p>"
+      },
+      {
+        "timestamp": "2020-11-05T11:00:00.000Z",
+        "title": "1984",
+        "content": "<p>War is peace.<em> Freedom is slavery.</em> <u>Ignorance is strength.</u> These paradoxes define the dystopian society in which the characters find themselves trapped.</p>"
+      }
+    ]
   },
   {
     "id": "J7xY8eU-pskO5BqPxZ4xR",
     "title": "To Kill a Mockingbird",
     "content": "<p>You never really understand a person until you consider things from his point of view, until you climb into his skin and walk around in it.</p>",
     "last_edited": "2019-09-14T12:00:00.000Z",
-    "folder": "Classics"
+    "folder": "Classics",
+    "history": [
+      {
+        "timestamp": "2019-07-20T09:15:00.000Z",
+        "title": "To Kill a Mockingbird",
+        "content": "<p>Mockingbirds don’t do one thing but make music for us to enjoy...</p>"
+      },
+      {
+        "timestamp": "2019-08-30T10:30:00.000Z",
+        "title": "To Kill a Mockingbird",
+        "content": "<p>The one thing that doesn’t abide by majority rule is a person’s conscience...</p>"
+      },
+      {
+        "timestamp": "2019-09-14T12:00:00.000Z",
+        "title": "To Kill a Mockingbird",
+        "content": "<p>You never really understand a person until you consider things from his point of view, until you climb into his skin and walk around in it.</p>"
+      }
+    ]
   },
   {
-    "id": "f9QiRek__2KdYm5CwSjHb",
-    "title": "The Great Gatsby",
-    "content": "<p><em>So we beat on, boats against the current</em>, borne back ceaselessly into the past. This line captures the essence of Gatsby's tragic pursuit.</p>",
-    "last_edited": "2018-04-20T13:00:00.000Z",
-    "folder": "Classics"
+    "id": "H4wR7tN2_mLkSdC9fEuXa",
+    "title": "Moby-Dick",
+    "content": "<p>Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world.</p>",
+    "last_edited": "2022-12-05T16:00:00.000Z",
+    "folder": "Classics",
+    "history": [
+      {
+        "timestamp": "2022-10-01T09:30:00.000Z",
+        "title": "Moby-Dick",
+        "content": "<p>Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul...</p>"
+      },
+      {
+        "timestamp": "2022-11-15T14:15:00.000Z",
+        "title": "Moby-Dick",
+        "content": "<p>It was the whiteness of the whale that above all things appalled me.</p>"
+      },
+      {
+        "timestamp": "2022-12-05T16:00:00.000Z",
+        "title": "Moby-Dick",
+        "content": "<p>Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world.</p>"
+      }
+    ]
   },
   {
-    "id": "M8SdFyH5IjU7zZrB1cMbG",
-    "title": "Brave New World",
-    "content": "<p>Words can be like X-rays if you use them properly—<em>they’ll go through anything.</em> You read and you’re pierced by their meaning.</p>",
-    "last_edited": "2017-12-10T14:00:00.000Z",
-    "folder": "SciFi"
+    "id": "F2yU9bM5_sZnGxW1jKpVd",
+    "title": "The Catcher in the Rye",
+    "content": "<p>Don't ever tell anybody anything. If you do, you start missing everybody.</p>",
+    "last_edited": "2023-02-10T10:45:00.000Z",
+    "folder": "Literature",
+    "history": [
+      {
+        "timestamp": "2022-12-20T08:00:00.000Z",
+        "title": "The Catcher in the Rye",
+        "content": "<p>If you really want to hear about it, the first thing you'll probably want to know is where I was born...</p>"
+      },
+      {
+        "timestamp": "2023-01-25T12:30:00.000Z",
+        "title": "The Catcher in the Rye",
+        "content": "<p>The mark of the immature man is that he wants to die nobly for a cause, while the mark of the mature man is that he wants to live humbly for one.</p>"
+      },
+      {
+        "timestamp": "2023-02-10T10:45:00.000Z",
+        "title": "The Catcher in the Rye",
+        "content": "<p>Don't ever tell anybody anything. If you do, you start missing everybody.</p>"
+      }
+    ]
   },
   {
-    "id": "R4LQ-VuHn-ZTe5wbx8CfU",
-    "title": "Jane Eyre",
-    "content": "<p>I am no bird; and <u>no net ensnares me</u>: <em>I am a free human being with an independent will, which I now exert to leave you.</em></p>",
-    "last_edited": "2016-08-25T15:00:00.000Z",
-    "folder": "SciFi"
+    "id": "G3xY8eU-pskO5BqPxZ4xR",
+    "title": "The Picture of Dorian Gray",
+    "content": "<p>There is only one way to get rid of temptation, and that is to yield to it.</p>",
+    "last_edited": "2022-09-14T12:00:00.000Z",
+    "folder": "Classics",
+    "history": [
+      {
+        "timestamp": "2022-07-20T09:15:00.000Z",
+        "title": "The Picture of Dorian Gray",
+        "content": "<p>Beauty is a form of genius—is higher, indeed, than genius, as it needs no explanation.</p>"
+      },
+      {
+        "timestamp": "2022-08-30T10:30:00.000Z",
+        "title": "The Picture of Dorian Gray",
+        "content": "<p>There is only one thing in the world worse than being talked about, and that is not being talked about.</p>"
+      },
+      {
+        "timestamp": "2022-09-14T12:00:00.000Z",
+        "title": "The Picture of Dorian Gray",
+        "content": "<p>There is only one way to get rid of temptation, and that is to yield to it.</p>"
+      }
+    ]
+  },
+  {
+    "id": "L5mX2pL9_qRnFvT3cWzYh",
+    "title": "The Adventures of Huckleberry Finn",
+    "content": "<p>It's a good thing to have a noble master, but it's a better thing to be a noble man.</p>",
+    "last_edited": "2022-06-20T14:30:00.000Z",
+    "folder": "Classics",
+    "history": [
+      {
+        "timestamp": "2022-04-10T11:00:00.000Z",
+        "title": "The Adventures of Huckleberry Finn",
+        "content": "<p>Tom Sawyer was a boy of twelve then, a little small for his age, but the same old sweet song and dance.</p>"
+      },
+      {
+        "timestamp": "2022-05-15T13:45:00.000Z",
+        "title": "The Adventures of Huckleberry Finn",
+        "content": "<p>It's a mighty long way from the Mississippi to the Gulf of Mexico.</p>"
+      },
+      {
+        "timestamp": "2022-06-20T14:30:00.000Z",
+        "title": "The Adventures of Huckleberry Finn",
+        "content": "<p>It's a good thing to have a noble master, but it's a better thing to be a noble man.</p>"
+      }
+    ]
   }
 ]

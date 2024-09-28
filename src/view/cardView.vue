@@ -1,141 +1,109 @@
 <template>
-  <div class="mx-2 md:mx-4">
-    <TransitionGroup
-      name="list"
-      tag="ul"
-      :class="['relative min-w-[300px] md:mx-auto', columnClass]"
+  <div class="px-1 md:px-3">
+    <div
+      ref="masonryGrid"
+      class="masonry-grid"
+      :style="{
+        '--columns': uiStore.columns,
+      }"
     >
-      <li
-        v-for="note in notes"
-        :key="note.id"
-        class="notes card break-inside-avoid h-min mb-[9px] p-2 cursor-pointer relative group select-none transform-gpu"
-        :class="[
-          { 'z-50': showMenu && notesStore.selectedNote?.id === note.id },
-          { shadow: note.pinned },
-          { selected: notesStore.selectedNotes.includes(note.id) },
-          computedMb,
-        ]"
-        @contextmenu.prevent="(event) => showContextMenu(event, note)"
-        @click.stop="handleNoteClick(note)"
+      <div
+        @before-leave="handleBeforeLeave"
+        @after-leave="updateMasonryLayout"
+        @enter="setItemPosition"
+        @after-enter="unsetItemPosition"
       >
-        <NoteSelectButton :note="note" />
-        <NoteHeader :note="note" />
-        <Separator />
-        <NoteContent :note="note" />
-        <NoteFooter :note="note" />
-      </li>
-    </TransitionGroup>
-    <Transition name="zoom">
-      <ContextMenu
-        v-if="selectedNote"
-        :visible="showMenu"
-        :position="menuPosition"
-        :note="selectedNote"
-        :noteId="selectedNote.id"
-        @hideMenu="hideContextMenu"
-        @select="selectNote"
-        @delete="confirmDelete"
-        @pin="togglePin"
-        @public="togglePublic"
-      />
-    </Transition>
+        <NoteCard
+          v-for="note in sortedNotes"
+          :key="note.id"
+          :note="note"
+          :is-selected="isNoteSelected(note)"
+          :data-index="sortedNotes.indexOf(note)"
+          @click="handleNoteClick"
+          @contextmenu="(event) => showContextMenu(event, note)"
+        />
+      </div>
+    </div>
+    <ContextMenu
+      v-if="selectedNote"
+      :visible="showMenu"
+      :position="menuPosition"
+      :note="selectedNote"
+      @hideMenu="hideContextMenu"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+  import { computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
+  import { useRoute } from 'vue-router';
   import { notesStore, uiStore } from '@/store';
   import { Note } from '@/store/notesStore/types';
   import ContextMenu from '@/components/contextMenu/contextMenu.vue';
-  import Separator from '@/components/ui/separator.vue';
-  import NoteSelectButton from './card/noteSelectButton.vue';
-  import NoteHeader from './card/noteHeader.vue';
-  import NoteContent from './card/noteContent.vue';
-  import NoteFooter from './card/noteFooter.vue';
+  import NoteCard from './card/noteCard.vue';
+  import { useContextMenu } from '@/utils/useContextMenu';
+  import { useMasonryLayout } from '@/utils/useMasonryLayout';
 
   const props = defineProps<{
     notes: Note[];
   }>();
 
-  const showMenu = ref(false);
-  const menuPosition = ref({ x: 0, y: 0 });
-  const selectedNote = ref<Note | null>(null);
+  const route = useRoute();
+  const isTrashView = computed(() => route.path.startsWith('/trash'));
 
-  const columnClass = computed(() => {
-    const classes = {
-      1: 'columns-1 md:max-w-xl',
-      2: 'columns-2 gap-2 md:gap-7 md:max-w-4xl',
-      3: 'columns-3 sm:columns-2 md:columns-3 gap-8 md:max-w-6xl',
-      4: 'columns-4 sm:columns-2 md:columns-3 lg:columns-4 gap-4',
-      5: 'columns-5 sm:columns-2 md:columns-3 lg:columns-5 gap-2',
-    };
-    return classes[uiStore.columns as keyof typeof classes];
-  });
+  const {
+    masonryGrid,
+    setItemPosition,
+    unsetItemPosition,
+    handleBeforeLeave,
+    updateMasonryLayout,
+    debouncedUpdateLayout,
+  } = useMasonryLayout(computed(() => uiStore.columns));
 
-  const computedMb = computed(() =>
-    uiStore.columns === 4
-      ? 'md:mb-4'
-      : uiStore.columns === 5
-        ? 'md:mb-2'
-        : 'md:mb-8'
-  );
+  const {
+    showMenu,
+    menuPosition,
+    selectedNote,
+    showContextMenu,
+    hideContextMenu,
+  } = useContextMenu();
 
-  const computedColumns = computed(() => {
-    const noteCount = props.notes.length;
-    const isMobile = window.innerWidth <= 768;
-    return Math.min(noteCount, isMobile ? 2 : 5);
-  });
+  const sortedNotes = computed(() => {
+    return [...props.notes].sort((a: Note, b: Note) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
 
-  const showContextMenu = (event: MouseEvent, note: Note) => {
-    event.stopPropagation();
-    uiStore.setActiveDropdown(null);
-    menuPosition.value = { x: event.clientX, y: event.clientY };
-    showMenu.value = true;
-    selectedNote.value = note;
-  };
-
-  const hideContextMenu = () => {
-    showMenu.value = false;
-  };
-
-  const selectNote = (noteId: string) => {
-    notesStore.toggleNoteSelection(noteId);
-    uiStore.isSelectMode = true;
-  };
-
-  const togglePin = (noteId: string) => {
-    notesStore.togglePin(noteId);
-  };
-
-  const togglePublic = (noteId: string) => {
-    notesStore.togglePublic(noteId);
-  };
-
-  const confirmDelete = async () => {
-    try {
-      if (selectedNote.value) {
-        await notesStore.deleteNote(selectedNote.value.id);
+      if (uiStore.sortType === 'date') {
+        const dateA = new Date(a.last_edited).getTime();
+        const dateB = new Date(b.last_edited).getTime();
+        return dateB - dateA;
+      } else {
+        return a.title.localeCompare(b.title);
       }
-    } catch (error) {
-      console.error('Error deleting note:', error);
-      uiStore.showToastMessage('Failed to delete note. Please try again.');
-    } finally {
-      hideContextMenu();
-    }
+    });
+  });
+
+  const isNoteSelected = (note: Note): boolean => {
+    return (
+      notesStore.selectedNotes.includes(note.id) ||
+      (showMenu.value &&
+        selectedNote.value !== null &&
+        selectedNote.value.id === note.id)
+    );
   };
 
   const handleNoteClick = (note: Note) => {
     if (uiStore.isSelectMode) {
       notesStore.toggleNoteSelection(note.id);
     } else {
-      notesStore.openNote(note.id);
+      notesStore.openNote(note.id, isTrashView.value);
     }
   };
 
   const handleOutsideClick = (event: MouseEvent) => {
     const clickedElement = event.target as HTMLElement;
     if (
-      !clickedElement.closest('li') &&
+      !clickedElement.closest('.notes') &&
       !clickedElement.closest('.select-button')
     ) {
       uiStore.isSelectMode = false;
@@ -143,7 +111,10 @@
     }
   };
 
-  const handleResize = () => uiStore.setColumns(computedColumns.value);
+  const handleResize = () => {
+    uiStore.handleResize();
+    debouncedUpdateLayout();
+  };
 
   watch(
     () => uiStore.isSelectMode,
@@ -152,12 +123,23 @@
     }
   );
 
-  watch(computedColumns, (newColumns) => uiStore.setColumns(newColumns));
+  watch(
+    [sortedNotes, () => props.notes.length, () => uiStore.columns],
+    () => {
+      nextTick(() => {
+        debouncedUpdateLayout();
+      });
+    },
+    { deep: true }
+  );
 
   onMounted(() => {
     window.addEventListener('click', handleOutsideClick);
     window.addEventListener('resize', handleResize);
     handleResize();
+    nextTick(() => {
+      updateMasonryLayout();
+    });
   });
 
   onUnmounted(() => {
@@ -167,119 +149,13 @@
 </script>
 
 <style scoped>
-  .truncate-text {
-    display: -webkit-box;
-    -webkit-line-clamp: 8;
-    line-clamp: 8;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: pre-wrap;
+  .masonry-grid {
+    position: relative;
+    width: 100%;
   }
 
-  @media (min-width: 640px) {
-    .truncate-text {
-      -webkit-line-clamp: 15;
-      line-clamp: 15;
-    }
-  }
-
-  .content :deep(p img) {
-    margin: 10px auto !important;
-    display: block;
-  }
-
-  .content :deep(a) {
-    color: blue;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-
-  .dark .content :deep(a) {
-    color: #3b82f6;
-  }
-
-  .content :deep(ul),
-  .content :deep(ol) {
-    padding-left: 20px;
-    margin: 10px 0;
-  }
-
-  .content :deep(ul) {
-    list-style-type: disc;
-  }
-
-  .content :deep(ol) {
-    list-style-type: decimal;
-  }
-
-  .content :deep(h1) {
-    font-size: 2em;
-    font-weight: bold;
-    line-height: 1.1;
-    padding-bottom: 5px;
-  }
-
-  .content :deep(h2) {
-    font-size: 1.5em;
-    font-weight: bold;
-    line-height: 1.05;
-    padding-bottom: 5px;
-  }
-
-  .content :deep(h3) {
-    font-size: 1.17em;
-    font-weight: bold;
-    padding-bottom: 3px;
-  }
-
-  .content :deep(blockquote) {
-    border-left: 3px solid #d9c698;
-    margin: 1em 0;
-    padding-left: 1em;
-    font-style: italic;
-    color: #666;
-  }
-
-  .dark .content :deep(blockquote) {
-    border-left: 3px solid #ccc;
-    color: #b1b1b1;
-  }
-
-  .content :deep(code) {
-    background-color: #d9c698;
-    padding: 2px 4px;
-    border-radius: 3px;
-  }
-
-  .dark .content :deep(code) {
-    background-color: #424242;
-    color: #fff;
-  }
-
-  .shadow {
-    box-shadow:
-      0 30px 60px -15px rgba(0, 0, 0, 0.3),
-      0 12px 16px -8px rgba(0, 0, 0, 0.2);
-  }
-
-  .shadow:hover {
-    box-shadow:
-      0 30px 60px -15px rgba(0, 0, 0, 0.3),
-      0 12px 16px -8px rgba(0, 0, 0, 0.2);
-  }
-
-  .notes {
-    transition: all 0.3s ease;
-    border-width: 1px;
-    border-style: solid;
-  }
-
-  .notes.selected {
-    border-width: 2px;
-  }
-
-  .notes:active {
-    transform: scale(0.98);
+  .masonry-wrapper {
+    position: relative;
+    width: 100%;
   }
 </style>

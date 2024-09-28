@@ -13,11 +13,8 @@
         @mouseenter="hoveredPinId = note.id"
         @mouseleave="hoveredPinId = null"
       >
-        <PhPushPin
-          v-if="hoveredPinId !== note.id"
-          class="size-[14px] md:size-[16px]"
-        />
-        <PhPushPinSlash v-else class="size-[14px] md:size-[16px]" />
+        <PhPushPin v-if="hoveredPinId !== note.id" class="size-[16px]" />
+        <PhPushPinSlash v-else class="size-[16px]" />
       </span>
       <span
         v-if="isNotePublic"
@@ -26,11 +23,8 @@
         @mouseenter="hoveredGlobeId = note.id"
         @mouseleave="hoveredGlobeId = null"
       >
-        <PhGlobe
-          v-if="hoveredGlobeId !== note.id"
-          class="text-[10px] md:text-xs"
-        />
-        <PhGlobeX v-else class="text-[10px] md:text-xs" />
+        <PhGlobe v-if="hoveredGlobeId !== note.id" class="size-[16px]" />
+        <PhGlobeX v-else class="size-[16px]" />
       </span>
     </div>
   </div>

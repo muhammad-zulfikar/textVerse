@@ -49,7 +49,7 @@ export default (): UIState => ({
   theme: 'system',
   viewType: 'card',
   noteViewType: 'modal',
-  columns: 4,
+  columns: 5,
   sortType: 'date',
   activeDropdown: null,
   activeModal: null,

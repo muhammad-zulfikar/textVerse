@@ -6,6 +6,13 @@ export interface Note {
   pinned: boolean;
   folder: string;
   time_deleted?: string | Date;
+  history?: NoteHistory[];
+}
+
+export interface NoteHistory {
+  timestamp: string | Date;
+  title: string;
+  content: string;
 }
 
 export interface PublicNote {

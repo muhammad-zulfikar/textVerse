@@ -17,18 +17,26 @@
           class="overflow-hidden absolute right-0"
           :class="{ 'w-full': !isMobile, 'w-[180px]': isMobile }"
         >
-          <input
-            ref="searchInput"
-            v-model="searchQuery"
-            @input="updateSearchQuery"
-            @focus="isFocused = true"
-            @blur="isFocused = false"
-            placeholder="Search..."
-            class="card-transparent text-sm md:text-base px-2.5 md:px-2 py-1 pr-8 outline-none w-full transition-all duration-300"
-            :class="{
-              'placeholder-transparent': isFocused,
-            }"
-          />
+          <div class="relative">
+            <div
+              v-if="!isMobile"
+              class="absolute inset-y-0 left-2 flex items-center pointer-events-none"
+            >
+              <PhMagnifyingGlass :size="20" class="text-gray-400" />
+            </div>
+            <input
+              ref="searchInput"
+              v-model="searchQuery"
+              @input="updateSearchQuery"
+              @focus="isFocused = true"
+              @blur="isFocused = false"
+              placeholder="Search..."
+              class="card-transparent text-sm md:text-base pl-2 md:pl-10 px-2.5 md:px-2 py-1 pr-8 outline-none w-full transition-all duration-300"
+              :class="{
+                'placeholder-transparent': isFocused,
+              }"
+            />
+          </div>
         </div>
       </Transition>
       <div
@@ -39,17 +47,26 @@
         <PhMagnifyingGlass :size="20" />
       </div>
       <div
-        class="hidden md:flex absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none transition-all duration-300"
+        class="hidden md:flex absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer transition-all duration-300"
       >
-        <span class="text-sm text-gray-500 dark:text-gray-300">
+        <PhX
+          v-if="searchQuery"
+          :size="20"
+          class="text-gray-500 dark:text-gray-300"
+          @click="clearSearch"
+        />
+        <span
+          v-else
+          class="text-sm text-gray-500 dark:text-gray-300 cursor-default"
+        >
           <kbd
-            class="px-1 py-[2px] mr-[6px] font-serif shadow-md bg-cream-200 text-gray-700 rounded dark:bg-gray-750 dark:text-gray-300"
+            class="px-[5px] py-[2px] mr-[6px] font-serif shadow-md bg-cream-200 text-gray-700 rounded dark:bg-gray-750 dark:text-gray-300"
           >
             Ctrl
           </kbd>
           +
           <kbd
-            class="px-1 py-[2px] ml-1 font-serif shadow-md bg-cream-200 text-gray-700 rounded dark:bg-gray-750 dark:text-gray-300"
+            class="px-[5px] py-[2px] ml-1 font-serif shadow-md bg-cream-200 text-gray-700 rounded dark:bg-gray-750 dark:text-gray-300"
           >
             K
           </kbd>
@@ -59,52 +76,62 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
   import { ref, computed, onMounted, onUnmounted } from 'vue';
-  import { PhMagnifyingGlass } from '@phosphor-icons/vue';
+  import { PhMagnifyingGlass, PhX } from '@phosphor-icons/vue';
+  import { notesStore } from '@/store';
 
   const searchQuery = ref('');
-  const searchInput = ref(null);
-  const searchContainer = ref(null);
+  const searchInput = ref<HTMLInputElement | null>(null);
+  const searchContainer = ref<HTMLDivElement | null>(null);
   const isFocused = ref(false);
   const isLoading = ref(true);
   const isExpanded = ref(false);
 
-  const emit = defineEmits(['update:modelValue', 'expanded']);
-
-  const updateSearchQuery = () => {
-    emit('update:modelValue', searchQuery.value.toLowerCase());
-  };
+  const emit = defineEmits<{
+    (e: 'expanded', value: boolean): void;
+  }>();
 
   const isMobile = computed(() => window.innerWidth < 768);
+
+  const updateSearchQuery = () => {
+    if (notesStore && notesStore.setSearchQuery) {
+      notesStore.setSearchQuery(searchQuery.value.toLowerCase());
+    }
+  };
+
+  const clearSearch = () => {
+    searchQuery.value = '';
+    updateSearchQuery();
+  };
 
   const toggleExpand = () => {
     isExpanded.value = !isExpanded.value;
     if (isExpanded.value) {
       setTimeout(() => {
-        searchInput.value.focus();
+        searchInput.value?.focus();
       }, 300);
     }
     emit('expanded', isExpanded.value);
   };
 
-  const handleOutsideClick = (event) => {
+  const handleOutsideClick = (event: MouseEvent) => {
     if (
       isExpanded.value &&
       searchContainer.value &&
-      !searchContainer.value.contains(event.target)
+      !searchContainer.value.contains(event.target as Node)
     ) {
       isExpanded.value = false;
       emit('expanded', false);
     }
   };
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event: KeyboardEvent) => {
     if (event.ctrlKey && event.key === 'k') {
       event.preventDefault();
       event.stopPropagation();
       setTimeout(() => {
-        searchInput.value.focus();
+        searchInput.value?.focus();
       }, 300);
     }
   };

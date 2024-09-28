@@ -16,29 +16,35 @@
   const isActive = ref(false);
 
   const openLinkModal = () => {
-    const selectedRange = ref<Range | null>(null);
-    const selection = window.getSelection();
-    if (selection && !selection.isCollapsed) {
-      selectedRange.value = selection.getRangeAt(0);
+    const selectedRange = window.getSelection()?.getRangeAt(0);
+    if (selectedRange && !selectedRange.collapsed) {
       uiStore.openInputModal({
         mode: 'link',
         cancel: () => {
           uiStore.setActiveModal('null');
         },
         confirm: async (url: string) => {
-          if (selectedRange.value) {
-            const linkElement = document.createElement('a');
-            linkElement.href = url;
-            linkElement.target = '_blank';
-            linkElement.rel = 'noopener noreferrer';
-            linkElement.appendChild(selectedRange.value.extractContents());
-            selectedRange.value.insertNode(linkElement);
+          const linkElement = document.createElement('a');
+          linkElement.href = url;
+          linkElement.target = '_blank';
+          linkElement.rel = 'noopener noreferrer';
+          linkElement.appendChild(selectedRange.extractContents());
+          selectedRange.insertNode(linkElement);
 
-            const selection = window.getSelection();
-            if (selection) {
-              selection.removeAllRanges();
-              selection.addRange(selectedRange.value);
-            }
+          const event = new Event('input', {
+            bubbles: true,
+            cancelable: true,
+          });
+          selectedRange.commonAncestorContainer.parentElement?.dispatchEvent(
+            event
+          );
+
+          const selection = window.getSelection();
+          if (selection) {
+            selection.removeAllRanges();
+            const range = document.createRange();
+            range.selectNodeContents(linkElement);
+            selection.addRange(range);
           }
         },
       });
