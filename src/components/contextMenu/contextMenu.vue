@@ -99,7 +99,6 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
-  import { useRoute } from 'vue-router';
   import { authStore } from '@/store';
   import { Note } from '@/store/notesStore/types';
   import {
@@ -121,6 +120,7 @@
   import DropdownItem from '@/components/ui/dropdownItem.vue';
   import DropdownSubmenu from '@/components/ui/dropdownSubmenu.vue';
   import { useNoteManagement } from '@/utils/useNoteManagement';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
 
   const props = defineProps({
     visible: {
@@ -138,8 +138,7 @@
   });
 
   const emit = defineEmits(['hideMenu']);
-  const route = useRoute();
-  const isTrashRoute = computed(() => route.path === '/trash');
+  const { isTrashRoute } = useCurrentRoute();
 
   const menuRef = ref<HTMLElement | null>(null);
   const showMenu = ref(false);

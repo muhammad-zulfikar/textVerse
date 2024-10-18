@@ -27,6 +27,7 @@
   import LoadingSpinner from '@/components/ui/loading.vue';
   import { useRoute } from 'vue-router';
   import { createNoteObject } from '@/store/notesStore/helpers';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
 
   const route = useRoute();
 
@@ -34,8 +35,10 @@
     notesStore.filteredNotes(folderStore.currentFolder)
   );
 
+  const { isHomeRoute } = useCurrentRoute();
+
   const handlePopState = () => {
-    if (location.pathname === '/') {
+    if (isHomeRoute) {
       notesStore.closeNote();
     }
   };

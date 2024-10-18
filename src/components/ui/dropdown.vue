@@ -126,4 +126,18 @@
   .dropdown-up.dropdown-left.zoom-leave-to {
     transform: scale(0.95) translate(0%, 0.5rem);
   }
+
+  .dropdown-content::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .dropdown-content::-webkit-scrollbar-thumb {
+    background-color: #ebdfc0;
+    border-radius: 4px;
+  }
+
+  .dark .dropdown-content::-webkit-scrollbar-thumb {
+    background-color: #6b6a6a;
+    border-radius: 4px;
+  }
 </style>

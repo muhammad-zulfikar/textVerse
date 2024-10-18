@@ -46,9 +46,8 @@
   import {
     PhSquaresFour,
     PhTable,
-    PhEnvelopeSimple,
-    PhFolder,
     PhCaretDown,
+    PhTreeView,
   } from '@phosphor-icons/vue';
   import { uiStore } from '@/store';
   import Button from '@/components/ui/button.vue';
@@ -65,8 +64,7 @@
   const viewOptions: ViewOption[] = [
     { label: 'Card', icon: PhSquaresFour, type: 'card' },
     { label: 'Table', icon: PhTable, type: 'table' },
-    { label: 'Mail', icon: PhEnvelopeSimple, type: 'mail' },
-    { label: 'Folder', icon: PhFolder, type: 'folder' },
+    { label: 'Tree', icon: PhTreeView, type: 'tree' },
   ];
 
   const currentViewTypeText = computed(() => {
@@ -79,10 +77,8 @@
         return PhSquaresFour;
       case 'table':
         return PhTable;
-      case 'mail':
-        return PhEnvelopeSimple;
-      case 'folder':
-        return PhFolder;
+      case 'tree':
+        return PhTreeView;
       default:
         return PhSquaresFour;
     }

@@ -1,23 +1,24 @@
 <template>
-  <div class="flex justify-between items-center w-full text-sm">
-    <NoteTitle
-      :note="note"
-      :is-trash="isTrash"
-      @edit-title="editTitle"
-      @save-title="saveTitle"
-    />
-    <NoteActions
-      :note="note"
-      :is-editing="isEditing"
-      :is-trash="isTrash"
-      :is-saving="isSaving"
-    />
+  <div class="flex items-center w-full text-sm">
+    <div class="max-w-[calc(100%-3rem)]">
+      <NoteTitle :note="note" @edit-title="editTitle" @save-title="saveTitle" />
+    </div>
+    <div class="ml-auto">
+      <NoteActions
+        :note="note"
+        :is-editing="isEditing"
+        :is-saving="isSaving"
+        :is-viewing-history="isViewingHistory"
+        @previewVersion="emitPreviewVersion"
+        @applyVersion="emitApplyVersion"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { Ref, onMounted, onUnmounted } from 'vue';
-  import { Note } from '@/store/notesStore/types';
+  import { Ref } from 'vue';
+  import { Note, NoteHistory } from '@/store/notesStore/types';
   import { useNoteTitle } from '@/utils/useNoteTitle';
   import NoteTitle from './toolbar/noteTitle.vue';
   import NoteActions from './toolbar/noteActions.vue';
@@ -27,17 +28,21 @@
     isEditing: boolean;
     hasChanges: boolean;
     isSaving: boolean;
-    isTrash: boolean;
+    isViewingHistory: boolean;
   }>();
 
-  const { updateTitleWidth, editTitle, saveTitle } = useNoteTitle(props.note);
+  const emit = defineEmits<{
+    (e: 'previewVersion', version: NoteHistory): void;
+    (e: 'applyVersion'): void;
+  }>();
 
-  onMounted(() => {
-    updateTitleWidth();
-    window.addEventListener('resize', updateTitleWidth);
-  });
+  const { editTitle, saveTitle } = useNoteTitle(props.note);
 
-  onUnmounted(() => {
-    window.removeEventListener('resize', updateTitleWidth);
-  });
+  const emitPreviewVersion = (version: NoteHistory) => {
+    emit('previewVersion', version);
+  };
+
+  const emitApplyVersion = () => {
+    emit('applyVersion');
+  };
 </script>

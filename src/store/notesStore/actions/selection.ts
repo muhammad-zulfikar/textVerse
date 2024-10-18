@@ -1,5 +1,6 @@
 import { NotesState } from '../state';
 import { uiStore } from '@/store';
+import { NoteHistory } from '../types';
 
 export const openNote = (
   state: NotesState,
@@ -53,5 +54,27 @@ export const selectAllNotes = (
     state.selectedNotes = state.deletedNotes.map((note) => note.id);
   } else {
     state.selectedNotes = state.notes.map((note) => note.id);
+  }
+};
+
+export const applyNoteVersion = (
+  state: NotesState,
+  noteId: string,
+  version: NoteHistory
+): void => {
+  const note = state.notes.find((n) => n.id === noteId);
+  if (note) {
+    note.title = version.title;
+    note.content = version.content;
+    note.last_edited = new Date().toISOString();
+
+    if (!note.history) {
+      note.history = [];
+    }
+    note.history.push({
+      timestamp: note.last_edited,
+      title: note.title,
+      content: note.content,
+    });
   }
 };

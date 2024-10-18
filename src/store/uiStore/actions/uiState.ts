@@ -1,3 +1,4 @@
+import { NoteHistory } from '@/store/notesStore/types';
 import { UIState } from '../state';
 
 export const toggleExpand = (state: UIState) => {
@@ -23,6 +24,19 @@ export const openAlertModal = (
   state.activeDropdown = null;
   state.activeModal = 'alert';
   state.alertOptions = options;
+};
+
+export const openVersionModal = (
+  state: UIState,
+  options: {
+    cancel: () => void;
+    preview: (version: NoteHistory) => void;
+    apply: () => void;
+  }
+) => {
+  state.activeDropdown = null;
+  state.activeModal = 'version';
+  state.versionOptions = options;
 };
 
 export const openInputModal = (

@@ -70,7 +70,10 @@ export const useFolderStore = defineStore('folders', {
           ])
         );
       } else {
-        this.folders = [];
+        this.folders = [
+          DEFAULT_FOLDERS.ALL_NOTES,
+          DEFAULT_FOLDERS.UNCATEGORIZED,
+        ];
         await this.saveFolders();
       }
     },

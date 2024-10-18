@@ -1,8 +1,14 @@
+<!--noteModal.vue-->
+
 <template>
-  <Modal :modelValue="props.isOpen" id="noteModal" @close="clickOutside">
+  <Modal :modelValue="props.isOpen" id="noteModal" @close="handleClose">
     <div :class="modalClasses">
       <div class="flex w-full pt-2 md:pt-4 select-none">
-        <NoteToolbar v-bind="toolbarProps" />
+        <NoteToolbar
+          v-bind="toolbarProps"
+          @previewVersion="previewVersion"
+          @applyVersion="applyVersion"
+        />
       </div>
       <div
         class="w-full bg-transparent pt-2 md:pt-4 md:pb-2 flex-grow overflow-y-auto flex flex-col"
@@ -10,8 +16,8 @@
         <TextEditor
           v-model="editedNote.content"
           @update:modelValue="updateNoteContent"
-          :showToolbar="!props.isTrash"
-          :editable="!props.isTrash"
+          :showToolbar="!props.isTrash && !isViewingHistory"
+          :editable="!props.isTrash && !isViewingHistory"
           class="h-full flex-grow overflow-y-auto"
         />
       </div>
@@ -21,14 +27,14 @@
 
 <script setup lang="ts">
   import { ref, computed, watch, onUnmounted, nextTick, onMounted } from 'vue';
-  import { onValue, ref as dbRef } from 'firebase/database';
-  import { db } from '@/firebase';
   import { Note, NoteHistory } from '@/store/notesStore/types';
-  import { notesStore, folderStore, uiStore, authStore } from '@/store';
+  import { notesStore, uiStore, authStore } from '@/store';
   import {
-    createNoteObject,
     hasChanged,
-    isContentEmpty,
+    setupNoteListener,
+    debouncedSaveNote,
+    createEmptyNote,
+    handleNoteClose,
   } from '@/store/notesStore/helpers';
   import Modal from '@/components/ui/modal.vue';
   import NoteToolbar from './noteToolbar.vue';
@@ -46,14 +52,13 @@
   const editedNote = ref<Note>(createEmptyNote());
   const initialNote = ref<Note | null>(null);
   const isNewNote = ref(false);
-
-  let saveNoteTimeout: ReturnType<typeof setTimeout> | null = null;
+  const isViewingHistory = ref(false);
 
   const modalClasses = computed(() => [
     'flex flex-col relative px-2 md:px-4',
     {
       'card-fullscreen w-full h-full': uiStore.isExpanded,
-      'card w-11/12 md:w-3/5': !uiStore.isExpanded,
+      'card w-11/12 md:w-3/5 h-[calc(100%-3rem)]': !uiStore.isExpanded,
     },
   ]);
 
@@ -66,125 +71,53 @@
     isEditing: isEditing.value,
     hasChanges: hasChanges.value,
     isSaving: isSaving.value,
-    isTrash: props.isTrash,
+    isViewingHistory: isViewingHistory.value,
   }));
 
   const hasChanges = computed(() =>
     initialNote.value ? hasChanged(initialNote.value, editedNote.value) : false
   );
 
-  function createEmptyNote(): Note {
-    return createNoteObject({
-      title: 'Untitled',
-      content: '',
-      folder: folderStore.currentFolder,
-    });
+  function updateNoteContent(newContent: string) {
+    editedNote.value.content = newContent;
+    debouncedSaveNote(editedNote, isNewNote, isSaving, props.isTrash);
   }
 
-  function debouncedSaveNote() {
-    if (saveNoteTimeout) {
-      clearTimeout(saveNoteTimeout);
+  const currentNoteVersion = ref<Note | null>(null);
+
+  function previewVersion(version: NoteHistory) {
+    if (!isViewingHistory.value) {
+      currentNoteVersion.value = { ...editedNote.value };
     }
-    saveNoteTimeout = setTimeout(saveNote, 500);
+    editedNote.value.title = version.title;
+    editedNote.value.content = version.content;
+    isViewingHistory.value = true;
   }
 
-  async function saveNote() {
-    if (isNewNote.value && isContentEmpty(editedNote.value.content)) {
-      uiStore.showToastMessage('Empty note discarded');
-      return;
-    }
-    if (isEditing.value && !hasChanges.value) return;
-
-    try {
-      isSaving.value = true;
-      const saveStartTime = Date.now();
-
-      const newHistoryEntry: NoteHistory = {
+  function applyVersion() {
+    if (isViewingHistory.value && props.noteId) {
+      const noteHistory: NoteHistory = {
         timestamp: new Date().toISOString(),
         title: editedNote.value.title,
         content: editedNote.value.content,
       };
-
-      if (isEditing.value) {
-        const updatedNote = {
-          ...editedNote.value,
-          history: [...(editedNote.value.history || []), newHistoryEntry],
-        };
-        await notesStore.updateNote(updatedNote.id, updatedNote);
-      } else {
-        const newNote = {
-          ...editedNote.value,
-          history: [newHistoryEntry],
-        };
-        const createdNote = await notesStore.createNote(newNote);
-        editedNote.value.id = createdNote.id;
-        isEditing.value = true;
-        isNewNote.value = false;
-      }
-
+      notesStore.applyNoteVersion(props.noteId, noteHistory);
       initialNote.value = { ...editedNote.value };
-      await new Promise((resolve) =>
-        setTimeout(resolve, Math.max(0, 500 - (Date.now() - saveStartTime)))
-      );
-    } catch (error) {
-      console.error('Error saving note:', error);
-      uiStore.showToastMessage('Failed to save note. Please try again.');
-    } finally {
-      isSaving.value = false;
+      isViewingHistory.value = false;
+      currentNoteVersion.value = null;
+      debouncedSaveNote(editedNote, isNewNote, isSaving, props.isTrash);
     }
   }
 
-  function updateNoteContent(newContent: string) {
-    editedNote.value.content = newContent;
-    debouncedSaveNote();
-  }
-
-  async function clickOutside() {
-    if (props.isTrash) {
-      await setLatestNoteVersion();
-      notesStore.closeNote(true);
-      return;
+  async function handleClose() {
+    if (isViewingHistory.value && currentNoteVersion.value) {
+      editedNote.value = { ...currentNoteVersion.value };
+      isViewingHistory.value = false;
+      currentNoteVersion.value = null;
+    } else {
+      await handleNoteClose(editedNote, isNewNote, props.isTrash, initialNote);
     }
-
-    if (isNewNote.value && isContentEmpty(editedNote.value.content)) {
-      notesStore.closeNote();
-      uiStore.showToastMessage('Empty note discarded');
-      return;
-    }
-
-    if (
-      notesStore.currentHistoryIndex === null ||
-      (editedNote.value.history &&
-        notesStore.currentHistoryIndex === editedNote.value.history.length - 1)
-    ) {
-      await saveNote();
-    }
-    await setLatestNoteVersion();
     notesStore.closeNote();
-  }
-
-  async function setLatestNoteVersion() {
-    if (editedNote.value.history && editedNote.value.history.length > 0) {
-      const latestHistory =
-        editedNote.value.history[editedNote.value.history.length - 1];
-      editedNote.value.title = latestHistory.title;
-      editedNote.value.content = latestHistory.content;
-      editedNote.value.last_edited = latestHistory.timestamp;
-    }
-    notesStore.currentHistoryIndex = null;
-  }
-
-  function setupNoteListener(noteId: string) {
-    if (authStore.isLoggedIn && noteId && authStore.user) {
-      const noteRef = dbRef(db, `users/${authStore.user.uid}/notes/${noteId}`);
-      return onValue(noteRef, (snapshot) => {
-        const updatedNote = snapshot.val();
-        if (updatedNote && updatedNote.id === editedNote.value.id) {
-          editedNote.value = { ...updatedNote };
-          initialNote.value = { ...updatedNote };
-        }
-      });
-    }
   }
 
   watch(
@@ -200,7 +133,12 @@
           if (note) {
             editedNote.value = { ...note };
             initialNote.value = { ...note };
-            setupNoteListener(newNoteId);
+            // setupNoteListener(
+            //   newNoteId,
+            //   editedNote,
+            //   initialNote,
+            //   authStore.user?.uid
+            // );
             isEditing.value = !isTrash;
             isNewNote.value = false;
           }
@@ -210,10 +148,28 @@
           isEditing.value = false;
           isNewNote.value = true;
         }
+        isViewingHistory.value = false;
       }
     },
     { immediate: true }
   );
+
+  watch(
+    () => editedNote.value.title,
+    (newTitle) => {
+      if (initialNote.value) {
+        initialNote.value.title = newTitle;
+      }
+    }
+  );
+
+  watch(isViewingHistory, (newValue) => {
+    if (newValue) {
+      isEditing.value = false;
+    } else {
+      isEditing.value = !props.isTrash;
+    }
+  });
 
   const handleResize = () => {
     isMobile.value = window.innerWidth <= 768;
@@ -226,11 +182,12 @@
     window.addEventListener('resize', handleResize);
   });
 
-  onUnmounted(async () => {
-    if (saveNoteTimeout) {
-      clearTimeout(saveNoteTimeout);
-    }
+  onUnmounted(() => {
     window.removeEventListener('resize', handleResize);
-    await setLatestNoteVersion();
+  });
+
+  defineExpose({
+    previewVersion,
+    applyVersion,
   });
 </script>

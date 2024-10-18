@@ -1,10 +1,8 @@
 <template>
-  <div
-    class="max-w-5xl mx-auto px-2 md:px-0 text-sm md:text-base mt-4 md:mt-0 select-none"
-  >
+  <div class="max-w-5xl mx-auto px-2 md:px-0 text-sm mt-4 md:mt-0 select-none">
     <div class="overflow-x-auto md:px-4 xl:px-0">
       <table
-        class="min-w-[800px] w-full border-separate border-spacing-0 font-serif rounded-lg overflow-hidden"
+        class="w-full border-separate border-spacing-0 font-serif rounded-lg overflow-hidden"
       >
         <TableHeader
           :visible-columns="visibleColumns"

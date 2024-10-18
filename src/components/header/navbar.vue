@@ -29,7 +29,7 @@
             v-if="!isSelectMode"
             class="hidden md:flex justify-center items-center w-full pointer-events-none"
           >
-            <div class="w-1/3 pointer-events-auto">
+            <div v-if="!isSettingsRoute" class="w-1/3 pointer-events-auto">
               <SearchBar @expanded="setSearchExpanded" />
             </div>
           </div>
@@ -70,9 +70,9 @@
 
 <script setup lang="ts">
   import { ref, computed } from 'vue';
-  import { useRoute } from 'vue-router';
   import { PhList, PhX } from '@phosphor-icons/vue';
   import { uiStore } from '@/store';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
   import Button from '@/components/ui/button.vue';
   import Separator from '@/components/ui/separator.vue';
   import SearchBar from '@/components/header/searchBar.vue';
@@ -82,7 +82,6 @@
   import View from '@/components/composable/dropdown/viewDropdown.vue';
   import SelectionModeOverlay from '@/components/header/selectionModeOverlay.vue';
 
-  const route = useRoute();
   const isSearchExpanded = ref(false);
 
   const setSearchExpanded = (expanded: boolean) => {
@@ -93,17 +92,7 @@
     uiStore.setActiveModal('sidebar');
   };
 
-  const isHomeRoute = computed(() => {
-    return route.path === '/' || route.name === 'Note';
-  });
-
-  const isPublicRoute = computed(() => {
-    return route.path.startsWith('/public');
-  });
-
-  const isSettingsRoute = computed(() => {
-    return route.path.startsWith('/settings');
-  });
+  const { isHomeRoute, isPublicRoute, isSettingsRoute } = useCurrentRoute();
 
   const isSelectMode = computed(() => {
     return uiStore.isSelectMode;

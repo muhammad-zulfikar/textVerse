@@ -1,46 +1,34 @@
+<!--noteTitle.vue-->
+
 <template>
   <div
-    class="flex items-center mr-2 md:mr-4 px-2 py-1.5 card"
+    class="flex items-center mr-2 md:mr-4 px-2 py-1.5 card max-w-full"
     :class="{
-      'hover:bg-cream-200 dark:hover:bg-gray-600': !isEditingTitle,
+      'hover:bg-cream-200 dark:hover:bg-gray-600':
+        !isEditingTitle && !isTrashRoute,
     }"
   >
     <PhFile :size="20" class="size-5 flex-shrink-0" />
-    <div class="relative ml-2 flex-grow">
-      <div v-if="isEditingTitle && !isTrash">
-        <input
-          ref="titleInputRef"
-          v-model="editedTitle"
-          @keyup.enter="saveTitle"
-          @blur="saveTitle"
-          class="bg-transparent outline-none w-full min-w-[50px]"
-          :style="{ width: `${titleWidth}px` }"
-          @input="updateTitleWidth"
-          :class="{
-            'border-b border-gray-600': isEditingTitle,
-          }"
-        />
-        <span
-          ref="titleMeasure"
-          class="invisible absolute top-0 left-0 whitespace-pre"
-        >
-          {{ editedTitle }}
-        </span>
-      </div>
-      <h1
-        v-else-if="!isEditingTitle && !isTrash"
-        ref="titleRef"
-        class="cursor-text truncate border-b border-transparent hover:border-b hover:border-gray-600"
-        @click="editTitle"
-      >
-        {{ truncatedTitle }}
-      </h1>
+    <div class="relative ml-2 flex-grow overflow-hidden">
+      <input
+        v-if="isEditingTitle && !isTrashRoute"
+        id="note-title-input"
+        v-model="editedTitle"
+        @keyup.enter="saveTitle"
+        @blur="saveTitle"
+        :style="{ width: `${titleWidth}px` }"
+        class="bg-transparent outline-none px-0"
+        :class="{
+          'border-b border-gray-600': isEditingTitle,
+        }"
+      />
       <h1
         v-else
-        ref="titleRef"
-        class="cursor-text truncate border-b border-transparent"
+        class="cursor-text truncate border-b border-transparent w-full"
+        :class="{ 'hover:border-b hover:border-gray-600': !isTrashRoute }"
+        @click="handleTitleClick"
       >
-        {{ truncatedTitle }}
+        {{ title }}
       </h1>
     </div>
   </div>
@@ -48,25 +36,44 @@
 
 <script setup lang="ts">
   import { PhFile } from '@phosphor-icons/vue';
-  import { Ref } from 'vue';
+  import { Ref, watch, onMounted } from 'vue';
   import { Note } from '@/store/notesStore/types';
   import { useNoteTitle } from '@/utils/useNoteTitle';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
 
   const props = defineProps<{
     note: Ref<Note>;
-    isTrash: boolean;
   }>();
 
   const {
+    title,
     isEditingTitle,
     editedTitle,
     titleWidth,
-    titleRef,
-    titleInputRef,
-    titleMeasure,
-    truncatedTitle,
-    updateTitleWidth,
     editTitle,
     saveTitle,
+    updateTitleWidth,
   } = useNoteTitle(props.note);
+
+  const { isTrashRoute } = useCurrentRoute();
+
+  const handleTitleClick = () => {
+    if (!isTrashRoute.value) {
+      editTitle();
+    }
+  };
+
+  watch(isEditingTitle, (newValue) => {
+    if (newValue) {
+      updateTitleWidth();
+    }
+  });
+
+  watch(title, (newTitle) => {
+    props.note.value.title = newTitle;
+  });
+
+  onMounted(() => {
+    updateTitleWidth();
+  });
 </script>

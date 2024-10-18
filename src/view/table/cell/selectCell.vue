@@ -1,6 +1,6 @@
 <template>
   <td
-    class="p-3 w-10 border-b-[1px] border-r-[1px] border-black dark:border-white"
+    class="px-3 pt-1.5 w-10 border-b-[1px] border-r-[1px] border-black dark:border-white"
   >
     <input
       type="checkbox"

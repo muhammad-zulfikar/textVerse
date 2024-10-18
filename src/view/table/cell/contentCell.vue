@@ -1,5 +1,7 @@
 <template>
-  <td class="p-3 border-b-[1px] border-r-[1px] border-black dark:border-white">
+  <td
+    class="p-3 border-b-[1px] border-r-[1px] border-black dark:border-white md:max-w-[500px]"
+  >
     <div
       v-html="sanitizeHtml(truncatedContent(content))"
       class="w-full bg-transparent outline-none truncate-text content syntax"

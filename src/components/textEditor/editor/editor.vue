@@ -1,8 +1,10 @@
+<!--editor.vue-->
+
 <template>
-  <div class="editor-container">
+  <div class="editor-container h-full">
     <div
       ref="editorRef"
-      class="editor syntax min-h-[440px] max-h-[440px]"
+      class="editor syntax h-full overflow-y-auto"
       :contenteditable="editable"
       @input="handleInput"
       @keydown="handleKeyDown"
@@ -83,3 +85,16 @@
 
   defineExpose({ focusEditor });
 </script>
+
+<style scoped>
+  .editor-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .editor {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+</style>

@@ -1,3 +1,5 @@
+<!--toolbar.vue-->
+
 <template>
   <div class="toolbar flex">
     <div class="flex mr-4">

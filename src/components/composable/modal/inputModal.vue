@@ -67,7 +67,7 @@
   const currentValue = computed(
     () => uiStore.inputModalOptions?.currentValue || ''
   );
-  const maxLength = computed(() => uiStore.inputModalOptions?.maxLength || 100);
+  const maxLength = computed(() => uiStore.inputModalOptions?.maxLength || 250);
 
   const inputValue = ref(currentValue.value);
   const placeholderText = ref('');

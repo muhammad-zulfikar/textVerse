@@ -55,7 +55,7 @@
       await notesStore.initializeNotes();
       await folderStore.initializeFolders();
 
-      if (!localStore.initialNotesLoaded) {
+      if (!authStore.isLoggedIn && !localStore.initialNotesLoaded) {
         await localStore.loadInitialNotes();
       }
     } catch (error) {

@@ -7,7 +7,7 @@
     </h1>
     <div class="absolute top-0 right-0 flex space-x-2">
       <span
-        v-if="note.pinned"
+        v-if="isNotePinned"
         @click.stop="notesStore.togglePin(note.id)"
         class="justify-start px-2 py-1 hover:bg-cream-200 dark:hover:bg-gray-700 rounded-md card"
         @mouseenter="hoveredPinId = note.id"
@@ -20,10 +20,10 @@
         v-if="isNotePublic"
         @click.stop="notesStore.togglePublic(note.id)"
         class="justify-start px-2 py-1 hover:bg-cream-200 dark:hover:bg-gray-700 rounded-md card"
-        @mouseenter="hoveredGlobeId = note.id"
-        @mouseleave="hoveredGlobeId = null"
+        @mouseenter="hoveredPublicId = note.id"
+        @mouseleave="hoveredPublicId = null"
       >
-        <PhGlobe v-if="hoveredGlobeId !== note.id" class="size-[16px]" />
+        <PhGlobe v-if="hoveredPublicId !== note.id" class="size-[16px]" />
         <PhGlobeX v-else class="size-[16px]" />
       </span>
     </div>
@@ -40,15 +40,16 @@
   } from '@phosphor-icons/vue';
   import { notesStore } from '@/store';
   import { Note } from '@/store/notesStore/types';
+  import { useNoteManagement } from '@/utils/useNoteManagement';
 
   const props = defineProps<{
     note: Note;
   }>();
 
   const hoveredPinId = ref<string | null>(null);
-  const hoveredGlobeId = ref<string | null>(null);
+  const hoveredPublicId = ref<string | null>(null);
 
-  const isNotePublic = computed(() =>
-    notesStore.publicNotes.has(props.note.id)
+  const { isNotePublic, isNotePinned } = useNoteManagement(
+    computed(() => props.note)
   );
 </script>

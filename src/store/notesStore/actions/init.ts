@@ -2,7 +2,6 @@ import { authStore, firebaseStore } from '@/store';
 import { Note } from '../types';
 import { NotesState } from '../state';
 import { loadNotes } from '.';
-import { reorderNotes } from '../helpers';
 
 export const initializeNotes = async (state: NotesState) => {
   await loadNotes(state);

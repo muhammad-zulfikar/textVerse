@@ -1,79 +1,63 @@
-import { ref, computed, watch, nextTick, Ref } from 'vue';
+//useNoteTitle
+
+import { ref, watch, nextTick, Ref } from 'vue';
 import { Note } from '@/store/notesStore/types';
 import { notesStore, uiStore } from '@/store';
-import { useNoteManagement } from './useNoteManagement';
 
 export function useNoteTitle(note: Ref<Note>) {
-  const { isNotePublic, isNotePinned } = useNoteManagement(note);
-
-  const title = computed({
-    get: () => note.value.title,
-    set: (newTitle) => {
-      if (note.value.id) {
-        notesStore.updateNote(note.value.id, {
-          ...note.value,
-          title: newTitle,
-        });
-      }
-    },
-  });
-
+  const title = ref(note.value.title);
   const isEditingTitle = ref(false);
   const editedTitle = ref(title.value);
   const titleWidth = ref(0);
-  const titleRef = ref<HTMLElement | null>(null);
-  const titleInputRef = ref<HTMLInputElement | null>(null);
-  const titleMeasure = ref<HTMLElement | null>(null);
-
-  const currentTitle = ref(title.value);
-
-  const truncatedTitle = computed(() => {
-    const mobileMaxLength = 18;
-    const midMaxLength = 25;
-    const defaultMaxLength = 35;
-
-    const truncate = (length: number) => {
-      if (currentTitle.value.length <= length) return currentTitle.value;
-      return currentTitle.value.slice(0, length - 3) + '...';
-    };
-
-    const isMobile = window.innerWidth <= 768;
-
-    switch (true) {
-      case isMobile && isNotePublic.value && isNotePinned.value:
-        return truncate(mobileMaxLength);
-      case isNotePublic.value || isNotePinned.value:
-        return truncate(midMaxLength);
-      default:
-        return truncate(defaultMaxLength);
-    }
-  });
 
   const updateTitleWidth = () => {
-    if (isEditingTitle.value && titleMeasure.value) {
-      titleWidth.value = titleMeasure.value.offsetWidth;
-    } else if (titleRef.value) {
-      titleWidth.value = titleRef.value.offsetWidth;
-    }
+    nextTick(() => {
+      const titleInput = document.getElementById(
+        'note-title-input'
+      ) as HTMLInputElement;
+      if (titleInput) {
+        const tempSpan = document.createElement('span');
+        tempSpan.style.visibility = 'hidden';
+        tempSpan.style.position = 'absolute';
+        tempSpan.style.whiteSpace = 'pre';
+        tempSpan.style.font = window.getComputedStyle(titleInput).font;
+        tempSpan.textContent = editedTitle.value || '\u00A0';
+        document.body.appendChild(tempSpan);
+
+        titleWidth.value = tempSpan.offsetWidth;
+
+        document.body.removeChild(tempSpan);
+      }
+    });
   };
 
   const editTitle = () => {
     if (!isEditingTitle.value) {
       isEditingTitle.value = true;
-      editedTitle.value = currentTitle.value;
-
+      editedTitle.value = title.value;
       nextTick(() => {
-        titleInputRef.value?.focus();
-        titleInputRef.value?.select();
+        updateTitleWidth();
+        const titleInput = document.getElementById(
+          'note-title-input'
+        ) as HTMLInputElement;
+        if (titleInput) {
+          titleInput.focus();
+          titleInput.select();
+        }
       });
     }
   };
 
   const saveTitle = () => {
     isEditingTitle.value = false;
-    if (editedTitle.value !== currentTitle.value) {
+    if (editedTitle.value !== title.value) {
       title.value = editedTitle.value;
-      currentTitle.value = editedTitle.value;
+      if (note.value.id) {
+        notesStore.updateNote(note.value.id, {
+          ...note.value,
+          title: editedTitle.value,
+        });
+      }
       uiStore.showToastMessage('Note title updated');
     }
   };
@@ -81,31 +65,22 @@ export function useNoteTitle(note: Ref<Note>) {
   watch(
     () => note.value.title,
     (newTitle) => {
+      title.value = newTitle;
       editedTitle.value = newTitle;
-      currentTitle.value = newTitle;
-      nextTick(() => updateTitleWidth());
     }
   );
 
-  watch(isEditingTitle, (newValue) => {
-    if (newValue) {
-      nextTick(() => {
-        updateTitleWidth();
-      });
-    }
+  watch(editedTitle, () => {
+    updateTitleWidth();
   });
 
   return {
-    title: currentTitle,
+    title,
     isEditingTitle,
     editedTitle,
     titleWidth,
-    titleRef,
-    titleInputRef,
-    titleMeasure,
-    truncatedTitle,
-    updateTitleWidth,
     editTitle,
     saveTitle,
+    updateTitleWidth,
   };
 }

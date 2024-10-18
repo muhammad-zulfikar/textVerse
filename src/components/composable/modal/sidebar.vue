@@ -79,56 +79,45 @@
       </div>
 
       <div v-if="authStore.isLoggedIn" class="p-2 absolute bottom-0 w-full">
-        <button
-          @click="toggleUserDropup"
-          class="w-full py-2 px-4 flex justify-between items-center card transition-colors duration-200"
-        >
-          <div class="flex items-center">
-            <img
-              :src="authStore.avatarUrl"
-              alt="User Avatar"
-              class="size-8 rounded-full object-cover mr-3"
-            />
-            <span>{{ authStore.user?.displayName || 'User' }}</span>
-          </div>
-          <div
-            class="p-1 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
-            :class="{
-              'rotate-180 bg-cream-300 dark:bg-gray-600': isUserDropupOpen,
-            }"
-          >
-            <PhCaretUp class="size-4" />
-          </div>
-        </button>
-
-        <Transition name="fade">
-          <div
-            v-if="isUserDropupOpen"
-            class="dropup card mt-2 p-2 mx-2 rounded shadow-lg z-60"
-          >
-            <p
-              class="text-sm text-center text-gray-600 dark:text-gray-400 mb-2"
+        <Dropdown dropdownId="userDropdown" direction="up" contentWidth="100%">
+          <template #label>
+            <Button
+              class="w-[14.9rem] py-2 px-4 flex justify-between items-center card transition-colors duration-200"
             >
-              {{ authStore.user?.email }}
-            </p>
-            <div class="border-t border-gray-500 dark:border-gray-600 pt-2">
-              <button
-                @click="navigateToSettings"
-                class="flex w-full text-left p-2 hover:bg-cream-200 dark:hover:bg-gray-700 rounded transition-colors duration-200"
+              <div class="flex items-center">
+                <img
+                  :src="authStore.avatarUrl"
+                  alt="User Avatar"
+                  class="size-8 rounded-full object-cover mr-3"
+                />
+                <span>{{ authStore.user?.displayName || 'User' }}</span>
+              </div>
+              <div
+                class="p-1 rounded-full hover:bg-cream-300 dark:hover:bg-gray-600 transition-transform duration-200"
+                :class="{
+                  'rotate-180 bg-cream-300 dark:bg-gray-600':
+                    uiStore.activeDropdown === 'userDropdown',
+                }"
               >
-                <PhGear class="size-5 mr-2" />
-                Settings
-              </button>
-              <button
-                @click="openSignOutAlert"
-                class="flex w-full text-left p-2 hover:bg-cream-200 dark:hover:bg-gray-700 rounded transition-colors duration-200"
-              >
-                <PhSignOut class="size-5 mr-2" />
-                Sign out
-              </button>
-            </div>
-          </div>
-        </Transition>
+                <PhCaretUp class="size-4" />
+              </div>
+            </Button>
+          </template>
+          <p class="text-sm text-center text-gray-600 dark:text-gray-400 mb-1">
+            {{ authStore.user?.email }}
+          </p>
+          <Separator />
+          <DropdownItem
+            @click="navigateToSettings"
+            :icon="PhGear"
+            label="Settings"
+          />
+          <DropdownItem
+            @click="openSignOutAlert"
+            :icon="PhSignOut"
+            label="Sign out"
+          />
+        </Dropdown>
       </div>
     </div>
   </Modal>
@@ -150,6 +139,9 @@
   } from '@phosphor-icons/vue';
   import Modal from '@/components/ui/modal.vue';
   import Separator from '@/components/ui/separator.vue';
+  import Dropdown from '@/components/ui/dropdown.vue';
+  import DropdownItem from '@/components/ui/dropdownItem.vue';
+  import Button from '@/components/ui/button.vue';
 
   const isOpen = computed(() => uiStore.activeModal === 'sidebar');
 
@@ -172,11 +164,6 @@
       })
       .slice(0, 5);
   });
-
-  const toggleUserDropup = (event: Event) => {
-    event.stopPropagation();
-    isUserDropupOpen.value = !isUserDropupOpen.value;
-  };
 
   const openNote = (noteId: string) => {
     router.push('/');
@@ -247,31 +234,3 @@
     }
   });
 </script>
-
-<style scoped>
-  .fade-enter-active,
-  .fade-leave-active {
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease;
-  }
-
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-    transform: translateY(50%);
-  }
-
-  .fade-enter-to,
-  .fade-leave-from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .dropup {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    right: 0;
-  }
-</style>

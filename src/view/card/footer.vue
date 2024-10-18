@@ -37,18 +37,16 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
-  import { useRoute } from 'vue-router';
   import { PhFolder, PhCalendarBlank, PhTrash } from '@phosphor-icons/vue';
   import { folderStore } from '@/store';
   import { Note } from '@/store/notesStore/types';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
   import { localeDate } from '@/store/notesStore/helpers';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
 
   const props = defineProps<{
     note: Note;
   }>();
 
-  const route = useRoute();
-  const isTrashRoute = computed(() => route.path === '/trash');
+  const { isTrashRoute } = useCurrentRoute();
 </script>

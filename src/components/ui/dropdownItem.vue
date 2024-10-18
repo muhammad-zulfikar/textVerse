@@ -4,7 +4,7 @@
     class="text-sm cursor-pointer px-1"
     :class="[
       itemType === 'destructive'
-        ? 'text-red-500 hover:text-red-100'
+        ? 'text-red-500 md:hover:text-red-100 active:text-red-100'
         : 'text-inherit',
     ]"
     role="menuitem"
@@ -12,9 +12,10 @@
     <span
       class="p-2 w-full text-left rounded-md transition-colors duration-200 flex items-center whitespace-nowrap cursor-pointer"
       :class="[
-        itemType === 'normal' && 'hover:bg-cream-200 dark:hover:bg-gray-700',
+        itemType === 'normal' &&
+          'md:hover:bg-cream-200 md:dark:hover:bg-gray-700 active:bg-cream-200 active:dark:bg-gray-700',
         itemType === 'destructive' &&
-          'hover:bg-red-700/50 dark:hover:bg-red-800/60',
+          'md:hover:bg-red-700/50 md:dark:hover:bg-red-800/60 active:bg-red-700/50 active:dark:bg-red-800/60',
         itemType === 'active' && 'bg-cream-200 dark:bg-gray-700',
       ]"
     >

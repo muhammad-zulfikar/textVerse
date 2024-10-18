@@ -49,10 +49,8 @@
         return defineAsyncComponent(() => import('@/view/cardView.vue'));
       case 'table':
         return defineAsyncComponent(() => import('@/view/tableView.vue'));
-      case 'mail':
-        return defineAsyncComponent(() => import('@/view/mailView.vue'));
-      case 'folder':
-        return defineAsyncComponent(() => import('@/view/folderView.vue'));
+      case 'tree':
+        return defineAsyncComponent(() => import('@/view/treeView.vue'));
       default:
         return null;
     }

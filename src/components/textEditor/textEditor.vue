@@ -1,3 +1,5 @@
+<!--textEditor.vue-->
+
 <template>
   <div class="text-editor">
     <Toolbar v-if="props.showToolbar" />

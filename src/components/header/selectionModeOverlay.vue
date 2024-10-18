@@ -58,7 +58,6 @@
 
 <script setup lang="ts">
   import { computed } from 'vue';
-  import { useRoute } from 'vue-router';
   import {
     PhX,
     PhChecks,
@@ -75,10 +74,9 @@
   import Dropdown from '@/components/ui/dropdown.vue';
   import DropdownItem from '@/components/ui/dropdownItem.vue';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
 
-  const route = useRoute();
-
-  const isTrashRoute = computed(() => route.path === '/trash');
+  const { isTrashRoute } = useCurrentRoute();
   const selectedNotesCount = computed(() => notesStore.selectedNotes.length);
 
   const allSelectedNotesPinned = computed(() => {

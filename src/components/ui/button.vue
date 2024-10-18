@@ -29,11 +29,12 @@
   const emit = defineEmits(['click']);
 
   const variantClasses = {
-    default: 'hover:bg-cream-200 dark:hover:bg-gray-700',
+    default:
+      'md:hover:bg-cream-200 md:dark:hover:bg-gray-700 active:bg-cream-200 active:dark:bg-gray-700',
     danger:
-      'hover:bg-red-700/50 dark:hover:bg-red-800/60 text-red-500 hover:text-red-100',
+      'md:hover:bg-red-700/50 md:dark:hover:bg-red-800/60 active:bg-red-700/50 active:dark:bg-red-800/60 text-red-500 md:hover:text-red-100 active:text-red-100',
     confirm:
-      'hover:bg-blue-400 dark:hover:bg-blue-900/60 text-blue-500 hover:text-blue-100',
+      'md:hover:bg-blue-400 md:dark:hover:bg-blue-900/60 active:bg-blue-400 active:dark:bg-blue-900/60 text-blue-500 md:hover:text-blue-100 active:text-blue-100',
   } as const;
 
   const handleClick = (event: MouseEvent) => {

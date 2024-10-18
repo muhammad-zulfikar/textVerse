@@ -13,11 +13,8 @@
         <div v-if="uiStore.viewType === 'table'">
           <PhTable :size="20" />
         </div>
-        <div v-if="uiStore.viewType === 'mail'">
-          <PhEnvelopeSimple :size="20" />
-        </div>
-        <div v-if="uiStore.viewType === 'folder'">
-          <PhFolder :size="20" />
+        <div v-if="uiStore.viewType === 'tree'">
+          <PhTreeView :size="20" />
         </div>
       </Button>
     </template>
@@ -47,16 +44,10 @@
       @click="setViewType('table')"
     />
     <DropdownItem
-      :label="'Mail'"
-      :icon="PhEnvelopeSimple"
-      :itemType="uiStore.viewType === 'mail' ? 'active' : 'normal'"
-      @click="setViewType('mail')"
-    />
-    <DropdownItem
-      :label="'Folder'"
-      :icon="PhFolder"
-      :itemType="'normal'"
-      @click="setViewType('folder')"
+      :label="'Tree'"
+      :icon="PhTreeView"
+      :itemType="uiStore.viewType === 'tree' ? 'active' : 'normal'"
+      @click="setViewType('tree')"
     />
   </Dropdown>
 </template>
@@ -67,8 +58,7 @@
   import {
     PhSquaresFour,
     PhTable,
-    PhEnvelopeSimple,
-    PhFolder,
+    PhTreeView,
     PhMinusCircle,
     PhPlusCircle,
   } from '@phosphor-icons/vue';
@@ -93,7 +83,7 @@
     openColumnSubmenu.value = isOpen;
   };
 
-  const setViewType = (viewType: 'card' | 'table' | 'mail' | 'folder') => {
+  const setViewType = (viewType: 'card' | 'table' | 'tree') => {
     uiStore.setViewType(viewType);
     if (viewType !== 'card') {
       uiStore.setColumns(isMobile.value ? 2 : 5);

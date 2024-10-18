@@ -20,15 +20,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed } from 'vue';
-  import { useRoute } from 'vue-router';
   import folderDropdown from '@/components/composable/dropdown/folderDropdown.vue';
   import selectButton from '@/components/composable/button/selectButton.vue';
   import sortDropdown from '@/components/composable/dropdown/sortDropdown.vue';
   import Button from '@/components/ui/button.vue';
   import { PhTrash } from '@phosphor-icons/vue';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
 
-  const route = useRoute();
-
-  const isTrashRoute = computed(() => route.path === '/trash');
+  const { isTrashRoute } = useCurrentRoute();
 </script>

@@ -1,5 +1,6 @@
 <template>
   <AlertModal />
+  <VersionModal />
   <InputModal />
   <SignInModal />
   <Sidebar />
@@ -12,6 +13,10 @@
 
   const AlertModal = defineAsyncComponent(
     () => import('@/components/composable/modal/alertModal.vue')
+  );
+
+  const VersionModal = defineAsyncComponent(
+    () => import('@/components/composable/modal/versionModal.vue')
   );
 
   const InputModal = defineAsyncComponent(

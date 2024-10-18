@@ -19,6 +19,7 @@
   import NoteView from '@/components/notes/noteView.vue';
   import LoadingSpinner from '@/components/ui/loading.vue';
   import NoteList from '@/components/notes/noteList.vue';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
 
   const route = useRoute();
   const router = useRouter();
@@ -43,8 +44,10 @@
     });
   };
 
+  const { isTrashRoute } = useCurrentRoute();
+
   const handlePopState = () => {
-    if (location.pathname === '/trash') {
+    if (isTrashRoute) {
       notesStore.closeNote();
     }
   };

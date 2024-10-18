@@ -7,7 +7,8 @@
         '--columns': uiStore.columns,
       }"
     >
-      <div
+      <TransitionGroup
+        name="fade-scale"
         @before-leave="handleBeforeLeave"
         @after-leave="updateMasonryLayout"
         @enter="setItemPosition"
@@ -22,7 +23,7 @@
           @click="handleNoteClick"
           @contextmenu="(event) => showContextMenu(event, note)"
         />
-      </div>
+      </TransitionGroup>
     </div>
     <ContextMenu
       v-if="selectedNote"
@@ -36,20 +37,19 @@
 
 <script setup lang="ts">
   import { computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
-  import { useRoute } from 'vue-router';
   import { notesStore, uiStore } from '@/store';
   import { Note } from '@/store/notesStore/types';
   import ContextMenu from '@/components/contextMenu/contextMenu.vue';
   import NoteCard from './card/noteCard.vue';
   import { useContextMenu } from '@/utils/useContextMenu';
   import { useMasonryLayout } from '@/utils/useMasonryLayout';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
 
   const props = defineProps<{
     notes: Note[];
   }>();
 
-  const route = useRoute();
-  const isTrashView = computed(() => route.path.startsWith('/trash'));
+  const { isTrashRoute } = useCurrentRoute();
 
   const {
     masonryGrid,
@@ -96,7 +96,7 @@
     if (uiStore.isSelectMode) {
       notesStore.toggleNoteSelection(note.id);
     } else {
-      notesStore.openNote(note.id, isTrashView.value);
+      notesStore.openNote(note.id, isTrashRoute.value);
     }
   };
 

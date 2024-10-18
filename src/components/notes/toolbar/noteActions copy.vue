@@ -1,29 +1,8 @@
 <template>
   <div class="flex">
-    <Button
-      v-if="isNotePinned"
-      class="ml-2 md:ml-4"
-      @mouseenter="hoverPin = true"
-      @mouseleave="hoverPin = false"
-      @click="togglePin"
-    >
-      <PhPushPin v-if="!hoverPin" :size="20" class="size-5" />
-      <PhPushPinSlash v-else :size="20" class="size-5" />
-    </Button>
-    <Button
-      v-if="isNotePublic"
-      class="ml-2 md:ml-4"
-      @mouseenter="hoverPublic = true"
-      @mouseleave="hoverPublic = false"
-      @click="togglePublic"
-    >
-      <PhGlobe v-if="!hoverPublic" :size="20" class="size-5" />
-      <PhGlobeX v-else :size="20" class="size-5" />
-    </Button>
-
     <Dropdown
       ref="dropdownRef"
-      dropdownId="noteOptionsDropdown"
+      dropdownId="noteActionsDropdown"
       contentWidth="9.5rem"
       position="right"
       direction="down"
@@ -36,6 +15,13 @@
         </div>
       </template>
 
+      <DropdownItem
+        v-if="note.value.history"
+        @click="openVersionModal"
+        :icon="PhClockCounterClockwise"
+        label="Version History"
+      />
+
       <DropdownItem @click="closeNote" :icon="PhX" label="Close" />
 
       <DropdownItem
@@ -46,35 +32,35 @@
       />
 
       <DropdownItem
-        v-if="!isTrash"
+        v-if="!isTrashRoute"
         @click="copyNote"
         :icon="PhClipboardText"
         label="Copy"
       />
 
       <DropdownItem
-        v-if="!isTrash"
+        v-if="!isTrashRoute"
         @click="duplicateNote"
         :icon="PhCopy"
         label="Duplicate"
       />
 
       <DropdownItem
-        v-if="!isNotePinned && !isTrash"
+        v-if="!isNotePinned && !isTrashRoute"
         @click="togglePin"
         :icon="PhPushPin"
         label="Pin"
       />
 
       <DropdownItem
-        v-if="isNotePinned && !isTrash"
+        v-if="isNotePinned && !isTrashRoute"
         @click="togglePin"
         :icon="PhPushPinSlash"
         label="Unpin"
       />
 
       <DropdownSubmenu
-        v-if="authStore.isLoggedIn && !isTrash"
+        v-if="authStore.isLoggedIn && !isTrashRoute"
         :icon="isNotePublic ? PhGlobe : PhLock"
         :label="isNotePublic ? 'Public' : 'Private'"
         :modelValue="activeSubmenu === 'public'"
@@ -101,7 +87,7 @@
       </DropdownSubmenu>
 
       <DropdownSubmenu
-        v-if="!isTrash"
+        v-if="!isTrashRoute"
         :label="currentFolder"
         :icon="
           currentFolder !== DEFAULT_FOLDERS.UNCATEGORIZED
@@ -127,6 +113,32 @@
         />
       </DropdownSubmenu>
 
+      <DropdownSubmenu
+        v-if="note.value.history"
+        label="Version"
+        :icon="PhClockCounterClockwise"
+        :modelValue="activeSubmenu === 'version'"
+        @update:modelValue="toggleSubmenu('version', $event)"
+      >
+        <template v-for="{ date, entries } in sortedGroupedHistory" :key="date">
+          <DropdownSubmenu
+            :label="localeDate(date)"
+            :icon="PhCalendarBlank"
+            :modelValue="activeSubSubmenu === date"
+            @update:modelValue="toggleSubSubmenu(date, $event)"
+          >
+            <DropdownItem
+              v-for="(historyEntry, index) in entries"
+              :key="index"
+              :icon="PhClockCounterClockwise"
+              :label="formatTime(historyEntry.timestamp)"
+              :itemType="isCurrentVersion(historyEntry) ? 'active' : 'normal'"
+              @click="openNoteHistory(getHistoryIndex(historyEntry))"
+            />
+          </DropdownSubmenu>
+        </template>
+      </DropdownSubmenu>
+
       <DropdownItem
         v-if="isEditing"
         @click="deleteNote"
@@ -136,14 +148,14 @@
       />
 
       <DropdownItem
-        v-if="isTrash"
+        v-if="isTrashRoute"
         @click="restoreNote"
         :icon="PhClockClockwise"
         label="Restore"
       />
 
       <DropdownItem
-        v-if="isTrash"
+        v-if="isTrashRoute"
         @click="deleteNotePermanently"
         :icon="PhTrash"
         label="Delete"
@@ -154,14 +166,11 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, Ref } from 'vue';
+  import { ref, computed, Ref, onMounted } from 'vue';
   import {
     PhPushPin,
     PhPushPinSlash,
     PhGlobe,
-    PhGlobeX,
-    PhSpinnerGap,
-    PhCalendarCheck,
     PhTrash,
     PhDotsThreeCircle,
     PhX,
@@ -174,14 +183,15 @@
     PhFolderMinus,
     PhFolderDashed,
     PhClockClockwise,
+    PhClockCounterClockwise,
     PhCalendarBlank,
   } from '@phosphor-icons/vue';
-  import { Note } from '@/store/notesStore/types';
+  import { Note, NoteHistory } from '@/store/notesStore/types';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
-  import { localeDate } from '@/store/notesStore/helpers';
   import { useNoteManagement } from '@/utils/useNoteManagement';
-  import { uiStore, authStore } from '@/store';
-  import Button from '@/components/ui/button.vue';
+  import { uiStore, authStore, notesStore } from '@/store';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
+  import { localeDate } from '@/store/notesStore/helpers';
   import Dropdown from '@/components/ui/dropdown.vue';
   import DropdownItem from '@/components/ui/dropdownItem.vue';
   import DropdownSubmenu from '@/components/ui/dropdownSubmenu.vue';
@@ -189,7 +199,6 @@
   const props = defineProps<{
     note: Ref<Note>;
     isEditing: boolean;
-    isTrash: boolean;
     isSaving: boolean;
   }>();
 
@@ -211,15 +220,114 @@
     closeNote,
   } = useNoteManagement(props.note);
 
-  const hoverPin = ref(false);
-  const hoverPublic = ref(false);
-  const activeSubmenu = ref<'public' | 'folder' | null>(null);
+  const { isTrashRoute } = useCurrentRoute();
+
+  const activeSubmenu = ref<'public' | 'folder' | 'version' | null>(null);
   const isExpanded = computed(() => uiStore.isExpanded);
   const isMobile = computed(() => window.innerWidth <= 768);
 
-  const toggleSubmenu = (submenu: 'public' | 'folder', isOpen: boolean) => {
+  const toggleSubmenu = (
+    submenu: 'public' | 'folder' | 'version',
+    isOpen: boolean
+  ) => {
     activeSubmenu.value = isOpen ? submenu : null;
   };
 
+  const openVersionModal = () => {
+    uiStore.openVersionModal({
+      cancel: () => {
+        // Handle cancel action if needed
+      },
+      confirm: () => {
+        // Handle confirm action if needed
+      },
+    });
+  };
+
   const toggleExpand = () => uiStore.toggleExpand();
+
+  const currentHistoryIndex = computed(() => notesStore.currentHistoryIndex);
+
+  function openNoteHistory(index: number) {
+    notesStore.currentHistoryIndex = index;
+    if (index === -1 || !props.note.value.history) {
+      props.note.value.title = props.note.value.title;
+      props.note.value.content = props.note.value.content;
+      props.note.value.last_edited = props.note.value.last_edited;
+    } else if (
+      props.note.value.history &&
+      index < props.note.value.history.length
+    ) {
+      const historyEntry = props.note.value.history[index];
+      props.note.value.title = historyEntry.title;
+      props.note.value.content = historyEntry.content;
+      props.note.value.last_edited = historyEntry.timestamp;
+    } else {
+      uiStore.showToastMessage('History not available');
+    }
+  }
+
+  const activeSubSubmenu = ref<string | null>(null);
+
+  const groupedHistory = computed(() => {
+    if (!props.note.value.history) return {};
+
+    return props.note.value.history.reduce(
+      (acc, entry) => {
+        const date = new Date(entry.timestamp).toDateString();
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(entry);
+        return acc;
+      },
+      {} as Record<string, NoteHistory[]>
+    );
+  });
+
+  const sortedGroupedHistory = computed(() => {
+    const sortedDates = Object.keys(groupedHistory.value).sort(
+      (a, b) => new Date(b).getTime() - new Date(a).getTime()
+    );
+
+    return sortedDates.map((date) => ({
+      date,
+      entries: groupedHistory.value[date].sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      ),
+    }));
+  });
+
+  const toggleSubSubmenu = (date: string, isOpen: boolean) => {
+    activeSubSubmenu.value = isOpen ? date : null;
+  };
+
+  const formatTime = (timestamp: string | Date) => {
+    return new Date(timestamp).toLocaleTimeString(undefined, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  };
+
+  const isCurrentVersion = (historyEntry: NoteHistory) => {
+    return getHistoryIndex(historyEntry) === currentHistoryIndex.value;
+  };
+
+  const getHistoryIndex = (historyEntry: NoteHistory) => {
+    return (
+      props.note.value.history?.findIndex(
+        (entry) => entry.timestamp === historyEntry.timestamp
+      ) ?? -1
+    );
+  };
+
+  onMounted(() => {
+    if (props.note.value.history && props.note.value.history.length > 0) {
+      notesStore.currentHistoryIndex = props.note.value.history.length - 1;
+    } else {
+      notesStore.currentHistoryIndex = null;
+    }
+  });
 </script>

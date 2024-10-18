@@ -9,7 +9,6 @@ import {
   createPublicNote,
   sanitizeNoteContent,
   getNoteById,
-  reorderNotes,
 } from '../helpers';
 
 export const createNote = async (

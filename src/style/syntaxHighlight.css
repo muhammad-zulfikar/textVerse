@@ -97,7 +97,8 @@
   background-color: #d9c698;
   padding: 2px 4px;
   border-radius: 3px;
-  font-family: serif;
+  font-family: monospace;
+  font-size: 13px;
 }
 
 .dark .syntax code,

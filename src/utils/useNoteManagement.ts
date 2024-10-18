@@ -1,6 +1,6 @@
 // useNoteManagement.ts
 
-import { ref, Ref, computed } from 'vue';
+import { Ref, computed } from 'vue';
 import { notesStore, folderStore, uiStore } from '@/store';
 import { Note } from '@/store/notesStore/types';
 import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
@@ -19,7 +19,7 @@ export function useNoteManagement(note: Ref<Note>, hideMenu?: () => void) {
     notesStore.pinnedNotes.has(note.value.id)
   );
 
-  const currentFolder = ref(note.value.folder);
+  const currentFolder = computed(() => note.value.folder);
 
   const togglePublic = () => {
     notesStore.togglePublic(note.value.id);
@@ -97,7 +97,6 @@ export function useNoteManagement(note: Ref<Note>, hideMenu?: () => void) {
 
   const moveNote = async (newFolder: string) => {
     await notesStore.moveNote(note.value.id, newFolder);
-    currentFolder.value = newFolder;
     hideMenu?.();
   };
 

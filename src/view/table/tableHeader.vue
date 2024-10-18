@@ -32,7 +32,7 @@
     PhTextT,
     PhArticle,
     PhFolder,
-    PhCalendar,
+    PhCalendarBlank,
   } from '@phosphor-icons/vue';
 
   defineProps<{
@@ -54,7 +54,7 @@
       case 'Folder':
         return PhFolder;
       case 'Date':
-        return PhCalendar;
+        return PhCalendarBlank;
       default:
         return null;
     }

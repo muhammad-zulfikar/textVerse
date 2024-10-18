@@ -1,9 +1,10 @@
 <template>
   <div
-    class="absolute top-0 -left-3 card-rounded hover:bg-cream-200 dark:hover:bg-gray-700 transition-opacity duration-200"
+    class="absolute top-0 -left-3 card-rounded md:hover:bg-cream-200 md:dark:hover:bg-gray-700 transition-opacity duration-200"
     :class="{
       'opacity-100': isSelected || uiStore.isSelectMode,
-      'opacity-0 group-hover:opacity-100': !isSelected && !uiStore.isSelectMode,
+      'opacity-0 md:group-hover:opacity-100':
+        !isSelected && !uiStore.isSelectMode,
     }"
     @click.stop="toggleNoteSelection(note.id)"
     style="transform: translateY(-50%)"

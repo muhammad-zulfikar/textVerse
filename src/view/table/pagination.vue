@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex justify-between items-center font-serif text-gray-600 dark:text-gray-400 text-sm"
+    class="flex justify-between items-center font-serif text-gray-600 dark:text-gray-400 text-xs md:text-sm"
   >
     <div class="flex items-center space-x-2">
       <p>Rows per page:</p>
@@ -29,32 +29,32 @@
       </Dropdown>
     </div>
     <div>Page {{ currentPage }} of {{ totalPages }}</div>
-    <div class="flex space-x-2">
+    <div class="flex space-x-1 md:space-x-2">
       <Button
         @click="goToFirstPage"
         :disabled="currentPage === 1"
-        class="py-[5px]"
+        class="px-[6px] py-[5px]"
       >
         <PhCaretDoubleLeft :size="16" />
       </Button>
       <Button
         @click="goToPreviousPage"
         :disabled="currentPage === 1"
-        class="py-[5px]"
+        class="px-[6px] py-[5px]"
       >
         <PhCaretLeft :size="16" />
       </Button>
       <Button
         @click="goToNextPage"
         :disabled="currentPage === totalPages"
-        class="py-[5px]"
+        class="px-[6px] py-[5px]"
       >
         <PhCaretRight :size="16" />
       </Button>
       <Button
         @click="goToLastPage"
         :disabled="currentPage === totalPages"
-        class="py-[5px]"
+        class="px-[6px] py-[5px]"
       >
         <PhCaretDoubleRight :size="16" />
       </Button>

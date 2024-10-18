@@ -1,3 +1,4 @@
+import { NoteHistory } from '../notesStore/types';
 import { Theme, ViewType, NoteViewType, SortType } from './types';
 
 export interface UIState {
@@ -16,6 +17,12 @@ export interface UIState {
     message: string;
     cancel: () => void;
     confirm: () => void;
+  } | null;
+
+  versionOptions: {
+    cancel: () => void;
+    preview: (version: NoteHistory) => void;
+    apply: () => void;
   } | null;
 
   inputModalOptions: {
@@ -58,6 +65,8 @@ export default (): UIState => ({
   toastTimeout: null,
 
   alertOptions: null,
+
+  versionOptions: null,
 
   inputModalOptions: null,
 
