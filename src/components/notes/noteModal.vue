@@ -28,10 +28,9 @@
 <script setup lang="ts">
   import { ref, computed, watch, onUnmounted, nextTick, onMounted } from 'vue';
   import { Note, NoteHistory } from '@/store/notesStore/types';
-  import { notesStore, uiStore, authStore } from '@/store';
+  import { notesStore, uiStore } from '@/store';
   import {
     hasChanged,
-    setupNoteListener,
     debouncedSaveNote,
     createEmptyNote,
     handleNoteClose,
@@ -133,12 +132,6 @@
           if (note) {
             editedNote.value = { ...note };
             initialNote.value = { ...note };
-            // setupNoteListener(
-            //   newNoteId,
-            //   editedNote,
-            //   initialNote,
-            //   authStore.user?.uid
-            // );
             isEditing.value = !isTrash;
             isNewNote.value = false;
           }
