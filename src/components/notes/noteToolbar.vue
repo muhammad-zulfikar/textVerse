@@ -6,11 +6,11 @@
     <div class="ml-auto">
       <NoteActions
         :note="note"
-        :is-editing="isEditing"
-        :is-saving="isSaving"
-        :is-viewing-history="isViewingHistory"
+        :isEditing="isEditing"
+        :isHistory="isHistory"
         @previewVersion="emitPreviewVersion"
         @applyVersion="emitApplyVersion"
+        @exitHistory="emitExitHistory"
       />
     </div>
   </div>
@@ -26,14 +26,13 @@
   const props = defineProps<{
     note: Ref<Note>;
     isEditing: boolean;
-    hasChanges: boolean;
-    isSaving: boolean;
-    isViewingHistory: boolean;
+    isHistory: boolean;
   }>();
 
   const emit = defineEmits<{
     (e: 'previewVersion', version: NoteHistory): void;
     (e: 'applyVersion'): void;
+    (e: 'exitHistory'): void;
   }>();
 
   const { editTitle, saveTitle } = useNoteTitle(props.note);
@@ -44,5 +43,9 @@
 
   const emitApplyVersion = () => {
     emit('applyVersion');
+  };
+
+  const emitExitHistory = () => {
+    emit('exitHistory');
   };
 </script>

@@ -74,16 +74,7 @@
     }
   );
 
-  const focusEditor = () => {
-    if (editorRef.value) {
-      editorRef.value.focus();
-    }
-  };
-
-  provide('focusEditor', focusEditor);
   provide('openImageModal', openImageModal);
-
-  defineExpose({ focusEditor });
 </script>
 
 <style scoped>

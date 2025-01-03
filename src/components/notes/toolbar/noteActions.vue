@@ -116,14 +116,20 @@
       />
 
       <DropdownItem
-        v-if="isViewingHistory"
+        v-if="isHistory"
+        @click="backToLatest"
+        :icon="PhArrowClockwise"
+        label="Back to Latest"
+      />
+
+      <DropdownItem
+        v-if="isHistory && !isTrashRoute"
         @click="applyVersion"
         :icon="PhCheck"
         label="Apply Version"
       />
 
       <DropdownItem
-        v-if="isEditing"
         @click="deleteNote"
         :icon="PhTrash"
         label="Delete"
@@ -168,6 +174,7 @@
     PhFolderDashed,
     PhClockClockwise,
     PhClockCounterClockwise,
+    PhArrowClockwise,
   } from '@phosphor-icons/vue';
   import { Note, NoteHistory } from '@/store/notesStore/types';
   import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
@@ -181,8 +188,7 @@
   const props = defineProps<{
     note: Ref<Note>;
     isEditing: boolean;
-    isSaving: boolean;
-    isViewingHistory: boolean;
+    isHistory: boolean;
   }>();
 
   const {
@@ -229,14 +235,33 @@
   };
 
   const applyVersion = () => {
-    if (props.isViewingHistory) {
+    if (props.isHistory) {
       emit('applyVersion');
     }
+  };
+
+  const backToLatest = () => {
+    const latestVersion = {
+      title: props.note.value.title,
+      content: props.note.value.content,
+    };
+
+    if (props.note.value.history?.length) {
+      const currentVersion = {
+        timestamp: props.note.value.last_edited || new Date().toISOString(),
+        title: latestVersion.title,
+        content: latestVersion.content,
+      };
+      emit('previewVersion', currentVersion);
+    }
+
+    emit('exitHistory');
   };
 
   const emit = defineEmits<{
     (e: 'previewVersion', version: NoteHistory): void;
     (e: 'applyVersion'): void;
+    (e: 'exitHistory'): void;
   }>();
 
   const toggleExpand = () => uiStore.toggleExpand();

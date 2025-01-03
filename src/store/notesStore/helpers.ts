@@ -1,11 +1,8 @@
-import { Note, NoteHistory, PublicNote } from './types';
+import { Note, PublicNote } from './types';
 import { NotesState } from './state';
 import { DEFAULT_FOLDERS } from '@/store/folderStore/constants';
 import DOMPurify from 'dompurify';
-import { ref as dbRef, onValue } from 'firebase/database';
-import { db } from '@/firebase';
-import { Ref } from 'vue';
-import { uiStore, notesStore, folderStore } from '@/store';
+import { folderStore } from '@/store';
 
 export const setSearchQuery = (state: NotesState, query: string): void => {
   state.searchQuery = query;
@@ -83,7 +80,7 @@ export function areValidNotes(notes: any[]): notes is Note[] {
   );
 }
 
-export function hasChanged(
+export function hasChanges(
   initialNote: Note,
   editedNote: Partial<Note>
 ): boolean {
@@ -196,152 +193,4 @@ export function createEmptyNote(): Note {
     content: '',
     folder: folderStore.currentFolder,
   });
-}
-
-let saveNoteTimeout: number | null = null;
-
-export function debouncedSaveNote(
-  editedNote: Ref<Note>,
-  isNewNote: Ref<boolean>,
-  isSaving: Ref<boolean>,
-  isTrash: boolean
-) {
-  if (isTrash) return;
-
-  if (isNewNote.value && isContentEmpty(editedNote.value.content)) {
-    uiStore.showToastMessage('Empty note discarded');
-    return;
-  }
-
-  if (saveNoteTimeout !== null) {
-    clearTimeout(saveNoteTimeout);
-  }
-
-  saveNoteTimeout = window.setTimeout(async () => {
-    try {
-      isSaving.value = true;
-      await saveNote(editedNote, isNewNote);
-    } catch (error) {
-      console.error('Error saving note:', error);
-      uiStore.showToastMessage('Failed to save note. Please try again.');
-    } finally {
-      isSaving.value = false;
-      saveNoteTimeout = null;
-    }
-  }, 2000);
-}
-
-async function saveNote(editedNote: Ref<Note>, isNewNote: Ref<boolean>) {
-  const currentTime = new Date().toISOString();
-
-  if (!isNewNote.value) {
-    const lastHistory =
-      editedNote.value.history?.[editedNote.value.history.length - 1];
-    const hasChanges =
-      !lastHistory ||
-      lastHistory.title !== editedNote.value.title ||
-      lastHistory.content !== editedNote.value.content;
-
-    if (hasChanges) {
-      const newHistoryEntry: NoteHistory = {
-        timestamp: currentTime,
-        title: editedNote.value.title,
-        content: editedNote.value.content,
-      };
-
-      const updatedNote = {
-        ...editedNote.value,
-        last_edited: currentTime,
-        history: [...(editedNote.value.history || []), newHistoryEntry],
-      };
-      await notesStore.updateNote(updatedNote.id, updatedNote);
-
-      editedNote.value = { ...updatedNote };
-    } else {
-      const updatedNote = {
-        ...editedNote.value,
-        last_edited: currentTime,
-      };
-      await notesStore.updateNote(updatedNote.id, updatedNote);
-
-      editedNote.value = { ...updatedNote };
-    }
-  } else {
-    const newHistoryEntry: NoteHistory = {
-      timestamp: currentTime,
-      title: editedNote.value.title,
-      content: editedNote.value.content,
-    };
-
-    const newNote = {
-      ...editedNote.value,
-      last_edited: currentTime,
-      history: [newHistoryEntry],
-    };
-    const createdNote = await notesStore.createNote(newNote);
-    editedNote.value = { ...createdNote };
-    isNewNote.value = false;
-  }
-}
-
-export function setupNoteListener(
-  noteId: string,
-  editedNote: Ref<Note>,
-  initialNote: Ref<Note | null>,
-  userId: string | undefined
-) {
-  if (userId) {
-    const noteRef = dbRef(db, `users/${userId}/notes/${noteId}`);
-    return onValue(noteRef, (snapshot) => {
-      const updatedNote = snapshot.val();
-      if (updatedNote && updatedNote.id === editedNote.value.id) {
-        editedNote.value = { ...updatedNote };
-        initialNote.value = { ...updatedNote };
-      }
-    });
-  }
-}
-
-export async function handleNoteClose(
-  editedNote: Ref<Note>,
-  isNewNote: Ref<boolean>,
-  isTrash: boolean,
-  initialNote: Ref<Note | null>
-) {
-  if (isTrash) {
-    await setLatestNoteVersion(editedNote);
-    return;
-  }
-
-  if (isNewNote.value && isContentEmpty(editedNote.value.content)) {
-    uiStore.showToastMessage('Empty note discarded');
-    return;
-  }
-
-  const hasChanges = initialNote.value
-    ? hasChanged(initialNote.value, editedNote.value)
-    : true;
-
-  if (hasChanges) {
-    if (
-      notesStore.currentHistoryIndex === null ||
-      (editedNote.value.history &&
-        notesStore.currentHistoryIndex === editedNote.value.history.length - 1)
-    ) {
-      await saveNote(editedNote, isNewNote);
-    }
-  }
-
-  await setLatestNoteVersion(editedNote);
-}
-
-async function setLatestNoteVersion(editedNote: Ref<Note>) {
-  if (editedNote.value.history && editedNote.value.history.length > 0) {
-    const latestHistory =
-      editedNote.value.history[editedNote.value.history.length - 1];
-    editedNote.value.title = latestHistory.title;
-    editedNote.value.content = latestHistory.content;
-    editedNote.value.last_edited = latestHistory.timestamp;
-  }
-  notesStore.currentHistoryIndex = null;
 }

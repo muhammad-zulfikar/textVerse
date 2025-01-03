@@ -19,6 +19,13 @@ export interface UIState {
     confirm: () => void;
   } | null;
 
+  saveAlertOptions: {
+    message: string;
+    cancel: () => void;
+    save: () => void;
+    dontSave?: () => void;
+  } | null;
+
   versionOptions: {
     cancel: () => void;
     preview: (version: NoteHistory) => void;
@@ -65,6 +72,8 @@ export default (): UIState => ({
   toastTimeout: null,
 
   alertOptions: null,
+
+  saveAlertOptions: null,
 
   versionOptions: null,
 

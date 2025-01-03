@@ -15,7 +15,6 @@
 
 <script setup lang="ts">
   import Backdrop from './backdrop.vue';
-  import { uiStore } from '@/store';
 
   const props = defineProps<{
     modelValue: boolean;
@@ -33,6 +32,5 @@
 
   const closeModal = () => {
     emit('close');
-    uiStore.setActiveModal(null);
   };
 </script>

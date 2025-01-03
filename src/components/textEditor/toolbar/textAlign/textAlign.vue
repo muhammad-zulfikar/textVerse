@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, inject } from 'vue';
+  import { ref, onMounted, onUnmounted } from 'vue';
   import {
     PhTextAlignLeft,
     PhTextAlignCenter,
@@ -49,12 +49,10 @@
   ];
 
   const activeStates = ref<Record<string, boolean>>({});
-  const focusEditor = inject('focusEditor') as () => void;
 
   const applyStyle = (command: string) => {
     document.execCommand(command, false);
     updateActiveState();
-    focusEditor();
   };
 
   const isActive = (command: string): boolean => !!activeStates.value[command];

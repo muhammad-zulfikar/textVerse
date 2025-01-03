@@ -26,6 +26,20 @@ export const openAlertModal = (
   state.alertOptions = options;
 };
 
+export const openSaveAlertModal = (
+  state: UIState,
+  options: {
+    message: string;
+    cancel: () => void;
+    save: () => void;
+    dontSave: () => void;
+  }
+) => {
+  state.activeDropdown = null;
+  state.activeModal = 'saveAlert';
+  state.saveAlertOptions = options;
+};
+
 export const openVersionModal = (
   state: UIState,
   options: {

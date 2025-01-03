@@ -1,5 +1,5 @@
 <template>
-  <Modal :modelValue="isOpen" id="signIn">
+  <Modal :modelValue="isOpen" id="signIn" @close="handleClose">
     <div
       class="card w-11/12 md:w-[500px] h-[500px] font-serif px-10 py-8 relative flex flex-col mx-auto"
     >
@@ -166,6 +166,9 @@
   import Button from '@/components/ui/button.vue';
 
   const isOpen = computed(() => uiStore.activeModal === 'signIn');
+  function handleClose() {
+    uiStore.setActiveModal(null);
+  }
 
   const router = useRouter();
   const email = ref('');

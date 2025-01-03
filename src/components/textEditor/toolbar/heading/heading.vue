@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted, onUnmounted, markRaw, inject } from 'vue';
+  import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue';
   import {
     PhCaretDown,
     PhTextT,
@@ -60,8 +60,6 @@
     markRaw
   );
   const currentHeadingIcon = ref(headingIcons[0]);
-
-  const focusEditor = inject('focusEditor') as () => void;
 
   const toggleHeadingDropdown = () => {
     isHeadingDropdownOpen.value = !isHeadingDropdownOpen.value;
@@ -96,7 +94,6 @@
 
     updateCurrentHeading();
     isHeadingDropdownOpen.value = false;
-    focusEditor();
   };
 
   const handleOutsideClick = (event: MouseEvent) => {

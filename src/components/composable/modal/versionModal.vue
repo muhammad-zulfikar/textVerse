@@ -98,9 +98,16 @@
   import { uiStore, notesStore } from '@/store';
   import { NoteHistory } from '@/store/notesStore/types';
   import Separator from '@/components/ui/separator.vue';
+  import { useCurrentRoute } from '@/utils/useCurrentRoute';
+
+  const { isTrashRoute } = useCurrentRoute();
 
   const isOpen = computed(() => uiStore.activeModal === 'version');
-  const selectedNote = computed(() => notesStore.selectedNote);
+  const selectedNote = computed(() =>
+    isTrashRoute.value
+      ? notesStore.deletedNotes.find((n) => n.id === notesStore.selectedNoteId)
+      : notesStore.selectedNote
+  );
 
   const groupedHistory = computed(() => {
     if (!selectedNote.value?.history) return {};
